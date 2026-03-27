@@ -20,7 +20,7 @@ export const fetchOutlookEmails = async (userId: number) => {
     return messages.map((msg: any) => ({
       id: msg.id,
       subject: msg.subject,
-      from: msg.from?.emailAddress?.address,
+      sender: msg.from?.emailAddress?.address,
       body: msg.bodyPreview || msg.body?.content,
     }));
   } catch (error: any) {

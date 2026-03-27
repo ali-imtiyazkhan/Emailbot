@@ -83,9 +83,11 @@ export async function deleteFilter(id: number): Promise<void> {
 }
 
 export async function fetchEmails(): Promise<ProcessedEmail[]> {
-  const response = await fetch(`${API_BASE_URL}/emails`);
+  const response = await fetch(`${API_BASE_URL}/emails?limit=50`);
   if (!response.ok) throw new Error('Failed to fetch emails');
-  return response.json();
+  const result = await response.json();
+  // API now returns { data, total, page, limit, totalPages }
+  return result.data ?? result;
 }
 
 export async function fetchAccounts(): Promise<EmailAccount[]> {

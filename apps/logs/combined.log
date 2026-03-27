@@ -1,0 +1,22 @@
+{"level":"info","message":"EmailBot API running on port 3001","timestamp":"2026-03-27T21:50:28.511Z"}
+{"level":"info","message":"Connected to Redis","timestamp":"2026-03-27T21:50:28.530Z"}
+{"level":"info","message":"Email processing worker initialized.","timestamp":"2026-03-27T21:50:40.213Z"}
+{"level":"info","message":"EmailBot API running on port 3001","timestamp":"2026-03-27T21:50:40.235Z"}
+{"level":"info","message":"Connected to Redis","timestamp":"2026-03-27T21:50:40.243Z"}
+{"level":"info","message":"Email processing worker initialized.","timestamp":"2026-03-27T21:53:15.023Z"}
+{"level":"info","message":"EmailBot API running on port 3001","timestamp":"2026-03-27T21:53:15.081Z"}
+{"level":"info","message":"Connected to Redis","timestamp":"2026-03-27T21:53:15.094Z"}
+{"level":"info","message":"Scheduler initialized.","timestamp":"2026-03-27T21:58:15.792Z"}
+{"level":"info","message":"Email processing worker initialized.","timestamp":"2026-03-27T21:58:15.808Z"}
+{"level":"info","message":"EmailBot API running on port 3001","timestamp":"2026-03-27T21:58:15.877Z"}
+{"level":"info","message":"Connected to Redis","timestamp":"2026-03-27T21:58:15.895Z"}
+{"level":"info","message":"Scheduler initialized.","timestamp":"2026-03-27T21:58:34.322Z"}
+{"level":"info","message":"Email processing worker initialized.","timestamp":"2026-03-27T21:58:34.326Z"}
+{"level":"info","message":"EmailBot API running on port 3001","timestamp":"2026-03-27T21:58:34.338Z"}
+{"level":"info","message":"Connected to Redis","timestamp":"2026-03-27T21:58:34.349Z"}
+{"level":"info","message":"Scheduler initialized.","timestamp":"2026-03-27T21:58:38.544Z"}
+{"level":"info","message":"Email processing worker initialized.","timestamp":"2026-03-27T21:58:38.551Z"}
+{"level":"info","message":"EmailBot API running on port 3001","timestamp":"2026-03-27T21:58:38.573Z"}
+{"level":"info","message":"Connected to Redis","timestamp":"2026-03-27T21:58:38.590Z"}
+{"level":"info","message":"Running scheduled email check...","timestamp":"2026-03-27T22:00:00.210Z"}
+{"level":"info","message":"Starting multi-user email processing (Producer)...","timestamp":"2026-03-27T22:00:00.220Z"}
