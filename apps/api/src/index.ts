@@ -10,6 +10,7 @@ import authRoutes from './routes/auth.js';
 import webhookRoutes from './routes/webhook.js';
 import dashboardRoutes from './routes/dashboard.js';
 import { initScheduler } from './services/scheduler.js';
+import { initWorker } from './services/queueService.js';
 
 dotenv.config();
 
@@ -33,8 +34,9 @@ app.use('/auth', authRoutes);
 app.use('/whatsapp', webhookRoutes);
 app.use('/api', dashboardRoutes);
 
-// Initialize Scheduler
+// Initialize Services
 initScheduler();
+initWorker();
 
 // Start server
 app.listen(PORT, () => {
