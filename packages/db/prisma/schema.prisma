@@ -1,0 +1,74 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id             Int             @id @default(autoincrement())
+  email          String          @unique
+  name           String?
+  whatsapp       String?         // user's WhatsApp number
+  createdAt      DateTime        @default(now())
+  accounts       EmailAccount[]
+  filterRules    FilterRule[]
+  processedEmails ProcessedEmail[]
+  digestSettings DigestSetting?
+}
+
+model EmailAccount {
+  id           Int              @id @default(autoincrement())
+  userId       Int
+  user         User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  provider     String           // 'gmail' | 'outlook'
+  email        String
+  accessToken  String?
+  refreshToken String?
+  tokenExpiry  DateTime?
+  isActive     Boolean          @default(true)
+  lastSynced   DateTime?
+  createdAt    DateTime         @default(now())
+  emails       ProcessedEmail[]
+}
+
+model FilterRule {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  ruleType  String   // 'sender' | 'keyword' | 'priority_min'
+  value     String
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+}
+
+model ProcessedEmail {
+  id             Int          @id @default(autoincrement())
+  userId         Int
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  emailAccountId Int
+  emailAccount   EmailAccount @relation(fields: [emailAccountId], references: [id], onDelete: Cascade)
+  messageId      String       // provider's unique message ID
+  subject        String?
+  sender         String?
+  summary        String?
+  priorityScore  Int?         // 1–10
+  notified       Boolean      @default(false)
+  digestIncluded Boolean      @default(false)
+  receivedAt     DateTime?
+  processedAt    DateTime     @default(now())
+
+  @@unique([userId, messageId])
+}
+
+model DigestSetting {
+  id        Int     @id @default(autoincrement())
+  userId    Int     @unique
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  enabled   Boolean @default(true)
+  sendTime  String  @default("08:00")
+  timezone  String  @default("UTC")
+  minEmails Int     @default(1)
+}

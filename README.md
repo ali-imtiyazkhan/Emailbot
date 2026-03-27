@@ -1,159 +1,90 @@
-# Turborepo starter
+# 📧 EmailBot — Get Emails on WhatsApp
 
-This Turborepo starter is maintained by the Turborepo core team.
+Most people's email inboxes are overflowing with spam and newsletters, which makes it easy to miss truly important messages. **EmailBot** acts as a personal assistant that watches your inbox for you. It uses AI to read your incoming mail, summarizes only the most critical messages, and sends those summaries directly to your WhatsApp. This way, you stay on top of your important business without ever having to open your cluttered inbox throughout the day.
 
-## Using this example
+---
 
-Run the following command:
+## ✨ Features
 
-```sh
-npx create-turbo@latest
+- **Multi-Service Support**: Connect both Gmail and Outlook via OAuth2.
+- **AI-Powered Summaries**: Important emails are summarized and scored (1–10) by Anthropic Claude.
+- **Multi-User Architecture**: Built to handle multiple users with isolated accounts and rules.
+- **Premium Dashboard**: Manage your connections and filters through a sleek Next.js dashboard.
+- **WhatsApp Alerts**: Real-time notifications for high-priority emails.
+- **Daily Digest**: Summarized morning reports of your daily inbox.
+
+---
+
+## 🛠️ Tech Stack
+
+- **Monorepo**: [Turborepo](https://turbo.build/)
+- **Frontend**: [Next.js 15+](https://nextjs.org/) (App Router) + Tailwind CSS
+- **Backend**: [Node.js](https://nodejs.org/) + [Express](https://expressjs.com/)
+- **Database**: [PostgreSQL](https://www.postgresql.org/) via [Prisma ORM](https://www.prisma.io/)
+- **AI**: [Anthropic Claude API](https://www.anthropic.com/)
+- **WhatsApp**: [Meta WhatsApp Cloud API](https://developers.facebook.com/docs/whatsapp/cloud-api)
+- **Email**: Gmail API & Microsoft Graph API
+
+---
+
+## 📂 Project Structure
+
+```text
+emailbot/
+├── apps/
+│   ├── api/          # Node.js/Express Backend
+│   └── web/          # Next.js Frontend Dashboard
+├── packages/
+│   ├── db/           # Shared Prisma client & Schema (PostgreSQL)
+│   ├── ui/           # Shared UI components
+│   └── typescript-config/ # Shared TS configurations
+├── data/             # Local data storage (logs/backups)
+└── turbo.json        # Turborepo configuration
 ```
 
-## What's inside?
+---
 
-This Turborepo includes the following packages/apps:
+## 🚀 Getting Started
 
-### Apps and Packages
+### 1. Prerequisites
+- Node.js 18+
+- Docker (for PostgreSQL) or a local Postgres instance
+- Meta WhatsApp Cloud API credentials
+- Anthropic API Key
 
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
+### 2. Installation
+```bash
+# Clone the repository
+git clone <your-repo>
+cd emailbot
 
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
+# Install dependencies
+npm install
 
-### Utilities
-
-This Turborepo has some additional tools already setup for you:
-
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
-
-### Build
-
-To build all apps and packages, run the following command:
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
-
-```sh
-cd my-turborepo
-turbo build
+# Set up environment variables
+cp .env.example .env
 ```
 
-Without global `turbo`, use your package manager:
+### 3. Database Setup
+```bash
+# Generate Prisma client
+npm run generate -w @repo/db
 
-```sh
-cd my-turborepo
-npx turbo build
-yarn dlx turbo build
-pnpm exec turbo build
+# Push schema to database
+cd packages/db
+npx prisma db push
 ```
 
-You can build a specific package by using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
+### 4. Running the Project
+```bash
+# Start all apps (api + web) in dev mode
+npm run dev
 
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
-
-```sh
-turbo build --filter=docs
+# Build the entire monorepo
+npm run build
 ```
 
-Without global `turbo`:
+---
 
-```sh
-npx turbo build --filter=docs
-yarn exec turbo build --filter=docs
-pnpm exec turbo build --filter=docs
-```
-
-### Develop
-
-To develop all apps and packages, run the following command:
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
-
-```sh
-cd my-turborepo
-turbo dev
-```
-
-Without global `turbo`, use your package manager:
-
-```sh
-cd my-turborepo
-npx turbo dev
-yarn exec turbo dev
-pnpm exec turbo dev
-```
-
-You can develop a specific package by using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
-
-```sh
-turbo dev --filter=web
-```
-
-Without global `turbo`:
-
-```sh
-npx turbo dev --filter=web
-yarn exec turbo dev --filter=web
-pnpm exec turbo dev --filter=web
-```
-
-### Remote Caching
-
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
-
-Turborepo can use a technique known as [Remote Caching](https://turborepo.dev/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
-
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
-
-```sh
-cd my-turborepo
-turbo login
-```
-
-Without global `turbo`, use your package manager:
-
-```sh
-cd my-turborepo
-npx turbo login
-yarn exec turbo login
-pnpm exec turbo login
-```
-
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
-
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
-
-```sh
-turbo link
-```
-
-Without global `turbo`:
-
-```sh
-npx turbo link
-yarn exec turbo link
-pnpm exec turbo link
-```
-
-## Useful Links
-
-Learn more about the power of Turborepo:
-
-- [Tasks](https://turborepo.dev/docs/crafting-your-repository/running-tasks)
-- [Caching](https://turborepo.dev/docs/crafting-your-repository/caching)
-- [Remote Caching](https://turborepo.dev/docs/core-concepts/remote-caching)
-- [Filtering](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters)
-- [Configuration Options](https://turborepo.dev/docs/reference/configuration)
-- [CLI Usage](https://turborepo.dev/docs/reference/command-line-reference)
+## 📝 License
+MIT
