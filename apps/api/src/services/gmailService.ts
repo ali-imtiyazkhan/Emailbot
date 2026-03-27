@@ -49,7 +49,7 @@ export const fetchLatestEmails = async (userId: number) => {
       body = Buffer.from(payload?.body?.data as string || '', 'base64').toString();
     }
 
-    emails.push({ id: msg.id, subject, from, body });
+    emails.push({ id: msg.id, subject, sender: from, body });
   }
 
   return emails;

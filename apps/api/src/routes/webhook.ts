@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import db from '../config/db.js';
 import { sendTextMessage } from '../services/whatsappService.js';
-
+import logger from '../utils/logger.js';
 const router = Router();
 
 // Webhook verification
@@ -27,7 +27,7 @@ router.post('/webhook', async (req, res) => {
   if (message) {
     const text = message.text?.body?.toUpperCase();
     const from = message.from;
-    console.log('Received WhatsApp command:', text, 'from:', from);
+    logger.info('Received WhatsApp command:', { text, from });
     
     // Find the user by WhatsApp number
     const user = await db.user.findFirst({ where: { whatsapp: from } });

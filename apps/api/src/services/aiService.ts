@@ -1,5 +1,6 @@
 import Anthropic from '@anthropic-ai/sdk';
 import dotenv from 'dotenv';
+import logger from '../utils/logger.js';
 
 dotenv.config();
 
@@ -15,7 +16,7 @@ export interface EmailSummary {
 
 export const summarizeEmail = async (subject: string, body: string): Promise<EmailSummary> => {
   if (!process.env.ANTHROPIC_API_KEY) {
-    console.warn('ANTHROPIC_API_KEY not set, skipping AI summarization');
+    logger.warn('ANTHROPIC_API_KEY not set, skipping AI summarization');
     return { summary: body.substring(0, 100) + '...', priority: 5, category: 'unknown' };
   }
 
@@ -45,7 +46,7 @@ export const summarizeEmail = async (subject: string, body: string): Promise<Ema
     }
     throw new Error('Unexpected response format from Claude');
   } catch (error) {
-    console.error('Error calling AI service:', error);
+    logger.error('Error calling AI service:', error);
     return { summary: 'Error summarizing email', priority: 5, category: 'error' };
   }
 };

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import Link from "next/link";
 import { fetchStats, fetchFilters, fetchEmails, Stats, FilterRule, ProcessedEmail } from "@/lib/api";
 
 export default function DashboardPage() {
@@ -128,12 +129,12 @@ export default function DashboardPage() {
               <h2 className="text-xl font-black mb-0.5">Recent Activity</h2>
               <p className="text-xs text-slate-500 font-medium">Latest processed emails</p>
             </div>
-            <a
+            <Link
               href="/emails"
               className="text-indigo-400 text-xs font-bold uppercase tracking-wider hover:text-indigo-300 transition-colors"
             >
               View all →
-            </a>
+            </Link>
           </div>
 
           {recentEmails.length === 0 ? (
@@ -187,7 +188,7 @@ export default function DashboardPage() {
           <div className="glass rounded-2xl p-6 gradient-border">
             <h3 className="text-sm font-black uppercase tracking-wider text-slate-400 mb-5">Quick Actions</h3>
             <div className="space-y-3">
-              <a href="/rules" className="flex items-center gap-3 p-3 rounded-xl bg-indigo-500/5 hover:bg-indigo-500/10 border border-indigo-500/10 transition-colors group">
+              <Link href="/rules" className="flex items-center gap-3 p-3 rounded-xl bg-indigo-500/5 hover:bg-indigo-500/10 border border-indigo-500/10 transition-colors group">
                 <div className="w-9 h-9 rounded-lg bg-indigo-500/10 flex items-center justify-center">
                   <svg className="w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -197,8 +198,8 @@ export default function DashboardPage() {
                   <p className="text-sm font-bold text-slate-200 group-hover:text-white transition-colors">Add New Rule</p>
                   <p className="text-[10px] text-slate-500">Create filter or alert</p>
                 </div>
-              </a>
-              <a href="/settings" className="flex items-center gap-3 p-3 rounded-xl bg-purple-500/5 hover:bg-purple-500/10 border border-purple-500/10 transition-colors group">
+              </Link>
+              <Link href="/settings" className="flex items-center gap-3 p-3 rounded-xl bg-purple-500/5 hover:bg-purple-500/10 border border-purple-500/10 transition-colors group">
                 <div className="w-9 h-9 rounded-lg bg-purple-500/10 flex items-center justify-center">
                   <svg className="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
@@ -208,7 +209,7 @@ export default function DashboardPage() {
                   <p className="text-sm font-bold text-slate-200 group-hover:text-white transition-colors">Connect Account</p>
                   <p className="text-[10px] text-slate-500">Gmail or Outlook</p>
                 </div>
-              </a>
+              </Link>
             </div>
           </div>
 
