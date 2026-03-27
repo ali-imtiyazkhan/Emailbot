@@ -1,8 +1,6 @@
 export const API_BASE_URL = 'http://localhost:3001/api';
 
-export interface PostResponse {
-  message: string;
-}
+// ── Types ──────────────────────────────────────────────
 
 export interface Stats {
   totalProcessed: number;
@@ -16,6 +14,45 @@ export interface FilterRule {
   isActive: boolean;
   createdAt: string;
 }
+
+export interface ProcessedEmail {
+  id: number;
+  userId: number;
+  emailAccountId: number;
+  messageId: string;
+  subject: string | null;
+  sender: string | null;
+  summary: string | null;
+  priorityScore: number | null;
+  notified: boolean;
+  digestIncluded: boolean;
+  receivedAt: string | null;
+  processedAt: string;
+  emailAccount: {
+    provider: string;
+    email: string;
+  };
+}
+
+export interface EmailAccount {
+  id: number;
+  provider: string;
+  email: string;
+  isActive: boolean;
+  lastSynced: string | null;
+  createdAt: string;
+}
+
+export interface DigestSetting {
+  id: number;
+  userId: number;
+  enabled: boolean;
+  sendTime: string;
+  timezone: string;
+  minEmails: number;
+}
+
+// ── Fetchers ───────────────────────────────────────────
 
 export async function fetchStats(): Promise<Stats> {
   const response = await fetch(`${API_BASE_URL}/stats`);
@@ -39,9 +76,36 @@ export async function createFilter(type: string, value: string): Promise<void> {
 }
 
 export async function deleteFilter(id: number): Promise<void> {
-  // Assuming a delete endpoint exists or will be added
   const response = await fetch(`${API_BASE_URL}/filters/${id}`, {
     method: 'DELETE',
   });
   if (!response.ok) throw new Error('Failed to delete filter');
+}
+
+export async function fetchEmails(): Promise<ProcessedEmail[]> {
+  const response = await fetch(`${API_BASE_URL}/emails`);
+  if (!response.ok) throw new Error('Failed to fetch emails');
+  return response.json();
+}
+
+export async function fetchAccounts(): Promise<EmailAccount[]> {
+  const response = await fetch(`${API_BASE_URL}/accounts`);
+  if (!response.ok) throw new Error('Failed to fetch accounts');
+  return response.json();
+}
+
+export async function fetchDigestSettings(): Promise<DigestSetting> {
+  const response = await fetch(`${API_BASE_URL}/digest-settings`);
+  if (!response.ok) throw new Error('Failed to fetch digest settings');
+  return response.json();
+}
+
+export async function updateDigestSettings(settings: Partial<DigestSetting>): Promise<DigestSetting> {
+  const response = await fetch(`${API_BASE_URL}/digest-settings`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(settings),
+  });
+  if (!response.ok) throw new Error('Failed to update digest settings');
+  return response.json();
 }
