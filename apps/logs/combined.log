@@ -179,3 +179,16 @@
 {"level":"info","message":"Email processing worker initialized.","timestamp":"2026-03-28T17:32:04.700Z"}
 {"level":"info","message":"EmailBot API running on port 3001","timestamp":"2026-03-28T17:32:04.831Z"}
 {"level":"info","message":"Connected to Redis","timestamp":"2026-03-28T17:32:04.847Z"}
+{"level":"info","message":"Running scheduled email check...","timestamp":"2026-03-28T17:45:00.538Z"}
+{"level":"info","message":"Starting multi-user email processing (Producer)...","timestamp":"2026-03-28T17:45:00.565Z"}
+{"level":"info","message":"Multi-user email discovery complete. All jobs queued.","timestamp":"2026-03-28T17:45:00.715Z"}
+{"level":"info","message":"Running scheduled email check...","timestamp":"2026-03-28T18:00:00.737Z"}
+{"level":"info","message":"Starting multi-user email processing (Producer)...","timestamp":"2026-03-28T18:00:00.760Z"}
+{"level":"info","message":"Multi-user email discovery complete. All jobs queued.","timestamp":"2026-03-28T18:00:00.935Z"}
+{"level":"info","message":"Running scheduled email check...","timestamp":"2026-03-28T18:15:00.928Z"}
+{"level":"info","message":"Starting multi-user email processing (Producer)...","timestamp":"2026-03-28T18:15:00.943Z"}
+{"level":"info","message":"Multi-user email discovery complete. All jobs queued.","timestamp":"2026-03-28T18:15:01.096Z"}
+{"level":"info","message":"Scheduler initialized.","timestamp":"2026-03-28T18:21:51.484Z"}
+{"level":"info","message":"Email processing worker initialized.","timestamp":"2026-03-28T18:21:51.489Z"}
+{"level":"info","message":"EmailBot API running on port 3001","timestamp":"2026-03-28T18:21:51.545Z"}
+{"level":"info","message":"Connected to Redis","timestamp":"2026-03-28T18:21:51.560Z"}
