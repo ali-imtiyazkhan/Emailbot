@@ -1,8 +1,9 @@
 import { Redis } from 'ioredis';
 import dotenv from 'dotenv';
+import path from 'path';
 import logger from '../utils/logger.js';
 
-dotenv.config();
+dotenv.config({ path: path.join(process.cwd(), '../../.env') });
 
 const REDIS_URL = process.env.REDIS_URL || 'redis://localhost:6379';
 

@@ -18,6 +18,10 @@ async function main() {
 
   console.log(`  ✓ User created: ${user.email} (id: ${user.id})`);
 
+  // Clean up existing seed data to make re-runs idempotent
+  await prisma.processedEmail.deleteMany({ where: { userId: user.id } });
+  await prisma.filterRule.deleteMany({ where: { userId: user.id } });
+
   // Create a Gmail account
   const gmailAccount = await prisma.emailAccount.upsert({
     where: { id: 1 },

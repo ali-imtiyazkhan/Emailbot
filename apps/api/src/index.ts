@@ -1,8 +1,8 @@
+import './config/env.js';
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
-import dotenv from 'dotenv';
 
 import authRoutes from './routes/auth.js';
 import webhookRoutes from './routes/webhook.js';
@@ -13,10 +13,8 @@ import { redisConnection } from './config/redis.js';
 import db from './config/db.js';
 import logger from './utils/logger.js';
 
-dotenv.config();
-
 const app = express();
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.API_PORT || 3001;
 
 app.use(helmet());
 app.use(cors());
