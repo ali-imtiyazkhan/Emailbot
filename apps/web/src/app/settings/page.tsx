@@ -89,13 +89,13 @@ export default function SettingsPage() {
               <p className="text-slate-500 text-sm mb-4">No email accounts connected yet.</p>
               <div className="flex gap-3 justify-center">
                 <button
-                  onClick={() => window.open("http://localhost:3001/auth/gmail/callback", "_blank")}
+                  onClick={() => window.open("http://localhost:3001/auth/gmail/connect", "_blank")}
                   className="bg-[#4285F4] hover:bg-[#3367d6] px-6 py-3 rounded-xl font-bold text-sm shadow-lg shadow-[#4285F4]/15 transition-all"
                 >
                   Connect Gmail
                 </button>
                 <button
-                  onClick={() => window.open("http://localhost:3001/auth/outlook/callback", "_blank")}
+                  onClick={() => window.open("http://localhost:3001/auth/outlook/connect", "_blank")}
                   className="bg-[#0078D4] hover:bg-[#005a9e] px-6 py-3 rounded-xl font-bold text-sm shadow-lg shadow-[#0078D4]/15 transition-all"
                 >
                   Connect Outlook
@@ -134,13 +134,13 @@ export default function SettingsPage() {
         {accounts.length > 0 && (
           <div className="flex gap-3 mt-4">
             <button
-              onClick={() => window.open("http://localhost:3001/auth/gmail/callback", "_blank")}
+              onClick={() => window.open("http://localhost:3001/auth/gmail/connect", "_blank")}
               className="text-xs font-bold text-[#4285F4] hover:text-[#5a9bf4] bg-[#4285F4]/5 hover:bg-[#4285F4]/10 px-4 py-2 rounded-xl border border-[#4285F4]/10 transition-all"
             >
               + Add Gmail
             </button>
             <button
-              onClick={() => window.open("http://localhost:3001/auth/outlook/callback", "_blank")}
+              onClick={() => window.open("http://localhost:3001/auth/outlook/connect", "_blank")}
               className="text-xs font-bold text-[#0078D4] hover:text-[#339ae8] bg-[#0078D4]/5 hover:bg-[#0078D4]/10 px-4 py-2 rounded-xl border border-[#0078D4]/10 transition-all"
             >
               + Add Outlook

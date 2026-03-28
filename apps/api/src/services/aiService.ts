@@ -1,12 +1,11 @@
-import Anthropic from '@anthropic-ai/sdk';
+import { GoogleGenerativeAI } from "@google/generative-ai";
 import dotenv from 'dotenv';
 import logger from '../utils/logger.js';
 
 dotenv.config();
 
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY,
-});
+const configuration = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY || "");
+const model = configuration.getGenerativeModel({ model: "gemini-1.5-flash" });
 
 export interface EmailSummary {
   summary: string;
@@ -15,8 +14,8 @@ export interface EmailSummary {
 }
 
 export const summarizeEmail = async (subject: string, body: string): Promise<EmailSummary> => {
-  if (!process.env.ANTHROPIC_API_KEY) {
-    logger.warn('ANTHROPIC_API_KEY not set, skipping AI summarization');
+  if (!process.env.GOOGLE_API_KEY) {
+    logger.warn('GOOGLE_API_KEY not set, skipping AI summarization');
     return { summary: body.substring(0, 100) + '...', priority: 5, category: 'unknown' };
   }
 
@@ -29,24 +28,26 @@ export const summarizeEmail = async (subject: string, body: string): Promise<Ema
     Subject: ${subject}
     Body: ${body}
 
-    Respond ONLY in JSON format like this:
+    Respond ONLY in valid JSON format like this:
     { "summary": "...", "priority": 5, "category": "..." }
   `;
 
   try {
-    const response = await anthropic.messages.create({
-      model: 'claude-3-sonnet-20240229',
-      max_tokens: 300,
-      messages: [{ role: 'user', content: prompt }],
-    });
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    let text = response.text();
+    
+    // Clean up potential markdown formatting if Gemini wraps in ```json
+    text = text.replace(/```json\n?|```/g, '').trim();
 
-    const content = response.content?.[0];
-    if (content && content.type === 'text' && content.text) {
-      return JSON.parse(content.text);
+    try {
+      return JSON.parse(text);
+    } catch (parseError) {
+      logger.error('Failed to parse Gemini JSON response:', text);
+      throw new Error('Invalid JSON from AI');
     }
-    throw new Error('Unexpected response format from Claude');
-  } catch (error) {
-    logger.error('Error calling AI service:', error);
+  } catch (error: any) {
+    logger.error('Error calling Google Gemini service:', error.message);
     return { summary: 'Error summarizing email', priority: 5, category: 'error' };
   }
 };
