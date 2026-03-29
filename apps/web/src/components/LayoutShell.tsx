@@ -9,10 +9,7 @@ export default function LayoutShell({ children }: { children: React.ReactNode })
   const isLanding = pathname === "/";
 
   return (
-    <div className="min-h-screen bg-[#050816] text-slate-50 selection:bg-indigo-500/30">
-      {/* Animated mesh background */}
-      <div className={isLanding ? "landing-mesh" : "mesh-bg"} />
-
+    <div className="min-h-screen bg-black text-white selection:bg-white/20">
       {/* Sidebar (hidden on landing) */}
       {!isLanding && <Sidebar />}
 
