@@ -1,7 +1,7 @@
 import { Router } from 'express';
-import db from '../config/db.js';
-import { sendTextMessage } from '../services/whatsappService.js';
-import logger from '../utils/logger.js';
+import { prisma as db } from '@repo/db';
+import { sendTextMessage } from '@repo/shared/whatsapp';
+import logger from '@repo/shared/logger';
 const router = Router();
 
 // Webhook verification

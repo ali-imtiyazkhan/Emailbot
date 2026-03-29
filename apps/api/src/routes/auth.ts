@@ -1,17 +1,18 @@
 import { Router } from 'express';
 import { google } from 'googleapis';
 import axios from 'axios';
-import db from '../config/db.js';
-import logger from '../utils/logger.js';
-import { googleOAuth2Client, GMAIL_SCOPES } from '../config/google.js';
+import { prisma as db } from '@repo/db';
+import logger from '@repo/shared/logger';
+import { createGoogleOAuth2Client, GMAIL_SCOPES } from '../config/google.js';
 import { OUTLOOK_AUTH_URL, OUTLOOK_TOKEN_URL, OUTLOOK_SCOPES } from '../config/outlook.js';
 
 const router = Router();
 
-// ─── Gmail OAuth2 ────────────────────────────────────────────────
+// ─── Gmail OAuth2 
 
 // Step 1: Redirect user to Google consent screen
 router.get('/gmail/connect', (req, res) => {
+  const googleOAuth2Client = createGoogleOAuth2Client();
   const authUrl = googleOAuth2Client.generateAuthUrl({
     access_type: 'offline',
     prompt: 'consent', // Force consent to ensure refresh_token is provided
@@ -30,6 +31,7 @@ router.get('/gmail/callback', async (req, res) => {
     }
 
     // Exchange code for tokens
+    const googleOAuth2Client = createGoogleOAuth2Client();
     const { tokens } = await googleOAuth2Client.getToken(code);
     googleOAuth2Client.setCredentials(tokens);
 
@@ -73,6 +75,19 @@ router.get('/gmail/callback', async (req, res) => {
       });
     }
 
+    // Sync User profile if it's the first connection or still using default seed
+    const currentUser = await db.user.findUnique({ where: { id: userId } });
+    if (currentUser && (currentUser.email === 'admin@emailbot.io' || !currentUser.name)) {
+      await db.user.update({
+        where: { id: userId },
+        data: {
+          email: gmailAddress,
+          name: userInfo.data.name || currentUser.name,
+        }
+      });
+      logger.info(`Updated user ${userId} profile to match Google account: ${gmailAddress}`);
+    }
+
     logger.info(`Gmail connected for user ${userId}: ${gmailAddress}`);
     res.send(`
       <html>
@@ -100,7 +115,7 @@ router.get('/gmail/callback', async (req, res) => {
   }
 });
 
-// ─── Outlook OAuth2 ─────────────────────────────────────────────
+// ─── Outlook OAuth2
 
 // Step 1: Redirect user to Microsoft consent screen
 router.get('/outlook/connect', (req, res) => {

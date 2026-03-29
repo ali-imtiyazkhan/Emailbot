@@ -1,13 +1,12 @@
 import axios from 'axios';
-import dotenv from 'dotenv';
 import logger from '../utils/logger.js';
 
-dotenv.config();
+// Env is loaded centrally via config/env.ts (first import in index.ts)
 
 const WHATSAPP_API_VERSION = 'v22.0';
 const WHATSAPP_API_URL = `https://graph.facebook.com/${WHATSAPP_API_VERSION}/${process.env.WHATSAPP_PHONE_NUMBER_ID}/messages`;
 
-export const sendTextMessage = async (to: string, text: string) => {
+export const sendTextMessage = async (to: string, text: string): Promise<void> => {
   if (!process.env.WHATSAPP_ACCESS_TOKEN) {
     logger.warn('WHATSAPP_ACCESS_TOKEN not set, skipping message');
     return;
@@ -29,12 +28,13 @@ export const sendTextMessage = async (to: string, text: string) => {
         },
       }
     );
-  } catch (error: any) {
-    logger.error('Error sending WhatsApp message:', error.response?.data || error.message);
+  } catch (error: unknown) {
+    const err = error as { response?: { data?: unknown }; message?: string };
+    logger.error('Error sending WhatsApp message:', err.response?.data || err.message);
   }
 };
 
-export const sendNotification = async (to: string, subject: string, summary: string, priority: number) => {
+export const sendNotification = async (to: string, subject: string, summary: string, priority: number): Promise<void> => {
   const message = `📧 *${subject}*\n\n📝 ${summary}\n\n⚠️ Priority: ${priority}/10\n\n_Reply with "FULL" for more, or "SKIP" to ignore._`;
   await sendTextMessage(to, message);
 };

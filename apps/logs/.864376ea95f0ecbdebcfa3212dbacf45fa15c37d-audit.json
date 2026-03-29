@@ -1,0 +1,15 @@
+{
+    "keep": {
+        "days": true,
+        "amount": 14
+    },
+    "auditLog": "D:\\projects\\EmailBot\\apps\\logs\\.864376ea95f0ecbdebcfa3212dbacf45fa15c37d-audit.json",
+    "files": [
+        {
+            "date": 1774797039083,
+            "name": "D:\\projects\\EmailBot\\apps\\logs\\combined-2026-03-29.log",
+            "hash": "46eb5b82959432c7a9ff84c9a614d0588d17859bf677281ef8b9c2ed69a809ea"
+        }
+    ],
+    "hashType": "sha256"
+}

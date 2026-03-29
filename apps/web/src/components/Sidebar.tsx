@@ -1,13 +1,14 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { fetchProfile, User } from "@/lib/api";
 
 const navItems = [
   {
     label: "Dashboard",
-    href: "/",
+    href: "/dashboard",
     icon: (
       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M4 5a1 1 0 011-1h4a1 1 0 011 1v5a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM14 5a1 1 0 011-1h4a1 1 0 011 1v3a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 16a1 1 0 011-1h4a1 1 0 011 1v3a1 1 0 01-1 1H5a1 1 0 01-1-1v-3zM14 13a1 1 0 011-1h4a1 1 0 011 1v5a1 1 0 01-1 1h-4a1 1 0 01-1-1v-5z" />
@@ -46,6 +47,13 @@ const navItems = [
 
 export default function Sidebar() {
   const pathname = usePathname();
+  const [user, setUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    fetchProfile()
+      .then(setUser)
+      .catch((err) => console.error("Failed to load user profile:", err));
+  }, []);
 
   return (
     <>
@@ -94,14 +102,18 @@ export default function Sidebar() {
           {/* Footer */}
           <div className="glass rounded-2xl p-4 mt-auto">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-xs font-black shadow-lg shadow-emerald-500/20">
-                A
+              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-xs font-black shadow-lg shadow-emerald-500/20 uppercase">
+                {user?.name?.[0] || user?.email?.[0] || "A"}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-bold text-slate-200 truncate">Admin User</p>
-                <p className="text-[10px] text-slate-500 font-medium">admin@emailbot.io</p>
+                <p className="text-sm font-bold text-slate-200 truncate">
+                  {user?.name || "Loading..."}
+                </p>
+                <p className="text-[10px] text-slate-500 font-medium truncate">
+                  {user?.email || "..."}
+                </p>
               </div>
-              <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              <div className={`w-2 h-2 rounded-full animate-pulse ${user ? "bg-emerald-500" : "bg-slate-600"}`} />
             </div>
           </div>
         </div>

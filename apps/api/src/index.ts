@@ -1,4 +1,4 @@
-import './config/env.js';
+import '@repo/shared/env';
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
@@ -7,11 +7,9 @@ import morgan from 'morgan';
 import authRoutes from './routes/auth.js';
 import webhookRoutes from './routes/webhook.js';
 import dashboardRoutes from './routes/dashboard.js';
-import { initScheduler } from './services/scheduler.js';
-import { initWorker } from './services/queueService.js';
 import { redisConnection } from './config/redis.js';
-import db from './config/db.js';
-import logger from './utils/logger.js';
+import { prisma as db } from '@repo/db';
+import logger from '@repo/shared/logger';
 
 const app = express();
 const PORT = process.env.API_PORT || 3001;
@@ -50,19 +48,14 @@ app.use('/auth', authRoutes);
 app.use('/whatsapp', webhookRoutes);
 app.use('/api', dashboardRoutes);
 
-// Initialize Services
-initScheduler();
-initWorker();
-
-// Global error handler (must be last middleware)
+// Global error handler
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
   logger.error('Unhandled error:', err);
   res.status(500).json({ error: 'Internal server error' });
 });
 
-// Start server
 app.listen(PORT, () => {
-  logger.info(`EmailBot API running on port ${PORT}`);
+  logger.info(`🚀 EmailBot API (Web Server) running on port ${PORT}`);
 });
 
 export default app;
