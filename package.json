@@ -1,6 +1,7 @@
 {
   "name": "EmailBot",
   "private": true,
+  "packageManager": "npm@10.9.4",
   "scripts": {
     "build": "turbo run build",
     "dev": "turbo run dev",
@@ -9,14 +10,16 @@
     "check-types": "turbo run check-types"
   },
   "devDependencies": {
+    "autoprefixer": "^10.4.27",
+    "postcss": "^8.5.8",
     "prettier": "^3.7.4",
+    "tailwindcss": "^4.2.2",
     "turbo": "^2.8.20",
     "typescript": "5.9.2"
   },
   "engines": {
     "node": ">=18"
   },
-  "packageManager": "npm@10.9.4",
   "workspaces": [
     "apps/*",
     "packages/*"

@@ -64,31 +64,23 @@ export default function RulesPage() {
     }
   };
 
-  const getRuleColor = (type: string) => {
-    switch (type) {
-      case "sender": return { text: "text-indigo-400", bg: "bg-indigo-500/10", border: "border-indigo-500/20" };
-      case "keyword": return { text: "text-amber-400", bg: "bg-amber-500/10", border: "border-amber-500/20" };
-      case "priority_min": return { text: "text-rose-400", bg: "bg-rose-500/10", border: "border-rose-500/20" };
-      default: return { text: "text-purple-400", bg: "bg-purple-500/10", border: "border-purple-500/20" };
-    }
-  };
-
   return (
-    <div className="p-6 md:p-10 max-w-7xl mx-auto">
+    <div className="p-8 md:p-12 xl:p-16 w-full ml-auto mr-auto max-w-[1400px]">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-10 animate-fade-in">
+      <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-6 mb-14">
         <div>
-          <h1 className="text-3xl font-black mb-1">Filter Rules</h1>
-          <p className="text-slate-500 text-sm font-medium">
+          <h1 className="text-4xl md:text-5xl font-serif italic tracking-tight mb-3">Filter Rules</h1>
+          <p className="text-slate-500 text-[16px] font-medium leading-relaxed max-w-lg">
             Configure how your emails are filtered, prioritized, and forwarded.
           </p>
         </div>
+
         <button
           onClick={() => setShowForm(!showForm)}
-          className={`px-6 py-3 rounded-2xl font-bold text-sm transition-all active:scale-95 ${
+          className={`px-5 py-2.5 rounded-md font-bold text-[13px] tracking-tight transition-all active:scale-95 ${
             showForm
               ? "bg-white/5 text-slate-400 border border-white/10"
-              : "bg-indigo-500 hover:bg-indigo-400 text-white shadow-xl shadow-indigo-500/20"
+              : "bg-white text-black hover:bg-slate-200"
           }`}
         >
           {showForm ? "Cancel" : "+ New Rule"}
@@ -97,18 +89,18 @@ export default function RulesPage() {
 
       {/* Create Form */}
       {showForm && (
-        <div className="glass rounded-2xl p-8 mb-8 gradient-border animate-slide-up">
-          <h3 className="text-lg font-black mb-6">Create New Rule</h3>
+        <div className="bg-[#0f0f0f] border border-white/5 rounded-lg p-8 mb-10 animate-fade-in">
+          <h3 className="text-[17px] font-bold mb-8">Create New Rule</h3>
           <form onSubmit={handleCreate}>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
               <div>
-                <label className="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-2">
+                <label className="block text-[11px] font-black uppercase text-slate-600 tracking-widest mb-3">
                   Rule Type
                 </label>
                 <select
                   value={newRule.type}
                   onChange={(e) => setNewRule({ ...newRule, type: e.target.value })}
-                  className="w-full bg-white/[0.03] border border-white/5 rounded-xl px-4 py-3 text-sm text-slate-200 focus:outline-none focus:ring-2 ring-indigo-500/30 focus:border-indigo-500/30 transition-all"
+                  className="w-full bg-white/[0.03] border border-white/5 rounded-md px-4 py-2.5 text-[14px] text-slate-200 focus:outline-none focus:border-white/20 transition-all font-medium appearance-none"
                 >
                   <option value="sender">Sender Email</option>
                   <option value="keyword">Subject Keyword</option>
@@ -116,7 +108,7 @@ export default function RulesPage() {
                 </select>
               </div>
               <div className="md:col-span-2">
-                <label className="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-2">
+                <label className="block text-[11px] font-black uppercase text-slate-600 tracking-widest mb-3">
                   Value
                 </label>
                 <input
@@ -130,14 +122,14 @@ export default function RulesPage() {
                   }
                   value={newRule.value}
                   onChange={(e) => setNewRule({ ...newRule, value: e.target.value })}
-                  className="w-full bg-white/[0.03] border border-white/5 rounded-xl px-4 py-3 text-sm text-slate-200 placeholder:text-slate-600 focus:outline-none focus:ring-2 ring-indigo-500/30 focus:border-indigo-500/30 transition-all"
+                  className="w-full bg-white/[0.03] border border-white/5 rounded-md px-4 py-2.5 text-[14px] text-slate-200 placeholder:text-slate-700 focus:outline-none focus:border-white/20 transition-all font-medium"
                 />
               </div>
             </div>
             <button
               type="submit"
               disabled={submitting || !newRule.value.trim()}
-              className="w-full bg-gradient-to-r from-indigo-500 to-purple-500 text-white py-3 rounded-xl font-bold text-sm hover:from-indigo-400 hover:to-purple-400 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+              className="w-full bg-white text-black py-3 rounded-md font-bold text-[14px] hover:bg-slate-200 transition-all disabled:opacity-20 disabled:cursor-not-allowed"
             >
               {submitting ? "Creating..." : "Apply Rule"}
             </button>
@@ -148,59 +140,57 @@ export default function RulesPage() {
       {/* Rules Grid */}
       {loading ? (
         <div className="text-center py-20">
-          <div className="w-8 h-8 border-2 border-indigo-500/30 border-t-indigo-500 rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-slate-500 text-sm">Loading rules...</p>
+          <div className="w-6 h-6 border-2 border-white/10 border-t-white rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-slate-600 text-[13px] font-medium">Loading rules...</p>
         </div>
       ) : filters.length === 0 ? (
-        <div className="glass rounded-2xl p-16 text-center gradient-border">
-          <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-slate-800/50 flex items-center justify-center">
-            <svg className="w-10 h-10 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div className="bg-[#0f0f0f] border border-white/5 rounded-lg p-20 text-center">
+          <div className="w-16 h-16 mx-auto mb-6 rounded-xl bg-white/[0.02] flex items-center justify-center border border-white/5">
+            <svg className="w-8 h-8 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
             </svg>
           </div>
-          <h3 className="text-lg font-black text-slate-300 mb-2">No rules configured</h3>
-          <p className="text-slate-500 text-sm max-w-md mx-auto">
+          <h3 className="text-lg font-bold text-slate-300 mb-2">No rules configured</h3>
+          <p className="text-slate-500 text-[14px] font-medium max-w-sm mx-auto">
             Create your first processing rule to control how emails are filtered and which ones trigger WhatsApp notifications.
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
-          {filters.map((filter, i) => {
-            const colors = getRuleColor(filter.ruleType);
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+          {filters.map((filter) => {
             return (
               <div
                 key={filter.id}
-                className="glass rounded-2xl p-6 gradient-border group hover:bg-white/[0.02] transition-all"
-                style={{ animation: `fade-in 0.4s ease-out ${i * 80}ms both` }}
+                className="bg-[#0f0f0f] border border-white/5 rounded-lg p-6 group hover:border-white/10 transition-all"
               >
-                <div className="flex items-start justify-between mb-5">
-                  <div className={`w-11 h-11 rounded-xl ${colors.bg} border ${colors.border} flex items-center justify-center`}>
-                    <svg className={`w-5 h-5 ${colors.text}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="flex items-start justify-between mb-6">
+                  <div className="w-10 h-10 rounded-md bg-white/[0.03] border border-white/5 flex items-center justify-center">
+                    <svg className="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d={getRuleIcon(filter.ruleType)} />
                     </svg>
                   </div>
                   <button
                     onClick={() => handleDelete(filter.id)}
-                    className="opacity-0 group-hover:opacity-100 p-2 rounded-lg hover:bg-rose-500/10 text-slate-600 hover:text-rose-400 transition-all"
+                    className="opacity-0 group-hover:opacity-100 p-2 rounded-md hover:bg-white/5 text-slate-600 hover:text-white transition-all"
                   >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                     </svg>
                   </button>
                 </div>
 
-                <span className={`text-[10px] font-black uppercase tracking-widest ${colors.text}`}>
+                <span className="text-[10px] font-black uppercase tracking-widest text-slate-600">
                   {filter.ruleType === "priority_min" ? "Min Priority" : filter.ruleType}
                 </span>
-                <p className="text-lg font-black text-slate-200 mt-1 break-all">{filter.value}</p>
+                <p className="text-[17px] font-bold text-white mt-1 break-all">{filter.value}</p>
 
-                <div className="flex items-center justify-between mt-5 pt-4 border-t border-white/5">
-                  <span className="text-[10px] text-slate-600 font-medium">
-                    Created {new Date(filter.createdAt).toLocaleDateString()}
+                <div className="flex items-center justify-between mt-6 pt-5 border-t border-white/5">
+                  <span className="text-[10px] text-slate-700 font-bold uppercase tracking-tight">
+                    {new Date(filter.createdAt).toLocaleDateString()}
                   </span>
-                  <div className="flex items-center gap-1.5">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                    <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-wider">Active</span>
+                  <div className="flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-white/20 animate-pulse" />
+                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Active</span>
                   </div>
                 </div>
               </div>
