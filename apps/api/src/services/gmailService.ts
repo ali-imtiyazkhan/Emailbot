@@ -1,10 +1,16 @@
 import { google } from 'googleapis';
 import db from '../config/db.js';
 import logger from '../utils/logger.js';
-import { googleOAuth2Client } from '../config/google.js';
+import { createGoogleOAuth2Client } from '../config/google.js';
 
+export interface FetchedEmail {
+  id: string;
+  subject: string;
+  sender: string;
+  body: string;
+}
 
-export const fetchLatestEmails = async (userId: number) => {
+export const fetchLatestEmails = async (userId: number): Promise<FetchedEmail[]> => {
   const account = await db.emailAccount.findFirst({ 
     where: { userId, provider: 'gmail', isActive: true } 
   });
@@ -14,13 +20,17 @@ export const fetchLatestEmails = async (userId: number) => {
     return [];
   }
 
-  googleOAuth2Client.setCredentials({
+  // Create a NEW OAuth2 client per-call to avoid multi-user race condition
+  const oauthClient = createGoogleOAuth2Client();
+
+  oauthClient.setCredentials({
     access_token: account.accessToken,
     refresh_token: account.refreshToken || undefined,
     expiry_date: account.tokenExpiry ? account.tokenExpiry.getTime() : undefined,
   });
 
-  googleOAuth2Client.on('tokens', async (tokens) => {
+  // Handle token refresh — use a one-time listener to avoid memory leak
+  const tokenRefreshHandler = async (tokens: { access_token?: string | null; refresh_token?: string | null; expiry_date?: number | null }) => {
     if (tokens.access_token) {
       await db.emailAccount.update({
         where: { id: account.id },
@@ -32,9 +42,12 @@ export const fetchLatestEmails = async (userId: number) => {
       });
       logger.info(`Refreshed Gmail access token for user ${userId}`);
     }
-  });
+  };
 
-  const gmail = google.gmail({ version: 'v1', auth: googleOAuth2Client });
+  // Use `once` instead of `on` to prevent listener accumulation
+  oauthClient.once('tokens', tokenRefreshHandler);
+
+  const gmail = google.gmail({ version: 'v1', auth: oauthClient });
 
   try {
     const res = await gmail.users.messages.list({ 
@@ -44,12 +57,14 @@ export const fetchLatestEmails = async (userId: number) => {
     });
     
     const messages = res.data.messages || [];
-    const emails = [];
+    const emails: FetchedEmail[] = [];
 
     for (const msg of messages) {
+      if (!msg.id) continue;
+
       const detail = await gmail.users.messages.get({ 
         userId: 'me', 
-        id: msg.id! 
+        id: msg.id 
       });
       
       const payload = detail.data.payload;
@@ -61,7 +76,7 @@ export const fetchLatestEmails = async (userId: number) => {
       // Extract snippet or body
       let body = detail.data.snippet || '';
       
-      // Attempt to get full body if available (simplified)
+      // Attempt to get full body if available
       if (payload?.parts) {
         const textPart = payload.parts.find(p => p.mimeType === 'text/plain');
         if (textPart?.body?.data) {
@@ -71,19 +86,16 @@ export const fetchLatestEmails = async (userId: number) => {
         body = Buffer.from(payload.body.data, 'base64').toString();
       }
 
-      emails.push({ 
-        id: msg.id, 
-        subject, 
-        sender: from, 
-        body 
-      });
+      emails.push({ id: msg.id, subject, sender: from, body });
     }
 
     return emails;
-  } catch (error: any) {
-    logger.error(`Error fetching Gmail for user ${userId}:`, error.message);
-    // If it's an auth error, we might want to deactivate the account
-    if (error.code === 401) {
+  } catch (error: unknown) {
+    const err = error as { code?: number; message?: string };
+    logger.error(`Error fetching Gmail for user ${userId}:`, err.message);
+    
+    // If it's an auth error, deactivate the account
+    if (err.code === 401) {
       await db.emailAccount.update({
         where: { id: account.id },
         data: { isActive: false }

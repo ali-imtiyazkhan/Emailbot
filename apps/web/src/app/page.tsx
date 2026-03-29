@@ -1,240 +1,130 @@
-"use client";
-
-import React, { useState, useEffect } from "react";
+import LandingNavbar from "@/components/LandingNavbar";
+import HeroSection from "@/components/HeroSection";
+import DemoWindow from "@/components/DemoWindow";
+import AIChatPanel from "@/components/AIChatPanel";
 import Link from "next/link";
-import { fetchStats, fetchFilters, fetchEmails, Stats, FilterRule, ProcessedEmail } from "@/lib/api";
 
-export default function DashboardPage() {
-  const [stats, setStats] = useState<Stats | null>(null);
-  const [filters, setFilters] = useState<FilterRule[]>([]);
-  const [emails, setEmails] = useState<ProcessedEmail[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    loadData();
-  }, []);
-
-  const loadData = async () => {
-    try {
-      const [s, f, e] = await Promise.all([fetchStats(), fetchFilters(), fetchEmails()]);
-      setStats(s);
-      setFilters(f);
-      setEmails(e);
-    } catch (err) {
-      console.error("Failed to load dashboard data:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const recentEmails = emails.slice(0, 5);
-
-  const getPriorityColor = (score: number | null) => {
-    if (!score) return "text-slate-500";
-    if (score >= 8) return "text-rose-400";
-    if (score >= 5) return "text-amber-400";
-    return "text-emerald-400";
-  };
-
-  const getPriorityBg = (score: number | null) => {
-    if (!score) return "bg-slate-500/10 border-slate-500/20";
-    if (score >= 8) return "bg-rose-500/10 border-rose-500/20";
-    if (score >= 5) return "bg-amber-500/10 border-amber-500/20";
-    return "bg-emerald-500/10 border-emerald-500/20";
-  };
-
+export default function LandingPage() {
   return (
-    <div className="p-6 md:p-10 max-w-7xl mx-auto">
-      {/* Page Header */}
-      <div className="mb-10 animate-fade-in">
-        <div className="flex items-center justify-between mb-2">
-          <div>
-            <h1 className="text-3xl font-black mb-1">Dashboard</h1>
-            <p className="text-slate-500 text-sm font-medium">
-              Welcome back. Here&apos;s your email processing overview.
-            </p>
-          </div>
-          <span className="hidden md:flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-emerald-400 bg-emerald-400/10 px-4 py-2 rounded-full border border-emerald-400/20">
-            <span className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
-            System Online
-          </span>
+    <>
+      <LandingNavbar />
+      <HeroSection />
+      <DemoWindow />
+      <AIChatPanel />
+
+      {/* Features Section */}
+      <section className="relative px-6 py-20 max-w-6xl mx-auto" id="features-section">
+        <div className="text-center mb-16">
+          <p className="text-[11px] font-bold uppercase tracking-widest text-indigo-400 mb-3">
+            Features
+          </p>
+          <h2 className="text-3xl sm:text-4xl font-black text-white mb-4">
+            Everything you need to{" "}
+            <span className="text-serif-italic font-normal text-white/80">
+              tame your inbox
+            </span>
+          </h2>
+          <p className="text-slate-500 text-sm max-w-lg mx-auto">
+            Connect once. Let AI do the rest. No scripts, no complex setups.
+          </p>
         </div>
-      </div>
 
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-10">
-        {[
-          {
-            label: "Emails Processed",
-            value: stats?.totalProcessed ?? 0,
-            change: "+12%",
-            color: "text-indigo-400",
-            glow: "glow-indigo",
-            icon: "M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z",
-          },
-          {
-            label: "Active Rules",
-            value: filters.length,
-            change: `${filters.length} active`,
-            color: "text-purple-400",
-            glow: "glow-purple",
-            icon: "M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4",
-          },
-          {
-            label: "Alerts Sent",
-            value: emails.filter(e => e.notified).length,
-            change: "WhatsApp",
-            color: "text-pink-400",
-            glow: "glow-pink",
-            icon: "M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9",
-          },
-          {
-            label: "Queue Ready",
-            value: "Active",
-            change: "Redis",
-            color: "text-emerald-400",
-            glow: "glow-emerald",
-            icon: "M13 10V3L4 14h7v7l9-11h-7z",
-          },
-        ].map((stat, i) => (
-          <div
-            key={i}
-            className={`glass glass-hover rounded-2xl p-6 ${stat.glow} gradient-border`}
-            style={{ animationDelay: `${i * 100}ms` }}
-          >
-            <div className="flex justify-between items-start mb-4">
-              <div className={`w-10 h-10 rounded-xl ${stat.color.replace("text-", "bg-").replace("400", "500/10")} flex items-center justify-center`}>
-                <svg className={`w-5 h-5 ${stat.color}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d={stat.icon} />
-                </svg>
-              </div>
-              <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
-                {stat.change}
-              </span>
-            </div>
-            <div className={`text-3xl font-black tracking-tight ${stat.color} mb-1`}>
-              {loading ? <span className="animate-pulse text-slate-600">—</span> : stat.value}
-            </div>
-            <p className="text-xs text-slate-500 font-semibold">{stat.label}</p>
-          </div>
-        ))}
-      </div>
-
-      {/* Main Content Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Recent Activity */}
-        <div className="lg:col-span-2 glass rounded-2xl p-8 gradient-border">
-          <div className="flex items-center justify-between mb-8">
-            <div>
-              <h2 className="text-xl font-black mb-0.5">Recent Activity</h2>
-              <p className="text-xs text-slate-500 font-medium">Latest processed emails</p>
-            </div>
-            <Link
-              href="/emails"
-              className="text-indigo-400 text-xs font-bold uppercase tracking-wider hover:text-indigo-300 transition-colors"
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {[
+            {
+              icon: "M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z",
+              title: "Smart Prioritization",
+              description: "AI analyzes every email and assigns a priority score from 1-10. Focus on what matters.",
+              color: "from-indigo-500 to-indigo-600",
+              glow: "shadow-indigo-500/20",
+            },
+            {
+              icon: "M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9",
+              title: "WhatsApp Alerts",
+              description: "Get instant notifications on WhatsApp for high-priority emails. Never miss what's critical.",
+              color: "from-emerald-500 to-teal-600",
+              glow: "shadow-emerald-500/20",
+            },
+            {
+              icon: "M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4",
+              title: "Custom Rules",
+              description: "Create powerful filter rules by sender, keyword, or priority threshold. Your inbox, your rules.",
+              color: "from-purple-500 to-fuchsia-600",
+              glow: "shadow-purple-500/20",
+            },
+          ].map((feature, i) => (
+            <div
+              key={i}
+              className="glass rounded-2xl p-8 gradient-border group hover:bg-white/[0.02] transition-all duration-300"
+              style={{ animation: `fade-in 0.5s ease-out ${i * 150}ms both` }}
             >
-              View all →
-            </Link>
-          </div>
-
-          {recentEmails.length === 0 ? (
-            <div className="text-center py-16">
-              <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-slate-800/50 flex items-center justify-center">
-                <svg className="w-8 h-8 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+              <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${feature.color} flex items-center justify-center mb-6 shadow-lg ${feature.glow} group-hover:scale-110 transition-transform duration-300`}>
+                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d={feature.icon} />
                 </svg>
               </div>
-              <p className="text-slate-500 text-sm font-medium">No emails processed yet</p>
-              <p className="text-slate-600 text-xs mt-1">Connect your email account to start</p>
+              <h3 className="text-lg font-black text-white mb-2">{feature.title}</h3>
+              <p className="text-sm text-slate-400 leading-relaxed">{feature.description}</p>
             </div>
-          ) : (
-            <div className="space-y-3">
-              {recentEmails.map((email, i) => (
-                <div
-                  key={email.id}
-                  className="flex items-start gap-4 p-4 rounded-xl bg-white/[0.02] hover:bg-white/[0.04] transition-colors border border-transparent hover:border-white/5"
-                  style={{ animation: `fade-in 0.4s ease-out ${i * 80}ms both` }}
-                >
-                  <div className={`mt-1 w-8 h-8 rounded-lg flex items-center justify-center text-xs font-black ${getPriorityBg(email.priorityScore)} border`}>
-                    <span className={getPriorityColor(email.priorityScore)}>
-                      {email.priorityScore ?? "—"}
-                    </span>
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-bold text-slate-200 truncate">
-                      {email.subject || "No Subject"}
-                    </p>
-                    <p className="text-xs text-slate-500 truncate mt-0.5">
-                      {email.sender || "Unknown"} • {email.emailAccount.provider}
-                    </p>
-                  </div>
-                  <div className="text-right shrink-0">
-                    <p className="text-[10px] text-slate-600 font-medium">
-                      {new Date(email.processedAt).toLocaleDateString()}
-                    </p>
-                    {email.notified && (
-                      <span className="text-[9px] font-bold text-emerald-400 uppercase tracking-wider">Notified</span>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
+          ))}
         </div>
+      </section>
 
-        {/* Sidebar */}
-        <div className="space-y-6">
-          {/* Quick Actions */}
-          <div className="glass rounded-2xl p-6 gradient-border">
-            <h3 className="text-sm font-black uppercase tracking-wider text-slate-400 mb-5">Quick Actions</h3>
-            <div className="space-y-3">
-              <Link href="/rules" className="flex items-center gap-3 p-3 rounded-xl bg-indigo-500/5 hover:bg-indigo-500/10 border border-indigo-500/10 transition-colors group">
-                <div className="w-9 h-9 rounded-lg bg-indigo-500/10 flex items-center justify-center">
-                  <svg className="w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                  </svg>
-                </div>
-                <div>
-                  <p className="text-sm font-bold text-slate-200 group-hover:text-white transition-colors">Add New Rule</p>
-                  <p className="text-[10px] text-slate-500">Create filter or alert</p>
-                </div>
+      {/* CTA Section */}
+      <section className="relative px-6 py-20" id="cta-section">
+        <div className="max-w-3xl mx-auto text-center">
+          <div className="glass rounded-3xl p-12 md:p-16 gradient-border">
+            <h2 className="text-3xl sm:text-4xl font-black text-white mb-4">
+              Ready to{" "}
+              <span className="gradient-text">automate</span>{" "}
+              your inbox?
+            </h2>
+            <p className="text-slate-400 text-sm max-w-md mx-auto mb-8">
+              Connect your Gmail or Outlook account and let EmailBot take care of the rest. Set up in under 2 minutes.
+            </p>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+              <Link href="/dashboard" className="btn-primary-landing flex items-center gap-2">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+                Open Dashboard
               </Link>
-              <Link href="/settings" className="flex items-center gap-3 p-3 rounded-xl bg-purple-500/5 hover:bg-purple-500/10 border border-purple-500/10 transition-colors group">
-                <div className="w-9 h-9 rounded-lg bg-purple-500/10 flex items-center justify-center">
-                  <svg className="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
-                  </svg>
-                </div>
-                <div>
-                  <p className="text-sm font-bold text-slate-200 group-hover:text-white transition-colors">Connect Account</p>
-                  <p className="text-[10px] text-slate-500">Gmail or Outlook</p>
-                </div>
+              <Link href="/settings" className="btn-secondary-landing">
+                Connect Account
               </Link>
             </div>
           </div>
+        </div>
+      </section>
 
-          {/* System Status */}
-          <div className="glass rounded-2xl p-6 gradient-border">
-            <h3 className="text-sm font-black uppercase tracking-wider text-slate-400 mb-5">System Status</h3>
-            <div className="space-y-4">
-              {[
-                { name: "API Server", status: "Online", color: "bg-emerald-500" },
-                { name: "Redis Queue", status: "Active", color: "bg-emerald-500" },
-                { name: "Email Sync", status: "Scheduled", color: "bg-amber-500" },
-                { name: "WhatsApp", status: "Connected", color: "bg-emerald-500" },
-              ].map((service) => (
-                <div key={service.name} className="flex items-center justify-between">
-                  <span className="text-sm text-slate-400 font-medium">{service.name}</span>
-                  <div className="flex items-center gap-2">
-                    <span className={`w-1.5 h-1.5 rounded-full ${service.color} animate-pulse`} />
-                    <span className="text-xs font-bold text-slate-300">{service.status}</span>
-                  </div>
-                </div>
-              ))}
+      {/* Footer */}
+      <footer className="relative px-6 py-10 border-t border-white/[0.04]">
+        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-2">
+            <div className="w-6 h-6 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-md flex items-center justify-center text-[10px] font-black text-white">
+              E
             </div>
+            <span className="text-sm font-bold text-slate-400">EmailBot</span>
+          </div>
+          <p className="text-xs text-slate-600">
+            © 2026 EmailBot. Built with AI.
+          </p>
+          <div className="flex items-center gap-6">
+            <button className="text-xs text-slate-600 hover:text-slate-400 transition-colors">Privacy</button>
+            <button className="text-xs text-slate-600 hover:text-slate-400 transition-colors">Terms</button>
+            <a
+              href="https://github.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-slate-600 hover:text-slate-400 transition-colors"
+            >
+              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
+              </svg>
+            </a>
           </div>
         </div>
-      </div>
-    </div>
+      </footer>
+    </>
   );
 }

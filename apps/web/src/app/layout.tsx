@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
-import { Inter, Outfit } from "next/font/google";
+import { Inter, Outfit, Playfair_Display } from "next/font/google";
 import "./globals.css";
-import Sidebar from "@/components/Sidebar";
+import LayoutShell from "../components/LayoutShell";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -13,9 +13,15 @@ const outfit = Outfit({
   subsets: ["latin"],
 });
 
+const playfair = Playfair_Display({
+  variable: "--font-playfair",
+  subsets: ["latin"],
+  style: ["normal", "italic"],
+});
+
 export const metadata: Metadata = {
-  title: "EmailBot | Intelligent Digest & Forwarding",
-  description: "Automate your inbox with AI-powered digests and custom forwarding rules.",
+  title: "EmailBot | AI-Powered Email Intelligence",
+  description: "Automate your inbox with AI-powered prioritization, WhatsApp alerts, and custom forwarding rules. The AI agent that manages your inbox.",
 };
 
 export default function RootLayout({
@@ -26,21 +32,10 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${outfit.variable} h-full antialiased`}
+      className={`${inter.variable} ${outfit.variable} ${playfair.variable} h-full antialiased`}
     >
       <body className="font-outfit">
-        <div className="min-h-screen bg-[#050816] text-slate-50 selection:bg-indigo-500/30">
-          {/* Animated mesh background */}
-          <div className="mesh-bg" />
-
-          {/* Sidebar */}
-          <Sidebar />
-
-          {/* Main content area — offset by sidebar on desktop */}
-          <main className="relative z-10 lg:ml-[260px] min-h-screen pb-20 lg:pb-0">
-            {children}
-          </main>
-        </div>
+        <LayoutShell>{children}</LayoutShell>
       </body>
     </html>
   );

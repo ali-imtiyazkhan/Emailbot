@@ -3,10 +3,18 @@ import db from '../config/db.js';
 import logger from '../utils/logger.js';
 import { refreshOutlookToken } from '../config/outlook.js';
 
+export interface FetchedOutlookEmail {
+  id: string;
+  subject: string;
+  sender: string;
+  body: string;
+  receivedAt?: Date;
+}
+
 /**
  * Fetch latest unread emails for a specific user's Outlook account.
  */
-export const fetchOutlookEmails = async (userId: number) => {
+export const fetchOutlookEmails = async (userId: number): Promise<FetchedOutlookEmail[]> => {
   const account = await db.emailAccount.findFirst({ 
     where: { userId, provider: 'outlook', isActive: true } 
   });
@@ -29,7 +37,6 @@ export const fetchOutlookEmails = async (userId: number) => {
       
       accessToken = refreshed.access_token;
       
-      // Update database with new tokens
       await db.emailAccount.update({
         where: { id: account.id },
         data: {
@@ -40,10 +47,10 @@ export const fetchOutlookEmails = async (userId: number) => {
       });
       
       logger.info(`Successfully refreshed Outlook token for user ${userId}`);
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: unknown }; message?: string };
       logger.error(`Failed to refresh Outlook token for user ${userId}:`, 
-                   error.response?.data || error.message);
-      // Optional: Mark as inactive if refresh fails
+                   err.response?.data || err.message);
       return [];
     }
   }
@@ -58,20 +65,29 @@ export const fetchOutlookEmails = async (userId: number) => {
       },
     });
 
-    const messages = response.data.value || [];
+    interface OutlookMessage {
+      id: string;
+      subject: string;
+      from?: { emailAddress?: { address?: string } };
+      bodyPreview?: string;
+      receivedDateTime?: string;
+    }
+
+    const messages: OutlookMessage[] = response.data.value || [];
     
-    return messages.map((msg: any) => ({
+    return messages.map((msg) => ({
       id: msg.id,
       subject: msg.subject,
       sender: msg.from?.emailAddress?.address || 'Unknown',
       body: msg.bodyPreview || 'No content preview available.',
       receivedAt: msg.receivedDateTime ? new Date(msg.receivedDateTime) : undefined,
     }));
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const err = error as { response?: { data?: unknown; status?: number }; message?: string };
     logger.error(`Error fetching Outlook for user ${userId}:`, 
-                 error.response?.data || error.message);
+                 err.response?.data || err.message);
                  
-    if (error.response?.status === 401) {
+    if (err.response?.status === 401) {
       await db.emailAccount.update({
         where: { id: account.id },
         data: { isActive: false }

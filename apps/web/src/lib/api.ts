@@ -1,7 +1,6 @@
 export const API_BASE_URL = 'http://localhost:3001/api';
 
-// ── Types ──────────────────────────────────────────────
-
+//  Types
 export interface Stats {
   totalProcessed: number;
 }
@@ -13,6 +12,13 @@ export interface FilterRule {
   value: string;
   isActive: boolean;
   createdAt: string;
+}
+
+export interface User {
+  id: number;
+  email: string;
+  name: string | null;
+  whatsapp: string | null;
 }
 
 export interface ProcessedEmail {
@@ -108,6 +114,12 @@ export async function updateDigestSettings(settings: Partial<DigestSetting>): Pr
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(settings),
   });
-  if (!response.ok) throw new Error('Failed to update digest settings');
   return response.json();
 }
+
+export async function fetchProfile(): Promise<User> {
+  const response = await fetch(`${API_BASE_URL}/profile`);
+  if (!response.ok) throw new Error('Failed to fetch profile');
+  return response.json();
+}
+

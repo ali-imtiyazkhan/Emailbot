@@ -1,10 +1,17 @@
-import { fetchLatestEmails } from './gmailService.js';
-import { fetchOutlookEmails } from './outlookService.js';
+import { fetchLatestEmails, FetchedEmail } from './gmailService.js';
+import { fetchOutlookEmails, FetchedOutlookEmail } from './outlookService.js';
 import db from '../config/db.js';
 import { emailQueue } from './queueService.js';
 import logger from '../utils/logger.js';
 
-export const processEmails = async () => {
+export interface EmailJobData {
+  userId: number;
+  accountId: number;
+  email: FetchedEmail | FetchedOutlookEmail;
+  whatsapp: string | null;
+}
+
+export const processEmails = async (): Promise<void> => {
   logger.info('Starting multi-user email processing (Producer)...');
   
   const users = await db.user.findMany({
@@ -13,7 +20,7 @@ export const processEmails = async () => {
 
   for (const user of users) {
     for (const account of user.accounts) {
-      let emails: any[] = [];
+      let emails: (FetchedEmail | FetchedOutlookEmail)[] = [];
       try {
         if (account.provider === 'gmail') {
           emails = await fetchLatestEmails(user.id);
@@ -33,12 +40,14 @@ export const processEmails = async () => {
         if (existing) continue;
 
         // Push to Redis Queue for async processing
-        await emailQueue.add(`email-${email.id}`, {
+        const jobData: EmailJobData = {
           userId: user.id,
           accountId: account.id,
           email,
-          whatsapp: user.whatsapp
-        });
+          whatsapp: user.whatsapp,
+        };
+
+        await emailQueue.add(`email-${email.id}`, jobData);
         
         logger.info(`Email queued for processing: ${email.id}`);
       }

@@ -1,9 +1,7 @@
 import { Redis } from 'ioredis';
-import dotenv from 'dotenv';
-import path from 'path';
-import logger from '../utils/logger.js';
+import logger from '@repo/shared/logger';
 
-dotenv.config({ path: path.join(process.cwd(), '../../.env') });
+// Env is loaded centrally via config/env.ts (first import in index.ts)
 
 const REDIS_URL = process.env.REDIS_URL || 'redis://localhost:6379';
 

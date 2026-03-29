@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { z } from 'zod';
-import db from '../config/db.js';
-import logger from '../utils/logger.js';
+import { prisma as db } from '@repo/db';
+import logger from '@repo/shared/logger';
 
 const router = Router();
 
@@ -17,6 +17,22 @@ const updateDigestSchema = z.object({
   sendTime: z.string().regex(/^\d{2}:\d{2}$/, 'Must be HH:MM format'),
   timezone: z.string().min(1),
   minEmails: z.number().int().min(1).max(50),
+});
+
+// ── Profile ──────────────────────────────────────────
+
+router.get('/profile', async (req, res) => {
+  try {
+    const userId = 1; // Assuming hardcoded for now
+    const user = await db.user.findUnique({
+      where: { id: userId },
+      select: { id: true, email: true, name: true, whatsapp: true }
+    });
+    res.json(user);
+  } catch (error) {
+    logger.error('Error fetching profile:', error);
+    res.status(500).json({ error: 'Failed to fetch profile' });
+  }
 });
 
 // ── Stats ──────────────────────────────────────────────

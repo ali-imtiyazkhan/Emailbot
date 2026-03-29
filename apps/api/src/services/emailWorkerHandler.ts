@@ -2,8 +2,9 @@ import { summarizeEmail } from './aiService.js';
 import { sendNotification } from './whatsappService.js';
 import db from '../config/db.js';
 import logger from '../utils/logger.js';
+import { EmailJobData } from './emailProcessor.js';
 
-export const handleEmailJob = async (jobData: any) => {
+export const handleEmailJob = async (jobData: EmailJobData): Promise<void> => {
   const { userId, accountId, email, whatsapp } = jobData;
 
   logger.info(`Processing email ${email.id} with AI summary...`);

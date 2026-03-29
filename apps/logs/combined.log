@@ -179,3 +179,291 @@
 {"level":"info","message":"Email processing worker initialized.","timestamp":"2026-03-28T17:32:04.700Z"}
 {"level":"info","message":"EmailBot API running on port 3001","timestamp":"2026-03-28T17:32:04.831Z"}
 {"level":"info","message":"Connected to Redis","timestamp":"2026-03-28T17:32:04.847Z"}
+{"level":"info","message":"Scheduler initialized.","timestamp":"2026-03-28T18:25:36.051Z"}
+{"level":"info","message":"Email processing worker initialized.","timestamp":"2026-03-28T18:25:36.060Z"}
+{"level":"info","message":"EmailBot API running on port 3001","timestamp":"2026-03-28T18:25:36.146Z"}
+{"level":"info","message":"Connected to Redis","timestamp":"2026-03-28T18:25:36.162Z"}
+{"level":"info","message":"Running scheduled email check...","timestamp":"2026-03-28T18:30:00.565Z"}
+{"level":"info","message":"Starting multi-user email processing (Producer)...","timestamp":"2026-03-28T18:30:00.588Z"}
+{"level":"info","message":"Multi-user email discovery complete. All jobs queued.","timestamp":"2026-03-28T18:30:00.826Z"}
+{"level":"info","message":"Running scheduled email check...","timestamp":"2026-03-28T18:45:00.185Z"}
+{"level":"info","message":"Starting multi-user email processing (Producer)...","timestamp":"2026-03-28T18:45:00.199Z"}
+{"level":"info","message":"Multi-user email discovery complete. All jobs queued.","timestamp":"2026-03-28T18:45:00.271Z"}
+{"level":"info","message":"Running scheduled email check...","timestamp":"2026-03-28T19:00:00.576Z"}
+{"level":"info","message":"Starting multi-user email processing (Producer)...","timestamp":"2026-03-28T19:00:00.592Z"}
+{"level":"info","message":"Multi-user email discovery complete. All jobs queued.","timestamp":"2026-03-28T19:00:00.751Z"}
+{"level":"info","message":"Scheduler initialized.","timestamp":"2026-03-28T19:15:35.881Z"}
+{"level":"info","message":"Email processing worker initialized.","timestamp":"2026-03-28T19:15:35.892Z"}
+{"level":"info","message":"EmailBot API running on port 3001","timestamp":"2026-03-28T19:15:35.992Z"}
+{"level":"info","message":"Connected to Redis","timestamp":"2026-03-28T19:15:36.013Z"}
+{"config":{"body":"<<REDACTED> - See `errorRedactor` option in `gaxios` for configuration>.","data":"<<REDACTED> - See `errorRedactor` option in `gaxios` for configuration>.","headers":{"Content-Type":"application/x-www-form-urlencoded","User-Agent":"google-api-nodejs-client/9.15.1","x-goog-api-client":"gl-node/22.21.1"},"method":"POST","responseType":"unknown","retry":true,"retryConfig":{"currentRetryAttempt":0,"httpMethodsToRetry":["GET","PUT","POST","HEAD","OPTIONS","DELETE"],"maxRetryDelay":9007199254740991,"noResponseRetries":2,"retry":3,"retryDelayMultiplier":2,"statusCodesToRetry":[[100,199],[408,408],[429,429],[500,599]],"timeOfFirstRequest":1774725951793,"totalTimeout":9007199254740991},"url":"https://oauth2.googleapis.com/token"},"level":"error","message":"Gmail callback error: invalid_client","response":{"config":{"body":"<<REDACTED> - See `errorRedactor` option in `gaxios` for configuration>.","data":"<<REDACTED> - See `errorRedactor` option in `gaxios` for configuration>.","headers":{"Content-Type":"application/x-www-form-urlencoded","User-Agent":"google-api-nodejs-client/9.15.1","x-goog-api-client":"gl-node/22.21.1"},"method":"POST","responseType":"unknown","retry":true,"retryConfig":{"httpMethodsToRetry":["GET","PUT","POST","HEAD","OPTIONS","DELETE"]},"url":"https://oauth2.googleapis.com/token"},"data":{"error":"invalid_client","error_description":"The provided client secret is invalid."},"headers":{"alt-svc":"h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000","cache-control":"no-cache, no-store, max-age=0, must-revalidate","content-encoding":"gzip","content-type":"application/json; charset=utf-8","date":"Sat, 28 Mar 2026 19:25:50 GMT","expires":"Mon, 01 Jan 1990 00:00:00 GMT","pragma":"no-cache","server":"scaffolding on HTTPServer2","transfer-encoding":"chunked","vary":"Origin, X-Origin, Referer","x-content-type-options":"nosniff","x-frame-options":"SAMEORIGIN","x-xss-protection":"0"},"request":{"responseURL":"https://oauth2.googleapis.com/token"},"status":401,"statusText":"Unauthorized"},"stack":"Error: invalid_client\n    at Gaxios._request (D:\\projects\\EmailBot\\node_modules\\gaxios\\src\\gaxios.ts:146:15)\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async OAuth2Client.getTokenAsync (D:\\projects\\EmailBot\\node_modules\\google-auth-library\\build\\src\\auth\\oauth2client.js:158:21)\n    at async <anonymous> (D:\\projects\\EmailBot\\apps\\api\\src\\routes\\auth.ts:33:24)","status":401,"timestamp":"2026-03-28T19:25:51.814Z"}
+{"level":"info","message":"Running scheduled email check...","timestamp":"2026-03-28T19:30:00.357Z"}
+{"level":"info","message":"Starting multi-user email processing (Producer)...","timestamp":"2026-03-28T19:30:00.372Z"}
+{"level":"info","message":"Multi-user email discovery complete. All jobs queued.","timestamp":"2026-03-28T19:30:00.602Z"}
+{"level":"info","message":"Scheduler initialized.","timestamp":"2026-03-28T19:42:44.178Z"}
+{"level":"info","message":"Email processing worker initialized.","timestamp":"2026-03-28T19:42:44.183Z"}
+{"level":"info","message":"EmailBot API running on port 3001","timestamp":"2026-03-28T19:42:44.241Z"}
+{"level":"info","message":"Connected to Redis","timestamp":"2026-03-28T19:42:44.274Z"}
+{"config":{"body":"<<REDACTED> - See `errorRedactor` option in `gaxios` for configuration>.","data":"<<REDACTED> - See `errorRedactor` option in `gaxios` for configuration>.","headers":{"Content-Type":"application/x-www-form-urlencoded","User-Agent":"google-api-nodejs-client/9.15.1","x-goog-api-client":"gl-node/22.21.1"},"method":"POST","responseType":"unknown","retry":true,"retryConfig":{"currentRetryAttempt":0,"httpMethodsToRetry":["GET","PUT","POST","HEAD","OPTIONS","DELETE"],"maxRetryDelay":9007199254740991,"noResponseRetries":2,"retry":3,"retryDelayMultiplier":2,"statusCodesToRetry":[[100,199],[408,408],[429,429],[500,599]],"timeOfFirstRequest":1774726999418,"totalTimeout":9007199254740991},"url":"https://oauth2.googleapis.com/token"},"level":"error","message":"Gmail callback error: invalid_client","response":{"config":{"body":"<<REDACTED> - See `errorRedactor` option in `gaxios` for configuration>.","data":"<<REDACTED> - See `errorRedactor` option in `gaxios` for configuration>.","headers":{"Content-Type":"application/x-www-form-urlencoded","User-Agent":"google-api-nodejs-client/9.15.1","x-goog-api-client":"gl-node/22.21.1"},"method":"POST","responseType":"unknown","retry":true,"retryConfig":{"httpMethodsToRetry":["GET","PUT","POST","HEAD","OPTIONS","DELETE"]},"url":"https://oauth2.googleapis.com/token"},"data":{"error":"invalid_client","error_description":"The provided client secret is invalid."},"headers":{"alt-svc":"h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000","cache-control":"no-cache, no-store, max-age=0, must-revalidate","content-encoding":"gzip","content-type":"application/json; charset=utf-8","date":"Sat, 28 Mar 2026 19:43:18 GMT","expires":"Mon, 01 Jan 1990 00:00:00 GMT","pragma":"no-cache","server":"scaffolding on HTTPServer2","transfer-encoding":"chunked","vary":"Origin, X-Origin, Referer","x-content-type-options":"nosniff","x-frame-options":"SAMEORIGIN","x-xss-protection":"0"},"request":{"responseURL":"https://oauth2.googleapis.com/token"},"status":401,"statusText":"Unauthorized"},"stack":"Error: invalid_client\n    at Gaxios._request (D:\\projects\\EmailBot\\node_modules\\gaxios\\src\\gaxios.ts:146:15)\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async OAuth2Client.getTokenAsync (D:\\projects\\EmailBot\\node_modules\\google-auth-library\\build\\src\\auth\\oauth2client.js:158:21)\n    at async <anonymous> (D:\\projects\\EmailBot\\apps\\api\\src\\routes\\auth.ts:33:24)","status":401,"timestamp":"2026-03-28T19:43:19.424Z"}
+{"level":"info","message":"Running scheduled email check...","timestamp":"2026-03-28T19:45:00.551Z"}
+{"level":"info","message":"Starting multi-user email processing (Producer)...","timestamp":"2026-03-28T19:45:00.552Z"}
+{"level":"info","message":"Multi-user email discovery complete. All jobs queued.","timestamp":"2026-03-28T19:45:00.578Z"}
+{"level":"info","message":"Running scheduled email check...","timestamp":"2026-03-28T20:00:00.562Z"}
+{"level":"info","message":"Starting multi-user email processing (Producer)...","timestamp":"2026-03-28T20:00:00.578Z"}
+{"level":"info","message":"Multi-user email discovery complete. All jobs queued.","timestamp":"2026-03-28T20:00:00.756Z"}
+{"level":"info","message":"Running scheduled email check...","timestamp":"2026-03-28T20:15:00.699Z"}
+{"level":"info","message":"Starting multi-user email processing (Producer)...","timestamp":"2026-03-28T20:15:00.732Z"}
+{"level":"info","message":"Multi-user email discovery complete. All jobs queued.","timestamp":"2026-03-28T20:15:01.026Z"}
+{"level":"info","message":"Running scheduled email check...","timestamp":"2026-03-28T20:30:00.169Z"}
+{"level":"info","message":"Starting multi-user email processing (Producer)...","timestamp":"2026-03-28T20:30:00.208Z"}
+{"level":"info","message":"Multi-user email discovery complete. All jobs queued.","timestamp":"2026-03-28T20:30:00.647Z"}
+{"level":"info","message":"Running scheduled email check...","timestamp":"2026-03-28T20:45:00.265Z"}
+{"level":"info","message":"Starting multi-user email processing (Producer)...","timestamp":"2026-03-28T20:45:00.301Z"}
+{"level":"info","message":"Multi-user email discovery complete. All jobs queued.","timestamp":"2026-03-28T20:45:00.647Z"}
+{"level":"info","message":"Running scheduled email check...","timestamp":"2026-03-28T21:00:00.450Z"}
+{"level":"info","message":"Starting multi-user email processing (Producer)...","timestamp":"2026-03-28T21:00:00.491Z"}
+{"level":"info","message":"Multi-user email discovery complete. All jobs queued.","timestamp":"2026-03-28T21:00:00.784Z"}
+{"level":"info","message":"Running scheduled email check...","timestamp":"2026-03-28T21:15:00.114Z"}
+{"level":"info","message":"Starting multi-user email processing (Producer)...","timestamp":"2026-03-28T21:15:00.225Z"}
+{"level":"info","message":"Multi-user email discovery complete. All jobs queued.","timestamp":"2026-03-28T21:15:00.546Z"}
+{"level":"info","message":"Running scheduled email check...","timestamp":"2026-03-28T21:30:00.783Z"}
+{"level":"info","message":"Starting multi-user email processing (Producer)...","timestamp":"2026-03-28T21:30:00.836Z"}
+{"level":"info","message":"Multi-user email discovery complete. All jobs queued.","timestamp":"2026-03-28T21:30:01.230Z"}
+{"level":"info","message":"Running scheduled email check...","timestamp":"2026-03-28T21:45:00.532Z"}
+{"level":"info","message":"Starting multi-user email processing (Producer)...","timestamp":"2026-03-28T21:45:00.579Z"}
+{"level":"info","message":"Multi-user email discovery complete. All jobs queued.","timestamp":"2026-03-28T21:45:01.010Z"}
+{"level":"info","message":"Scheduler initialized.","timestamp":"2026-03-28T21:48:08.072Z"}
+{"level":"info","message":"Email processing worker initialized.","timestamp":"2026-03-28T21:48:08.104Z"}
+{"level":"info","message":"EmailBot API running on port 3001","timestamp":"2026-03-28T21:48:08.687Z"}
+{"level":"info","message":"Connected to Redis","timestamp":"2026-03-28T21:48:08.768Z"}
+{"level":"info","message":"Scheduler initialized.","timestamp":"2026-03-28T21:54:59.247Z"}
+{"level":"info","message":"Email processing worker initialized.","timestamp":"2026-03-28T21:54:59.250Z"}
+{"level":"info","message":"EmailBot API running on port 3001","timestamp":"2026-03-28T21:54:59.301Z"}
+{"level":"info","message":"Connected to Redis","timestamp":"2026-03-28T21:54:59.311Z"}
+{"config":{"body":"<<REDACTED> - See `errorRedactor` option in `gaxios` for configuration>.","data":"<<REDACTED> - See `errorRedactor` option in `gaxios` for configuration>.","headers":{"Content-Type":"application/x-www-form-urlencoded","User-Agent":"google-api-nodejs-client/9.15.1","x-goog-api-client":"gl-node/22.21.1"},"method":"POST","responseType":"unknown","retry":true,"retryConfig":{"currentRetryAttempt":0,"httpMethodsToRetry":["GET","PUT","POST","HEAD","OPTIONS","DELETE"],"maxRetryDelay":9007199254740991,"noResponseRetries":2,"retry":3,"retryDelayMultiplier":2,"statusCodesToRetry":[[100,199],[408,408],[429,429],[500,599]],"timeOfFirstRequest":1774734930282,"totalTimeout":9007199254740991},"url":"https://oauth2.googleapis.com/token"},"level":"error","message":"Gmail callback error: invalid_client","response":{"config":{"body":"<<REDACTED> - See `errorRedactor` option in `gaxios` for configuration>.","data":"<<REDACTED> - See `errorRedactor` option in `gaxios` for configuration>.","headers":{"Content-Type":"application/x-www-form-urlencoded","User-Agent":"google-api-nodejs-client/9.15.1","x-goog-api-client":"gl-node/22.21.1"},"method":"POST","responseType":"unknown","retry":true,"retryConfig":{"httpMethodsToRetry":["GET","PUT","POST","HEAD","OPTIONS","DELETE"]},"url":"https://oauth2.googleapis.com/token"},"data":{"error":"invalid_client","error_description":"The provided client secret is invalid."},"headers":{"alt-svc":"h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000","cache-control":"no-cache, no-store, max-age=0, must-revalidate","content-encoding":"gzip","content-type":"application/json; charset=utf-8","date":"Sat, 28 Mar 2026 21:55:30 GMT","expires":"Mon, 01 Jan 1990 00:00:00 GMT","pragma":"no-cache","server":"scaffolding on HTTPServer2","transfer-encoding":"chunked","vary":"Origin, X-Origin, Referer","x-content-type-options":"nosniff","x-frame-options":"SAMEORIGIN","x-xss-protection":"0"},"request":{"responseURL":"https://oauth2.googleapis.com/token"},"status":401,"statusText":"Unauthorized"},"stack":"Error: invalid_client\n    at Gaxios._request (D:\\projects\\EmailBot\\node_modules\\gaxios\\src\\gaxios.ts:146:15)\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async OAuth2Client.getTokenAsync (D:\\projects\\EmailBot\\node_modules\\google-auth-library\\build\\src\\auth\\oauth2client.js:158:21)\n    at async <anonymous> (D:\\projects\\EmailBot\\apps\\api\\src\\routes\\auth.ts:33:24)","status":401,"timestamp":"2026-03-28T21:55:30.289Z"}
+{"config":{"body":"<<REDACTED> - See `errorRedactor` option in `gaxios` for configuration>.","data":"<<REDACTED> - See `errorRedactor` option in `gaxios` for configuration>.","headers":{"Content-Type":"application/x-www-form-urlencoded","User-Agent":"google-api-nodejs-client/9.15.1","x-goog-api-client":"gl-node/22.21.1"},"method":"POST","responseType":"unknown","retry":true,"retryConfig":{"currentRetryAttempt":0,"httpMethodsToRetry":["GET","PUT","POST","HEAD","OPTIONS","DELETE"],"maxRetryDelay":9007199254740991,"noResponseRetries":2,"retry":3,"retryDelayMultiplier":2,"statusCodesToRetry":[[100,199],[408,408],[429,429],[500,599]],"timeOfFirstRequest":1774734939627,"totalTimeout":9007199254740991},"url":"https://oauth2.googleapis.com/token"},"level":"error","message":"Gmail callback error: invalid_client","response":{"config":{"body":"<<REDACTED> - See `errorRedactor` option in `gaxios` for configuration>.","data":"<<REDACTED> - See `errorRedactor` option in `gaxios` for configuration>.","headers":{"Content-Type":"application/x-www-form-urlencoded","User-Agent":"google-api-nodejs-client/9.15.1","x-goog-api-client":"gl-node/22.21.1"},"method":"POST","responseType":"unknown","retry":true,"retryConfig":{"httpMethodsToRetry":["GET","PUT","POST","HEAD","OPTIONS","DELETE"]},"url":"https://oauth2.googleapis.com/token"},"data":{"error":"invalid_client","error_description":"The provided client secret is invalid."},"headers":{"alt-svc":"h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000","cache-control":"no-cache, no-store, max-age=0, must-revalidate","content-encoding":"gzip","content-type":"application/json; charset=utf-8","date":"Sat, 28 Mar 2026 21:55:39 GMT","expires":"Mon, 01 Jan 1990 00:00:00 GMT","pragma":"no-cache","server":"scaffolding on HTTPServer2","transfer-encoding":"chunked","vary":"Origin, X-Origin, Referer","x-content-type-options":"nosniff","x-frame-options":"SAMEORIGIN","x-xss-protection":"0"},"request":{"responseURL":"https://oauth2.googleapis.com/token"},"status":401,"statusText":"Unauthorized"},"stack":"Error: invalid_client\n    at Gaxios._request (D:\\projects\\EmailBot\\node_modules\\gaxios\\src\\gaxios.ts:146:15)\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async OAuth2Client.getTokenAsync (D:\\projects\\EmailBot\\node_modules\\google-auth-library\\build\\src\\auth\\oauth2client.js:158:21)\n    at async <anonymous> (D:\\projects\\EmailBot\\apps\\api\\src\\routes\\auth.ts:33:24)","status":401,"timestamp":"2026-03-28T21:55:39.627Z"}
+{"config":{"body":"<<REDACTED> - See `errorRedactor` option in `gaxios` for configuration>.","data":"<<REDACTED> - See `errorRedactor` option in `gaxios` for configuration>.","headers":{"Content-Type":"application/x-www-form-urlencoded","User-Agent":"google-api-nodejs-client/9.15.1","x-goog-api-client":"gl-node/22.21.1"},"method":"POST","responseType":"unknown","retry":true,"retryConfig":{"currentRetryAttempt":0,"httpMethodsToRetry":["GET","PUT","POST","HEAD","OPTIONS","DELETE"],"maxRetryDelay":9007199254740991,"noResponseRetries":2,"retry":3,"retryDelayMultiplier":2,"statusCodesToRetry":[[100,199],[408,408],[429,429],[500,599]],"timeOfFirstRequest":1774735004681,"totalTimeout":9007199254740991},"url":"https://oauth2.googleapis.com/token"},"level":"error","message":"Gmail callback error: invalid_client","response":{"config":{"body":"<<REDACTED> - See `errorRedactor` option in `gaxios` for configuration>.","data":"<<REDACTED> - See `errorRedactor` option in `gaxios` for configuration>.","headers":{"Content-Type":"application/x-www-form-urlencoded","User-Agent":"google-api-nodejs-client/9.15.1","x-goog-api-client":"gl-node/22.21.1"},"method":"POST","responseType":"unknown","retry":true,"retryConfig":{"httpMethodsToRetry":["GET","PUT","POST","HEAD","OPTIONS","DELETE"]},"url":"https://oauth2.googleapis.com/token"},"data":{"error":"invalid_client","error_description":"The provided client secret is invalid."},"headers":{"alt-svc":"h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000","cache-control":"no-cache, no-store, max-age=0, must-revalidate","content-encoding":"gzip","content-type":"application/json; charset=utf-8","date":"Sat, 28 Mar 2026 21:56:44 GMT","expires":"Mon, 01 Jan 1990 00:00:00 GMT","pragma":"no-cache","server":"scaffolding on HTTPServer2","transfer-encoding":"chunked","vary":"Origin, X-Origin, Referer","x-content-type-options":"nosniff","x-frame-options":"SAMEORIGIN","x-xss-protection":"0"},"request":{"responseURL":"https://oauth2.googleapis.com/token"},"status":401,"statusText":"Unauthorized"},"stack":"Error: invalid_client\n    at Gaxios._request (D:\\projects\\EmailBot\\node_modules\\gaxios\\src\\gaxios.ts:146:15)\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async OAuth2Client.getTokenAsync (D:\\projects\\EmailBot\\node_modules\\google-auth-library\\build\\src\\auth\\oauth2client.js:158:21)\n    at async <anonymous> (D:\\projects\\EmailBot\\apps\\api\\src\\routes\\auth.ts:33:24)","status":401,"timestamp":"2026-03-28T21:56:44.685Z"}
+{"level":"info","message":"Scheduler initialized.","timestamp":"2026-03-28T21:58:54.130Z"}
+{"level":"info","message":"Email processing worker initialized.","timestamp":"2026-03-28T21:58:54.135Z"}
+{"level":"info","message":"EmailBot API running on port 3001","timestamp":"2026-03-28T21:58:54.197Z"}
+{"level":"info","message":"Connected to Redis","timestamp":"2026-03-28T21:58:54.207Z"}
+{"level":"info","message":"Gmail connected for user 1: itzkhantijara@gmail.com","timestamp":"2026-03-28T21:59:27.720Z"}
+{"level":"info","message":"Running scheduled email check...","timestamp":"2026-03-28T22:00:00.751Z"}
+{"level":"info","message":"Starting multi-user email processing (Producer)...","timestamp":"2026-03-28T22:00:00.783Z"}
+{"level":"info","message":"Email queued for processing: 19d34b62cbd8b373","timestamp":"2026-03-28T22:00:15.330Z"}
+{"level":"info","message":"Processing job 1 for email 19d34b62cbd8b373","timestamp":"2026-03-28T22:00:15.378Z"}
+{"level":"info","message":"Processing email 19d34b62cbd8b373 with AI summary...","timestamp":"2026-03-28T22:00:15.390Z"}
+{"level":"info","message":"Email queued for processing: 19d343a168733db6","timestamp":"2026-03-28T22:00:15.702Z"}
+{"level":"info","message":"Email queued for processing: 19d33925718caa6b","timestamp":"2026-03-28T22:00:15.772Z"}
+{"level":"info","message":"Processing job 2 for email 19d343a168733db6","timestamp":"2026-03-28T22:00:15.774Z"}
+{"level":"info","message":"Processing email 19d343a168733db6 with AI summary...","timestamp":"2026-03-28T22:00:15.779Z"}
+{"level":"info","message":"Processing job 3 for email 19d33925718caa6b","timestamp":"2026-03-28T22:00:15.823Z"}
+{"level":"info","message":"Processing email 19d33925718caa6b with AI summary...","timestamp":"2026-03-28T22:00:15.828Z"}
+{"level":"info","message":"Email queued for processing: 19d3129f3142f53c","timestamp":"2026-03-28T22:00:15.846Z"}
+{"level":"info","message":"Processing job 4 for email 19d3129f3142f53c","timestamp":"2026-03-28T22:00:15.883Z"}
+{"level":"info","message":"Processing email 19d3129f3142f53c with AI summary...","timestamp":"2026-03-28T22:00:15.887Z"}
+{"level":"info","message":"Email queued for processing: 19d3126b21e8b06c","timestamp":"2026-03-28T22:00:15.912Z"}
+{"level":"info","message":"Processing job 5 for email 19d3126b21e8b06c","timestamp":"2026-03-28T22:00:15.921Z"}
+{"level":"info","message":"Processing email 19d3126b21e8b06c with AI summary...","timestamp":"2026-03-28T22:00:15.925Z"}
+{"level":"info","message":"Email queued for processing: 19d2f81902b91615","timestamp":"2026-03-28T22:00:16.162Z"}
+{"level":"info","message":"Email queued for processing: 19d2e3806bfbcc2e","timestamp":"2026-03-28T22:00:16.221Z"}
+{"level":"info","message":"Email queued for processing: 19d2d522ba71f0cf","timestamp":"2026-03-28T22:00:16.267Z"}
+{"level":"info","message":"Email queued for processing: 19d2bc56deaa2f5d","timestamp":"2026-03-28T22:00:16.333Z"}
+{"level":"info","message":"Email queued for processing: 19d2bb9e028e86dd","timestamp":"2026-03-28T22:00:16.629Z"}
+{"level":"info","message":"Email queued for processing: 19d2b9c59952e337","timestamp":"2026-03-28T22:00:16.661Z"}
+{"level":"info","message":"Email queued for processing: 19d2b944ec560a8b","timestamp":"2026-03-28T22:00:16.696Z"}
+{"level":"info","message":"Email queued for processing: 19d2b84b54a041dc","timestamp":"2026-03-28T22:00:16.791Z"}
+{"level":"info","message":"Email queued for processing: 19d2b7dde7057a8f","timestamp":"2026-03-28T22:00:16.950Z"}
+{"level":"info","message":"Email queued for processing: 19d2b7d73f85834a","timestamp":"2026-03-28T22:00:17.786Z"}
+{"level":"info","message":"Multi-user email discovery complete. All jobs queued.","timestamp":"2026-03-28T22:00:17.802Z"}
+{"level":"error","message":"Error calling Google Gemini service:","timestamp":"2026-03-28T22:00:17.933Z"}
+{"level":"error","message":"Error calling Google Gemini service:","timestamp":"2026-03-28T22:00:18.276Z"}
+{"level":"error","message":"Error calling Google Gemini service:","timestamp":"2026-03-28T22:00:18.871Z"}
+{"level":"error","message":"Error calling Google Gemini service:","timestamp":"2026-03-28T22:00:18.886Z"}
+{"level":"error","message":"Error calling Google Gemini service:","timestamp":"2026-03-28T22:00:18.921Z"}
+{"level":"info","message":"Successfully processed email 19d34b62cbd8b373.","timestamp":"2026-03-28T22:00:19.085Z"}
+{"level":"info","message":"Job 1 completed successfully","timestamp":"2026-03-28T22:00:19.943Z"}
+{"level":"info","message":"Processing job 6 for email 19d2f81902b91615","timestamp":"2026-03-28T22:00:19.961Z"}
+{"level":"info","message":"Processing email 19d2f81902b91615 with AI summary...","timestamp":"2026-03-28T22:00:19.980Z"}
+{"level":"info","message":"Successfully processed email 19d33925718caa6b.","timestamp":"2026-03-28T22:00:20.176Z"}
+{"level":"info","message":"Job 3 completed successfully","timestamp":"2026-03-28T22:00:20.441Z"}
+{"level":"info","message":"Processing job 7 for email 19d2e3806bfbcc2e","timestamp":"2026-03-28T22:00:20.445Z"}
+{"level":"info","message":"Processing email 19d2e3806bfbcc2e with AI summary...","timestamp":"2026-03-28T22:00:20.452Z"}
+{"level":"error","message":"Error calling Google Gemini service:","timestamp":"2026-03-28T22:00:20.709Z"}
+{"level":"error","message":"Error calling Google Gemini service:","timestamp":"2026-03-28T22:00:20.753Z"}
+{"level":"info","message":"Successfully processed email 19d2f81902b91615.","timestamp":"2026-03-28T22:00:20.972Z"}
+{"level":"info","message":"Successfully processed email 19d2e3806bfbcc2e.","timestamp":"2026-03-28T22:00:21.005Z"}
+{"level":"info","message":"Job 6 completed successfully","timestamp":"2026-03-28T22:00:21.042Z"}
+{"level":"info","message":"Processing job 8 for email 19d2d522ba71f0cf","timestamp":"2026-03-28T22:00:21.061Z"}
+{"level":"info","message":"Processing email 19d2d522ba71f0cf with AI summary...","timestamp":"2026-03-28T22:00:21.075Z"}
+{"level":"info","message":"Job 7 completed successfully","timestamp":"2026-03-28T22:00:21.116Z"}
+{"level":"info","message":"Processing job 9 for email 19d2bc56deaa2f5d","timestamp":"2026-03-28T22:00:21.128Z"}
+{"level":"info","message":"Processing email 19d2bc56deaa2f5d with AI summary...","timestamp":"2026-03-28T22:00:21.131Z"}
+{"level":"error","message":"Error calling Google Gemini service:","timestamp":"2026-03-28T22:00:21.295Z"}
+{"level":"info","message":"Successfully processed email 19d2d522ba71f0cf.","timestamp":"2026-03-28T22:00:21.398Z"}
+{"level":"error","message":"Error calling Google Gemini service:","timestamp":"2026-03-28T22:00:21.495Z"}
+{"level":"info","message":"Job 8 completed successfully","timestamp":"2026-03-28T22:00:21.697Z"}
+{"level":"info","message":"Processing job 10 for email 19d2bb9e028e86dd","timestamp":"2026-03-28T22:00:21.707Z"}
+{"level":"info","message":"Processing email 19d2bb9e028e86dd with AI summary...","timestamp":"2026-03-28T22:00:21.709Z"}
+{"level":"info","message":"Successfully processed email 19d2bc56deaa2f5d.","timestamp":"2026-03-28T22:00:21.832Z"}
+{"level":"info","message":"Job 9 completed successfully","timestamp":"2026-03-28T22:00:21.989Z"}
+{"level":"info","message":"Processing job 11 for email 19d2b9c59952e337","timestamp":"2026-03-28T22:00:22.010Z"}
+{"level":"info","message":"Processing email 19d2b9c59952e337 with AI summary...","timestamp":"2026-03-28T22:00:22.029Z"}
+{"level":"error","message":"Error calling Google Gemini service:","timestamp":"2026-03-28T22:00:22.178Z"}
+{"level":"error","message":"Error calling Google Gemini service:","timestamp":"2026-03-28T22:00:22.274Z"}
+{"level":"info","message":"Successfully processed email 19d2b9c59952e337.","timestamp":"2026-03-28T22:00:22.388Z"}
+{"level":"info","message":"Job 11 completed successfully","timestamp":"2026-03-28T22:00:22.475Z"}
+{"level":"info","message":"Processing job 12 for email 19d2b944ec560a8b","timestamp":"2026-03-28T22:00:22.487Z"}
+{"level":"info","message":"Processing email 19d2b944ec560a8b with AI summary...","timestamp":"2026-03-28T22:00:22.491Z"}
+{"level":"info","message":"Successfully processed email 19d2bb9e028e86dd.","timestamp":"2026-03-28T22:00:22.510Z"}
+{"level":"info","message":"Job 10 completed successfully","timestamp":"2026-03-28T22:00:22.560Z"}
+{"level":"info","message":"Processing job 13 for email 19d2b84b54a041dc","timestamp":"2026-03-28T22:00:22.568Z"}
+{"level":"info","message":"Processing email 19d2b84b54a041dc with AI summary...","timestamp":"2026-03-28T22:00:22.570Z"}
+{"level":"error","message":"Error calling Google Gemini service:","timestamp":"2026-03-28T22:00:23.102Z"}
+{"level":"error","message":"Error calling Google Gemini service:","timestamp":"2026-03-28T22:00:23.157Z"}
+{"level":"info","message":"Successfully processed email 19d3126b21e8b06c.","timestamp":"2026-03-28T22:00:23.190Z"}
+{"level":"info","message":"Job 5 completed successfully","timestamp":"2026-03-28T22:00:23.248Z"}
+{"level":"info","message":"Processing job 14 for email 19d2b7dde7057a8f","timestamp":"2026-03-28T22:00:23.258Z"}
+{"level":"info","message":"Processing email 19d2b7dde7057a8f with AI summary...","timestamp":"2026-03-28T22:00:23.262Z"}
+{"level":"info","message":"Successfully processed email 19d343a168733db6.","timestamp":"2026-03-28T22:00:23.289Z"}
+{"level":"info","message":"Job 2 completed successfully","timestamp":"2026-03-28T22:00:23.343Z"}
+{"level":"info","message":"Processing job 15 for email 19d2b7d73f85834a","timestamp":"2026-03-28T22:00:23.353Z"}
+{"level":"info","message":"Processing email 19d2b7d73f85834a with AI summary...","timestamp":"2026-03-28T22:00:23.357Z"}
+{"level":"info","message":"Successfully processed email 19d2b84b54a041dc.","timestamp":"2026-03-28T22:00:23.367Z"}
+{"level":"info","message":"Job 13 completed successfully","timestamp":"2026-03-28T22:00:23.429Z"}
+{"level":"info","message":"Successfully processed email 19d2b944ec560a8b.","timestamp":"2026-03-28T22:00:23.481Z"}
+{"level":"info","message":"Job 12 completed successfully","timestamp":"2026-03-28T22:00:23.509Z"}
+{"level":"info","message":"Successfully processed email 19d3129f3142f53c.","timestamp":"2026-03-28T22:00:23.534Z"}
+{"level":"info","message":"Job 4 completed successfully","timestamp":"2026-03-28T22:00:23.552Z"}
+{"level":"error","message":"Error calling Google Gemini service:","timestamp":"2026-03-28T22:00:23.780Z"}
+{"level":"error","message":"Error calling Google Gemini service:","timestamp":"2026-03-28T22:00:23.786Z"}
+{"level":"info","message":"Successfully processed email 19d2b7d73f85834a.","timestamp":"2026-03-28T22:00:23.831Z"}
+{"level":"info","message":"Successfully processed email 19d2b7dde7057a8f.","timestamp":"2026-03-28T22:00:23.851Z"}
+{"level":"info","message":"Job 15 completed successfully","timestamp":"2026-03-28T22:00:23.868Z"}
+{"level":"info","message":"Job 14 completed successfully","timestamp":"2026-03-28T22:00:23.883Z"}
+{"level":"info","message":"Scheduler initialized.","timestamp":"2026-03-29T12:13:26.236Z"}
+{"level":"info","message":"Email processing worker initialized.","timestamp":"2026-03-29T12:13:26.240Z"}
+{"level":"info","message":"EmailBot API running on port 3001","timestamp":"2026-03-29T12:13:26.370Z"}
+{"level":"info","message":"Connected to Redis","timestamp":"2026-03-29T12:13:26.390Z"}
+{"level":"info","message":"Running scheduled email check...","timestamp":"2026-03-29T12:15:00.164Z"}
+{"level":"info","message":"Starting multi-user email processing (Producer)...","timestamp":"2026-03-29T12:15:00.166Z"}
+{"level":"info","message":"Refreshed Gmail access token for user 1","timestamp":"2026-03-29T12:15:00.634Z"}
+{"level":"info","message":"Multi-user email discovery complete. All jobs queued.","timestamp":"2026-03-29T12:15:09.533Z"}
+{"error":{"code":"Authorization_RequestDenied","innerError":{"client-request-id":"82e65361-aff6-416d-a332-f9d0b0ffa9e5","date":"2026-03-29T12:16:40","request-id":"82e65361-aff6-416d-a332-f9d0b0ffa9e5"},"message":"Insufficient privileges to complete the operation."},"level":"error","message":"Outlook callback error:","timestamp":"2026-03-29T12:16:39.723Z"}
+{"level":"info","message":"Scheduler initialized.","timestamp":"2026-03-29T12:20:56.750Z"}
+{"level":"info","message":"Email processing worker initialized.","timestamp":"2026-03-29T12:20:56.763Z"}
+{"level":"info","message":"EmailBot API running on port 3001","timestamp":"2026-03-29T12:20:56.848Z"}
+{"level":"info","message":"Connected to Redis","timestamp":"2026-03-29T12:20:56.871Z"}
+{"level":"info","message":"Scheduler initialized.","timestamp":"2026-03-29T12:21:02.427Z"}
+{"level":"info","message":"Email processing worker initialized.","timestamp":"2026-03-29T12:21:02.431Z"}
+{"level":"info","message":"EmailBot API running on port 3001","timestamp":"2026-03-29T12:21:02.446Z"}
+{"level":"info","message":"Connected to Redis","timestamp":"2026-03-29T12:21:02.457Z"}
+{"level":"info","message":"Scheduler initialized.","timestamp":"2026-03-29T12:21:09.688Z"}
+{"level":"info","message":"Email processing worker initialized.","timestamp":"2026-03-29T12:21:09.692Z"}
+{"level":"info","message":"EmailBot API running on port 3001","timestamp":"2026-03-29T12:21:09.707Z"}
+{"level":"info","message":"Connected to Redis","timestamp":"2026-03-29T12:21:09.717Z"}
+{"level":"info","message":"Scheduler initialized.","timestamp":"2026-03-29T12:21:18.705Z"}
+{"level":"info","message":"Email processing worker initialized.","timestamp":"2026-03-29T12:21:18.722Z"}
+{"level":"info","message":"EmailBot API running on port 3001","timestamp":"2026-03-29T12:21:18.776Z"}
+{"level":"info","message":"Connected to Redis","timestamp":"2026-03-29T12:21:18.835Z"}
+{"level":"info","message":"Scheduler initialized.","timestamp":"2026-03-29T12:21:22.962Z"}
+{"level":"info","message":"Email processing worker initialized.","timestamp":"2026-03-29T12:21:22.966Z"}
+{"level":"info","message":"EmailBot API running on port 3001","timestamp":"2026-03-29T12:21:22.980Z"}
+{"level":"info","message":"Connected to Redis","timestamp":"2026-03-29T12:21:22.994Z"}
+{"level":"info","message":"Scheduler initialized.","timestamp":"2026-03-29T12:21:30.468Z"}
+{"level":"info","message":"Email processing worker initialized.","timestamp":"2026-03-29T12:21:30.473Z"}
+{"level":"info","message":"EmailBot API running on port 3001","timestamp":"2026-03-29T12:21:30.487Z"}
+{"level":"info","message":"Connected to Redis","timestamp":"2026-03-29T12:21:30.502Z"}
+{"level":"info","message":"Running scheduled email check...","timestamp":"2026-03-29T12:22:00.778Z"}
+{"level":"info","message":"Starting multi-user email processing (Producer)...","timestamp":"2026-03-29T12:22:00.779Z"}
+{"level":"info","message":"Multi-user email discovery complete. All jobs queued.","timestamp":"2026-03-29T12:22:09.539Z"}
+{"level":"info","message":"Running scheduled email check...","timestamp":"2026-03-29T12:23:00.348Z"}
+{"level":"info","message":"Starting multi-user email processing (Producer)...","timestamp":"2026-03-29T12:23:00.351Z"}
+{"level":"info","message":"Multi-user email discovery complete. All jobs queued.","timestamp":"2026-03-29T12:23:08.495Z"}
+{"level":"error","message":"Error calling Google Gemini service:","timestamp":"2026-03-29T12:23:51.000Z"}
+{"level":"error","message":"Error calling Google Gemini service:","timestamp":"2026-03-29T12:23:51.334Z"}
+{"level":"error","message":"Error calling Google Gemini service:","timestamp":"2026-03-29T12:23:51.627Z"}
+{"level":"info","message":"Running scheduled email check...","timestamp":"2026-03-29T12:24:00.991Z"}
+{"level":"info","message":"Starting multi-user email processing (Producer)...","timestamp":"2026-03-29T12:24:00.991Z"}
+{"level":"error","message":"Error calling Google Gemini service:","timestamp":"2026-03-29T12:24:07.551Z"}
+{"level":"error","message":"Error calling Google Gemini service:","timestamp":"2026-03-29T12:24:07.708Z"}
+{"level":"error","message":"Error calling Google Gemini service:","timestamp":"2026-03-29T12:24:08.027Z"}
+{"level":"info","message":"Multi-user email discovery complete. All jobs queued.","timestamp":"2026-03-29T12:24:09.099Z"}
+{"level":"error","message":"Error calling Google Gemini service:","timestamp":"2026-03-29T12:24:30.265Z"}
+{"level":"error","message":"Error calling Google Gemini service:","timestamp":"2026-03-29T12:24:30.590Z"}
+{"level":"error","message":"Error calling Google Gemini service:","timestamp":"2026-03-29T12:24:30.747Z"}
+{"level":"info","message":"Scheduler initialized.","timestamp":"2026-03-29T12:24:40.594Z"}
+{"level":"info","message":"Email processing worker initialized.","timestamp":"2026-03-29T12:24:40.618Z"}
+{"level":"info","message":"EmailBot API running on port 3001","timestamp":"2026-03-29T12:24:40.672Z"}
+{"level":"info","message":"Connected to Redis","timestamp":"2026-03-29T12:24:40.686Z"}
+{"level":"error","message":"Error calling Google Gemini service:","timestamp":"2026-03-29T12:24:47.258Z"}
+{"level":"error","message":"Error calling Google Gemini service:","timestamp":"2026-03-29T12:24:47.419Z"}
+{"level":"error","message":"Error calling Google Gemini service:","timestamp":"2026-03-29T12:24:47.759Z"}
+{"level":"info","message":"Running scheduled email check...","timestamp":"2026-03-29T12:25:00.813Z"}
+{"level":"info","message":"Starting multi-user email processing (Producer)...","timestamp":"2026-03-29T12:25:00.814Z"}
+{"level":"info","message":"Multi-user email discovery complete. All jobs queued.","timestamp":"2026-03-29T12:25:10.532Z"}
+{"level":"info","message":"Scheduler initialized.","timestamp":"2026-03-29T12:25:59.080Z"}
+{"level":"info","message":"Email processing worker initialized.","timestamp":"2026-03-29T12:25:59.094Z"}
+{"level":"info","message":"EmailBot API running on port 3001","timestamp":"2026-03-29T12:25:59.150Z"}
+{"level":"info","message":"Connected to Redis","timestamp":"2026-03-29T12:25:59.164Z"}
+{"level":"info","message":"Running scheduled email check...","timestamp":"2026-03-29T12:26:00.083Z"}
+{"level":"info","message":"Starting multi-user email processing (Producer)...","timestamp":"2026-03-29T12:26:00.085Z"}
+{"level":"info","message":"Scheduler initialized.","timestamp":"2026-03-29T12:26:09.287Z"}
+{"level":"info","message":"Email processing worker initialized.","timestamp":"2026-03-29T12:26:09.290Z"}
+{"level":"info","message":"EmailBot API running on port 3001","timestamp":"2026-03-29T12:26:09.307Z"}
+{"level":"info","message":"Connected to Redis","timestamp":"2026-03-29T12:26:09.317Z"}
+{"level":"info","message":"Scheduler initialized.","timestamp":"2026-03-29T12:26:17.689Z"}
+{"level":"info","message":"Email processing worker initialized.","timestamp":"2026-03-29T12:26:17.694Z"}
+{"level":"info","message":"EmailBot API running on port 3001","timestamp":"2026-03-29T12:26:17.713Z"}
+{"level":"info","message":"Connected to Redis","timestamp":"2026-03-29T12:26:17.724Z"}
+{"level":"info","message":"Running scheduled email check...","timestamp":"2026-03-29T12:27:00.118Z"}
+{"level":"info","message":"Starting multi-user email processing (Producer)...","timestamp":"2026-03-29T12:27:00.120Z"}
+{"level":"info","message":"Multi-user email discovery complete. All jobs queued.","timestamp":"2026-03-29T12:27:09.061Z"}
+{"level":"info","message":"Running scheduled email check...","timestamp":"2026-03-29T12:28:00.691Z"}
+{"level":"info","message":"Starting multi-user email processing (Producer)...","timestamp":"2026-03-29T12:28:00.700Z"}
+{"level":"info","message":"Multi-user email discovery complete. All jobs queued.","timestamp":"2026-03-29T12:28:09.687Z"}
+{"level":"info","message":"Running scheduled email check...","timestamp":"2026-03-29T12:29:00.250Z"}
+{"level":"info","message":"Starting multi-user email processing (Producer)...","timestamp":"2026-03-29T12:29:00.251Z"}
+{"level":"info","message":"Scheduler initialized.","timestamp":"2026-03-29T12:29:13.713Z"}
+{"level":"info","message":"Email processing worker initialized.","timestamp":"2026-03-29T12:29:13.717Z"}
+{"level":"info","message":"EmailBot API running on port 3001","timestamp":"2026-03-29T12:29:13.751Z"}
+{"level":"info","message":"Connected to Redis","timestamp":"2026-03-29T12:29:13.759Z"}
+{"level":"info","message":"Running scheduled email check...","timestamp":"2026-03-29T12:30:00.188Z"}
+{"level":"info","message":"Starting multi-user email processing (Producer)...","timestamp":"2026-03-29T12:30:00.197Z"}
+{"level":"info","message":"Multi-user email discovery complete. All jobs queued.","timestamp":"2026-03-29T12:30:09.293Z"}
+{"level":"info","message":"Running scheduled email check...","timestamp":"2026-03-29T12:31:00.842Z"}
+{"level":"info","message":"Starting multi-user email processing (Producer)...","timestamp":"2026-03-29T12:31:00.846Z"}
+{"level":"info","message":"Multi-user email discovery complete. All jobs queued.","timestamp":"2026-03-29T12:31:09.511Z"}
+{"level":"info","message":"Running scheduled email check...","timestamp":"2026-03-29T12:32:00.427Z"}
+{"level":"info","message":"Starting multi-user email processing (Producer)...","timestamp":"2026-03-29T12:32:00.432Z"}
+{"level":"info","message":"Multi-user email discovery complete. All jobs queued.","timestamp":"2026-03-29T12:32:10.327Z"}
+{"level":"info","message":"Running scheduled email check...","timestamp":"2026-03-29T12:33:00.338Z"}
+{"level":"info","message":"Starting multi-user email processing (Producer)...","timestamp":"2026-03-29T12:33:00.345Z"}
+{"level":"info","message":"Multi-user email discovery complete. All jobs queued.","timestamp":"2026-03-29T12:33:09.113Z"}
+{"level":"info","message":"Running scheduled email check...","timestamp":"2026-03-29T12:34:00.914Z"}
+{"level":"info","message":"Starting multi-user email processing (Producer)...","timestamp":"2026-03-29T12:34:00.915Z"}
+{"level":"info","message":"Multi-user email discovery complete. All jobs queued.","timestamp":"2026-03-29T12:34:12.105Z"}
+{"level":"info","message":"Running scheduled email check...","timestamp":"2026-03-29T12:35:00.518Z"}
+{"level":"info","message":"Starting multi-user email processing (Producer)...","timestamp":"2026-03-29T12:35:00.519Z"}
+{"level":"info","message":"Multi-user email discovery complete. All jobs queued.","timestamp":"2026-03-29T12:35:09.433Z"}
+{"level":"info","message":"Running scheduled email check...","timestamp":"2026-03-29T12:36:00.090Z"}
+{"level":"info","message":"Starting multi-user email processing (Producer)...","timestamp":"2026-03-29T12:36:00.091Z"}
+{"level":"info","message":"Multi-user email discovery complete. All jobs queued.","timestamp":"2026-03-29T12:36:08.089Z"}
+{"level":"info","message":"Running scheduled email check...","timestamp":"2026-03-29T12:37:00.685Z"}
+{"level":"info","message":"Starting multi-user email processing (Producer)...","timestamp":"2026-03-29T12:37:00.686Z"}
+{"level":"info","message":"Multi-user email discovery complete. All jobs queued.","timestamp":"2026-03-29T12:37:09.060Z"}
+{"level":"info","message":"Running scheduled email check...","timestamp":"2026-03-29T12:38:00.231Z"}
+{"level":"info","message":"Starting multi-user email processing (Producer)...","timestamp":"2026-03-29T12:38:00.232Z"}
+{"level":"info","message":"Multi-user email discovery complete. All jobs queued.","timestamp":"2026-03-29T12:38:09.887Z"}
+{"level":"info","message":"Running scheduled email check...","timestamp":"2026-03-29T12:39:00.814Z"}
+{"level":"info","message":"Starting multi-user email processing (Producer)...","timestamp":"2026-03-29T12:39:00.815Z"}
+{"level":"info","message":"Multi-user email discovery complete. All jobs queued.","timestamp":"2026-03-29T12:39:08.835Z"}
+{"level":"info","message":"Running scheduled email check...","timestamp":"2026-03-29T12:40:00.399Z"}
+{"level":"info","message":"Starting multi-user email processing (Producer)...","timestamp":"2026-03-29T12:40:00.400Z"}
+{"level":"info","message":"Multi-user email discovery complete. All jobs queued.","timestamp":"2026-03-29T12:40:09.518Z"}
+{"level":"info","message":"Running scheduled email check...","timestamp":"2026-03-29T12:41:00.978Z"}
+{"level":"info","message":"Starting multi-user email processing (Producer)...","timestamp":"2026-03-29T12:41:00.978Z"}
+{"level":"info","message":"Multi-user email discovery complete. All jobs queued.","timestamp":"2026-03-29T12:41:09.631Z"}
+{"level":"info","message":"Running scheduled email check...","timestamp":"2026-03-29T12:42:00.480Z"}
+{"level":"info","message":"Starting multi-user email processing (Producer)...","timestamp":"2026-03-29T12:42:00.480Z"}
+{"level":"info","message":"Multi-user email discovery complete. All jobs queued.","timestamp":"2026-03-29T12:42:09.770Z"}

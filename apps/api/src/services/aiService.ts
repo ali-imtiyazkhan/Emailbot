@@ -1,8 +1,7 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import dotenv from 'dotenv';
 import logger from '../utils/logger.js';
 
-dotenv.config();
+// Env is loaded centrally via config/env.ts (first import in index.ts)
 
 const configuration = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY || "");
 const model = configuration.getGenerativeModel({ model: "gemini-1.5-flash" });
@@ -41,13 +40,21 @@ export const summarizeEmail = async (subject: string, body: string): Promise<Ema
     text = text.replace(/```json\n?|```/g, '').trim();
 
     try {
-      return JSON.parse(text);
+      const parsed = JSON.parse(text) as EmailSummary;
+      // Validate the parsed response
+      if (typeof parsed.summary !== 'string' || typeof parsed.priority !== 'number') {
+        throw new Error('Invalid structure');
+      }
+      parsed.priority = Math.max(1, Math.min(10, Math.round(parsed.priority)));
+      return parsed;
     } catch (parseError) {
       logger.error('Failed to parse Gemini JSON response:', text);
-      throw new Error('Invalid JSON from AI');
+      // Return a safe fallback instead of silently defaulting to priority 5
+      return { summary: 'AI could not analyze this email', priority: 3, category: 'unanalyzed' };
     }
-  } catch (error: any) {
-    logger.error('Error calling Google Gemini service:', error.message);
-    return { summary: 'Error summarizing email', priority: 5, category: 'error' };
+  } catch (err: any) {
+    logger.error('Error calling Google Gemini service:', { error: err.message || err, stack: err.stack });
+    // Lower fallback priority to avoid false-positive notifications
+    return { summary: 'Error summarizing email', priority: 3, category: 'error' };
   }
 };
