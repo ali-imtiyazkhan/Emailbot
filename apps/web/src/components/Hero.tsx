@@ -103,7 +103,7 @@ export default function Hero() {
         transition={{ duration: 0.4, ease: "easeOut", delay: 0.45 }}
       >
         <a
-          href="https://github.com/avayyyyyyy/Intron"
+          href="https://github.com/ali-imtiyazkhan/EmailBot"
           target="_blank"
           rel="noopener noreferrer"
           className="btn btn-primary btn-lg"
