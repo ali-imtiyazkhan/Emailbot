@@ -4,8 +4,10 @@ import { sendTextMessage } from '@repo/shared/whatsapp';
 import logger from '@repo/shared/logger';
 import { sendEmailReply as sendGmailReply } from '../services/gmailService.js';
 import { sendEmailReply as sendOutlookReply } from '../services/outlookService.js';
-const router = Router();
+import { refineEmailReply } from '../services/aiService.js';
 
+
+const router = Router();
 // Webhook verification
 router.get('/webhook', (req, res) => {
   const mode = req.query['hub.mode'];
@@ -36,7 +38,7 @@ router.post('/webhook', async (req, res) => {
     const user = await db.user.findFirst({ where: { whatsapp: from } });
     if (!user) return res.sendStatus(200);
 
-    // 1. Handle REPLIES to email notifications
+    // Handle REPLIES to email notifications
     if (context?.id && text) {
       const originalEmail = await db.processedEmail.findFirst({
         where: { userId: user.id, whatsappMessageId: context.id },
@@ -46,15 +48,37 @@ router.post('/webhook', async (req, res) => {
       if (originalEmail) {
         logger.info(`Forwarding WhatsApp reply as email for user ${user.id} (Original Msg: ${originalEmail.messageId})`);
         
+        let finalReplyText = text;
+        let wasImproved = false;
+
+        // Apply AI Improvement if enabled
+        if (user.aiReplyImprovement) {
+          try {
+            const improved = await refineEmailReply(
+              originalEmail.subject || 'No Subject',
+              originalEmail.summary || '',
+              text
+            );
+            if (improved && improved !== text) {
+              finalReplyText = improved;
+              wasImproved = true;
+              logger.info(`AI improved reply for user ${user.id}: "${text.substring(0, 20)}..." -> "${improved.substring(0, 20)}..."`);
+            }
+          } catch (aiErr) {
+            logger.error('Failed to refine reply with AI, sending original text:', aiErr);
+          }
+        }
+
         let success = false;
         if (originalEmail.emailAccount.provider === 'gmail') {
-          success = await sendGmailReply(user.id, originalEmail.messageId, text);
+          success = await sendGmailReply(user.id, originalEmail.messageId, finalReplyText);
         } else if (originalEmail.emailAccount.provider === 'outlook') {
-          success = await sendOutlookReply(user.id, originalEmail.messageId, text);
+          success = await sendOutlookReply(user.id, originalEmail.messageId, finalReplyText);
         }
 
         if (success) {
-          await sendTextMessage(from, `✅ Your reply has been sent to *${originalEmail.sender}*`);
+          const improvedNotice = wasImproved ? '\n\n_✨ Polished by AI for a professional tone._' : '';
+          await sendTextMessage(from, `✅ Your reply has been sent to *${originalEmail.sender}*${improvedNotice}`);
         } else {
           await sendTextMessage(from, `❌ Failed to send your email reply. Please try again later.`);
         }
@@ -62,7 +86,7 @@ router.post('/webhook', async (req, res) => {
       }
     }
 
-    // 2. Handle COMMANDS
+    // Handle COMMANDS
     const command = text?.toUpperCase();
     if (command === 'FULL') {
       const lastEmail = await db.processedEmail.findFirst({
