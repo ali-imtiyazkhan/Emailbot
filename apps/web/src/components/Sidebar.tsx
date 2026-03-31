@@ -53,11 +53,6 @@ export default function Sidebar() {
             </div>
           </Link>
 
-          {/* Section label */}
-          <p className="text-[9.5px] font-semibold uppercase tracking-[0.2em] text-white/12 px-3 mb-2">
-            Menu
-          </p>
-
           {/* Nav */}
           <nav className="flex flex-col gap-0.5 flex-1">
             {navItems.map(({ label, href, icon: Icon }) => {
@@ -97,7 +92,7 @@ export default function Sidebar() {
         </div>
       </aside>
 
-      {/* ── Mobile Bottom Nav ────────────────────────── */}
+      {/* Mobile Bottom Nav */}
       <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-[#050505]/95 backdrop-blur-xl border-t border-[#161616] flex">
         {navItems.map(({ label, href, icon: Icon }) => {
           const active = pathname === href;
