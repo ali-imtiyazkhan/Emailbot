@@ -6,7 +6,7 @@ const getAIModel = (() => {
   return () => {
     if (!model) {
       const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY || "");
-      model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+      model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
     }
     return model;
   };
@@ -57,6 +57,7 @@ export const summarizeEmail = async (subject: string, body: string): Promise<Ema
   } catch (err: any) {
     // Better error logging as identified during debugging
     logger.error('Error calling Google Gemini service:', { error: err.message || err, stack: err.stack });
-    return { summary: 'Error summarizing email', priority: 3, category: 'error' };
+    // Default to priority 5 so notifications aren't silently skipped on AI failure
+    return { summary: 'Error summarizing email', priority: 5, category: 'error' };
   }
 };
