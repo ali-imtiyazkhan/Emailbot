@@ -98,3 +98,53 @@ export const fetchOutlookEmails = async (userId: number): Promise<FetchedOutlook
     return [];
   }
 };
+export const sendEmailReply = async (userId: number, originalMessageId: string, replyText: string): Promise<boolean> => {
+  const account = await db.emailAccount.findFirst({
+    where: { userId, provider: 'outlook', isActive: true }
+  });
+
+  if (!account || !account.accessToken) {
+    logger.warn(`No active Outlook account found for user ${userId} to send reply`);
+    return false;
+  }
+
+  let accessToken = account.accessToken;
+  // (Potentially reuse refresh logic here if needed, but for simplicity we'll assume it's fresh or about to be handled by the call)
+
+  try {
+    // Microsoft Graph has a specific "createReply" action which handle threading headers automatically
+    const createReplyResponse = await axios.post(
+      `https://graph.microsoft.com/v1.0/me/messages/${originalMessageId}/createReply`,
+      {},
+      { headers: { Authorization: `Bearer ${accessToken}` } }
+    );
+
+    const draftId = createReplyResponse.data.id;
+
+    // Update the draft with the reply text
+    await axios.patch(
+      `https://graph.microsoft.com/v1.0/me/messages/${draftId}`,
+      {
+        body: {
+          contentType: 'Text',
+          content: `${replyText}\n\n--\nSent via EmailBot`
+        }
+      },
+      { headers: { Authorization: `Bearer ${accessToken}` } }
+    );
+
+    // Send the draft
+    await axios.post(
+      `https://graph.microsoft.com/v1.0/me/messages/${draftId}/send`,
+      {},
+      { headers: { Authorization: `Bearer ${accessToken}` } }
+    );
+
+    logger.info(`Successfully sent Outlook reply for user ${userId} to message ${originalMessageId}`);
+    return true;
+  } catch (error: any) {
+    logger.error(`Error sending Outlook reply for user ${userId}:`, 
+                 error.response?.data || error.message);
+    return false;
+  }
+};
