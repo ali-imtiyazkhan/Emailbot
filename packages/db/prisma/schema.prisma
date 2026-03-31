@@ -12,6 +12,7 @@ model User {
   email          String          @unique
   name           String?
   whatsapp       String?         
+  aiReplyImprovement Boolean       @default(true)
   createdAt      DateTime        @default(now())
   accounts       EmailAccount[]
   filterRules    FilterRule[]
