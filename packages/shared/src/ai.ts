@@ -7,7 +7,7 @@ const getAIModel = (() => {
   return () => {
     if (!model) {
       const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY || "");
-      model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-8b" });
+      model = genAI.getGenerativeModel({ model: "gemini-2.5-flash-lite" });
     }
     return model;
   };
