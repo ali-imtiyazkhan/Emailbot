@@ -58,7 +58,7 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-[#050505] text-white">
-      <div className="max-w-[1280px] mx-auto px-6 py-12 flex flex-col gap-10">
+      <div className="max-w-[1400px] mx-auto px-10 py-16 flex flex-col gap-16">
 
         <PageHeader 
           title="Dashboard"
@@ -76,12 +76,12 @@ export default function DashboardPage() {
         {/*  Stats */}
         <motion.div
           initial="hidden" animate="show" variants={cascade}
-          className="grid grid-cols-2 lg:grid-cols-4 gap-4"
+          className="grid grid-cols-2 lg:grid-cols-4 gap-8"
         >
           {statCards.map((s, i) => (
             <motion.div key={i} variants={up}>
-              <Card hoverable className="p-6">
-                <div className="flex items-center justify-between mb-6">
+              <Card hoverable className="p-8">
+                <div className="flex items-center justify-between mb-10">
                   <div className="w-9 h-9 rounded-xl bg-white/[0.03] border border-white/5 flex items-center justify-center">
                     <s.icon size={16} className="text-white/40" strokeWidth={1.8} />
                   </div>
@@ -104,7 +104,7 @@ export default function DashboardPage() {
         </motion.div>
 
         {/* ── Main grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
 
           {/* Recent Intelligence — 2 cols */}
           <motion.div
@@ -127,7 +127,7 @@ export default function DashboardPage() {
 
               <div className="flex-1">
                 {loading && [1,2,3,4,5].map(i => (
-                  <div key={i} className="flex items-center gap-5 px-6 py-5 border-b border-white/[0.02] last:border-0 animate-pulse">
+                  <div key={i} className="flex items-center gap-8 px-10 py-8 border-b border-white/[0.02] last:border-0 animate-pulse">
                     <div className="w-10 h-10 rounded-xl bg-white/5" />
                     <div className="flex-1 space-y-2">
                       <div className="h-3 bg-white/5 rounded-full w-3/4" />
@@ -149,7 +149,7 @@ export default function DashboardPage() {
                   return (
                     <div
                       key={email.id}
-                      className="group flex items-center gap-5 px-6 py-5 border-b border-white/[0.02] last:border-0 hover:bg-white/[0.02] transition-all cursor-pointer"
+                      className="group flex items-center gap-8 px-10 py-8 border-b border-white/[0.02] last:border-0 hover:bg-white/[0.02] transition-all cursor-pointer"
                     >
                       <div className={`w-10 h-10 rounded-xl border border-white/5 bg-white/[0.02] flex items-center justify-center text-[13px] font-bold shrink-0 transition-all ${p.variant === 'danger' ? 'text-red-400 bg-red-400/5 border-red-400/10' : p.variant === 'warning' ? 'text-amber-400 bg-amber-400/5 border-amber-400/10' : 'text-white/20'}`}>
                         {p.label}
@@ -181,10 +181,10 @@ export default function DashboardPage() {
           {/* Right column */}
           <motion.div
             initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.30 }}
-            className="flex flex-col gap-6"
+            className="flex flex-col gap-12"
           >
             {/* Management Controls */}
-            <Card hoverable className="p-6">
+            <Card hoverable className="p-10">
               <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/15 mb-6">Management</p>
               <div className="flex flex-col gap-3">
                 {[
@@ -212,7 +212,7 @@ export default function DashboardPage() {
             </Card>
 
             {/* Node Infrastructure */}
-            <Card className="p-6">
+            <Card className="p-10">
               <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/15 mb-6">Core Infrastructure</p>
               <div className="flex flex-col gap-5">
                 {[
@@ -235,7 +235,7 @@ export default function DashboardPage() {
             </Card>
 
             {/* Session Stats */}
-            <Card className="p-6">
+            <Card className="p-10">
               <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/15 mb-5">Session Intelligence</p>
               <div className="grid grid-cols-2 gap-3">
                 {[
