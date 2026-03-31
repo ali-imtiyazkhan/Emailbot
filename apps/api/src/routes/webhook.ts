@@ -28,12 +28,13 @@ router.post('/webhook', async (req, res) => {
   const value = changes?.value;
   const message = value?.messages?.[0];
 
+  // if message present
   if (message) {
     const text = message.text?.body;
     const from = message.from;
     const context = message.context; // Contains the ID of the message being replied to
     logger.info('Received WhatsApp message:', { text, from, replyContext: context?.id });
-    
+
     // Find the user by WhatsApp number
     const user = await db.user.findFirst({ where: { whatsapp: from } });
     if (!user) return res.sendStatus(200);
@@ -47,7 +48,7 @@ router.post('/webhook', async (req, res) => {
 
       if (originalEmail) {
         logger.info(`Forwarding WhatsApp reply as email for user ${user.id} (Original Msg: ${originalEmail.messageId})`);
-        
+
         let finalReplyText = text;
         let wasImproved = false;
 
