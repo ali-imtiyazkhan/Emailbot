@@ -70,8 +70,8 @@ export const fetchLatestEmails = async (userId: number): Promise<FetchedEmail[]>
       const payload = detail.data.payload;
       const headers = payload?.headers;
       
-      const subject = headers?.find(h => h.name === 'Subject')?.value || 'No Subject';
-      const from = headers?.find(h => h.name === 'From')?.value || 'Unknown';
+      const subject = headers?.find(h => h.name?.toLowerCase() === 'subject')?.value || 'No Subject';
+      const from = headers?.find(h => h.name?.toLowerCase() === 'from')?.value || 'Unknown';
       
       // Extract snippet or body
       let body = detail.data.snippet || '';
@@ -103,5 +103,72 @@ export const fetchLatestEmails = async (userId: number): Promise<FetchedEmail[]>
       logger.warn(`Deactivated Gmail account for user ${userId} due to auth failure.`);
     }
     return [];
+  }
+};
+export const sendEmailReply = async (userId: number, originalMessageId: string, replyText: string): Promise<boolean> => {
+  const account = await db.emailAccount.findFirst({
+    where: { userId, provider: 'gmail', isActive: true }
+  });
+
+  if (!account || !account.accessToken) {
+    logger.warn(`No active Gmail account found for user ${userId} to send reply`);
+    return false;
+  }
+
+  const oauthClient = createGoogleOAuth2Client();
+  oauthClient.setCredentials({
+    access_token: account.accessToken,
+    refresh_token: account.refreshToken || undefined,
+    expiry_date: account.tokenExpiry ? account.tokenExpiry.getTime() : undefined,
+  });
+
+  const gmail = google.gmail({ version: 'v1', auth: oauthClient });
+
+  try {
+    // Get the original message to extract headers for threading
+    const original = await gmail.users.messages.get({ userId: 'me', id: originalMessageId });
+    const headers = original.data.payload?.headers;
+    const subject = headers?.find(h => h.name?.toLowerCase() === 'subject')?.value || '';
+    const from = headers?.find(h => h.name?.toLowerCase() === 'from')?.value || '';
+    const messageIdHeader = headers?.find(h => h.name?.toLowerCase() === 'message-id')?.value || '';
+    const references = headers?.find(h => h.name?.toLowerCase() === 'references')?.value || '';
+
+    // Construct the email manually (RFC 2822)
+    const replySubject = subject.toLowerCase().startsWith('re:') ? subject : `Re: ${subject}`;
+    const boundary = `----=_Part_${Date.now()}`;
+    
+    // Simplest way to send a reply in Gmail API is to construct the raw message
+    const emailLines = [
+      `To: ${from}`,
+      `Subject: ${replySubject}`,
+      `In-Reply-To: ${messageIdHeader}`,
+      `References: ${references ? references + ' ' : ''}${messageIdHeader}`,
+      'Content-Type: text/plain; charset="UTF-8"',
+      '',
+      replyText,
+      '',
+      '--',
+      'Sent via EmailBot'
+    ];
+
+    const raw = Buffer.from(emailLines.join('\r\n'))
+      .toString('base64')
+      .replace(/\+/g, '-')
+      .replace(/\//g, '_')
+      .replace(/=+$/, '');
+
+    await gmail.users.messages.send({
+      userId: 'me',
+      requestBody: {
+        raw,
+        threadId: original.data.threadId
+      }
+    });
+
+    logger.info(`Successfully sent Gmail reply for user ${userId} to message ${originalMessageId}`);
+    return true;
+  } catch (error: any) {
+    logger.error(`Error sending Gmail reply for user ${userId}:`, error.message);
+    return false;
   }
 };

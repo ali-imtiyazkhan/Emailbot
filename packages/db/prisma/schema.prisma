@@ -11,7 +11,7 @@ model User {
   id             Int             @id @default(autoincrement())
   email          String          @unique
   name           String?
-  whatsapp       String?         // user's WhatsApp number
+  whatsapp       String?         
   createdAt      DateTime        @default(now())
   accounts       EmailAccount[]
   filterRules    FilterRule[]
@@ -23,7 +23,7 @@ model EmailAccount {
   id           Int              @id @default(autoincrement())
   userId       Int
   user         User             @relation(fields: [userId], references: [id], onDelete: Cascade)
-  provider     String           // 'gmail' | 'outlook'
+  provider     String           
   email        String
   accessToken  String?
   refreshToken String?
@@ -50,13 +50,14 @@ model ProcessedEmail {
   user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
   emailAccountId Int
   emailAccount   EmailAccount @relation(fields: [emailAccountId], references: [id], onDelete: Cascade)
-  messageId      String       // provider's unique message ID
+  messageId      String       
   subject        String?
   sender         String?
   summary        String?
-  priorityScore  Int?         // 1–10
+  priorityScore  Int?   
   notified       Boolean      @default(false)
   digestIncluded Boolean      @default(false)
+  whatsappMessageId String?  
   receivedAt     DateTime?
   processedAt    DateTime     @default(now())
 

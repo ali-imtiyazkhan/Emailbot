@@ -18,9 +18,10 @@ export const handleEmailJob = async (jobData: any): Promise<void> => {
 
   const shouldNotify = analysis.priority >= minPriority;
 
+  let whatsappMessageId: string | undefined;
   if (shouldNotify && whatsapp) {
-    await sendNotification(whatsapp, email.subject, analysis.summary, analysis.priority);
-    logger.info(`Notification sent to ${whatsapp} for email ${email.id}`);
+    whatsappMessageId = await sendNotification(whatsapp, email.subject, analysis.summary, analysis.priority);
+    logger.info(`Notification sent to ${whatsapp} for email ${email.id} (WA CID: ${whatsappMessageId})`);
   } else {
     logger.info(`Notification skipped for email ${email.id} (Priority: ${analysis.priority}, Threshold: ${minPriority}, WhatsApp: ${!!whatsapp})`);
   }
@@ -36,6 +37,7 @@ export const handleEmailJob = async (jobData: any): Promise<void> => {
       summary: analysis.summary,
       priorityScore: analysis.priority,
       notified: shouldNotify,
+      whatsappMessageId,
       processedAt: new Date()
     }
   });
