@@ -1,16 +1,18 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import logger from './logger.js';
 
+// getAIModel is a function that returns the AI model
 const getAIModel = (() => {
   let model: any;
   return () => {
     if (!model) {
       const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY || "");
-      model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
+      model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-8b" });
     }
     return model;
   };
 })();
+
 
 export interface EmailSummary {
   summary: string;
@@ -18,6 +20,7 @@ export interface EmailSummary {
   category: string;
 }
 
+// summarizeEmail is a function that summarizes the email
 export const summarizeEmail = async (subject: string, body: string): Promise<EmailSummary> => {
   if (!process.env.GOOGLE_API_KEY) {
     logger.warn('GOOGLE_API_KEY not set, skipping AI summarization');
@@ -52,12 +55,19 @@ export const summarizeEmail = async (subject: string, body: string): Promise<Ema
       return parsed;
     } catch (parseError) {
       logger.error('Failed to parse Gemini JSON response:', { text, error: parseError });
-      return { summary: 'AI could not analyze this email', priority: 3, category: 'unanalyzed' };
+      return { 
+        summary: body.substring(0, 150) + (body.length > 150 ? '...' : ''), 
+        priority: 7, 
+        category: 'unanalyzed' 
+      };
     }
   } catch (err: any) {
-    // Better error logging as identified during debugging
-    logger.error('Error calling Google Gemini service:', { error: err.message || err, stack: err.stack });
-    // Default to priority 5 so notifications aren't silently skipped on AI failure
-    return { summary: 'Error summarizing email', priority: 5, category: 'error' };
+    logger.error('Error calling Google Gemini service:', { error: err.message || err });
+    // Default to priority 10 to ensure the user gets a notification if AI is down (fail-open)
+    return { 
+      summary: `[AI Error] ${body.substring(0, 150)}...`, 
+      priority: 10, 
+      category: 'error' 
+    };
   }
 };
