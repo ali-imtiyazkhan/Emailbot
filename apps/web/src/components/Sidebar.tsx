@@ -41,11 +41,11 @@ export default function Sidebar() {
   return (
     <>
       {/* ── Desktop Sidebar */}
-      <aside className="hidden lg:flex w-[220px] h-screen shrink-0 flex-col bg-[#050505] border-r border-[#161616] sticky top-0">
-        <div className="flex flex-col h-full px-4 py-6">
+      <aside className="hidden lg:flex w-[260px] h-screen shrink-0 flex-col bg-[#050505] border-r border-[#161616] sticky top-0">
+        <div className="flex flex-col h-full px-8 py-10">
 
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/[0.03] transition-colors mb-7 no-underline group">
+          <Link href="/" className="flex items-center gap-3 px-6 py-4 rounded-2xl hover:bg-white/[0.03] transition-colors mb-12 no-underline group">
             <LogoMark />
             <div>
               <p className="text-[14px] font-semibold text-white leading-none">EmailBot</p>
@@ -54,14 +54,14 @@ export default function Sidebar() {
           </Link>
 
           {/* Nav */}
-          <nav className="flex flex-col gap-0.5 flex-1">
+          <nav className="flex flex-col gap-3 flex-1">
             {navItems.map(({ label, href, icon: Icon }) => {
               const active = pathname === href;
               return (
                 <Link
                   key={href}
                   href={href}
-                  className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-[13px] font-medium transition-all no-underline
+                  className={`flex items-center gap-4 px-6 py-4 rounded-2xl text-[14px] font-medium transition-all no-underline
                     ${active
                       ? "bg-white/[0.07] text-white border border-[#1e1e1e]"
                       : "text-white/35 hover:text-white/65 hover:bg-white/[0.04]"
@@ -78,7 +78,7 @@ export default function Sidebar() {
           {/* User footer */}
           <div>
             <div className="h-px bg-[#161616] mb-4" />
-            <div className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/[0.03] transition-colors cursor-pointer">
+            <div className="flex items-center gap-3 px-6 py-4 rounded-2xl hover:bg-white/[0.03] transition-colors cursor-pointer">
               <div className="w-7 h-7 rounded-md bg-[#111] border border-[#222] flex items-center justify-center text-[10px] font-bold text-white/30 uppercase shrink-0">
                 {initial}
               </div>

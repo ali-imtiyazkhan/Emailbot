@@ -14,9 +14,9 @@ export function PageHeader({ title, description, badge, actions }: PageHeaderPro
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
-      className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 mb-12"
+      className="flex flex-col sm:flex-row sm:items-end justify-between gap-10 mb-20"
     >
-      <div className="space-y-4">
+      <div className="space-y-6">
         {badge && (
           <div className="flex items-center gap-2">
             <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/20 border border-white/5 px-2.5 py-1 rounded-md bg-white/[0.02]">
@@ -25,7 +25,7 @@ export function PageHeader({ title, description, badge, actions }: PageHeaderPro
           </div>
         )}
         <h1 
-          className="text-4xl md:text-5xl lg:text-6xl font-normal leading-tight tracking-tight italic"
+          className="text-4xl md:text-5xl lg:text-6xl font-bold leading-[1.1] tracking-tight"
           style={{ fontFamily: "'Instrument Serif', Georgia, serif" }}
         >
           {title}

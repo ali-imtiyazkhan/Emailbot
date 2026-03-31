@@ -54,7 +54,7 @@ export default function EmailsPage() {
 
   return (
     <div className="min-h-screen bg-[#050505] text-white">
-      <div className="max-w-[1280px] mx-auto px-6 py-12 flex flex-col gap-10">
+      <div className="max-w-[1400px] mx-auto px-10 py-16 flex flex-col gap-16">
         
         <PageHeader 
           badge="Intelligence"
@@ -63,11 +63,11 @@ export default function EmailsPage() {
         />
 
         {/*  Filters & Stats Row */}
-        <div className="flex flex-col xl:flex-row gap-6">
+        <div className="flex flex-col xl:flex-row gap-10">
           
           {/* Search & Filter */}
-          <Card className="flex-1 p-4">
-            <div className="flex flex-col sm:flex-row gap-3">
+          <Card className="flex-1 p-6">
+            <div className="flex flex-col sm:flex-row gap-5">
               <div className="relative flex-1">
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20" />
                 <input
@@ -78,7 +78,7 @@ export default function EmailsPage() {
                   className="w-full bg-white/[0.02] border border-white/5 rounded-xl pl-11 pr-4 py-3 text-[14px] text-white/80 placeholder:text-white/10 focus:outline-none focus:border-white/10 transition-all font-medium"
                 />
               </div>
-              <div className="flex p-1 bg-white/[0.02] rounded-xl border border-white/5">
+              <div className="flex p-1.5 bg-white/[0.02] rounded-xl border border-white/5 gap-1.5">
                 {["all", "high", "medium", "low"].map((p) => (
                   <button
                     key={p}
@@ -97,14 +97,14 @@ export default function EmailsPage() {
           </Card>
 
           {/* Quick Stats */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 shrink-0">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-5 shrink-0">
             {[
               { label: "Total", value: emails.length, icon: Mail },
               { label: "High", value: emails.filter(e => (e.priorityScore ?? 0) >= 8).length, icon: Zap },
               { label: "Notified", value: emails.filter(e => e.notified).length, icon: Bell },
               { label: "Summary", value: emails.filter(e => e.summary).length, icon: FileText },
             ].map((s, i) => (
-              <Card key={i} className="px-5 py-4 min-w-[120px] flex flex-col justify-center">
+              <Card key={i} className="px-8 py-6 min-w-[140px] flex flex-col justify-center">
                 <div className="text-xl font-normal italic tracking-tight text-white/40 mb-1" style={{ fontFamily: "'Instrument Serif', serif" }}>
                   {loading ? "—" : s.value}
                 </div>
@@ -141,7 +141,7 @@ export default function EmailsPage() {
                   <div key={email.id} className="group">
                     <button
                       onClick={() => setExpandedId(isExpanded ? null : email.id)}
-                      className={`w-full flex items-center gap-6 p-6 hover:bg-white/[0.01] transition-all text-left ${isExpanded ? "bg-white/[0.02]" : ""}`}
+                      className={`w-full flex items-center gap-10 p-10 hover:bg-white/[0.01] transition-all text-left ${isExpanded ? "bg-white/[0.02]" : ""}`}
                     >
                       {/* Priority Marker */}
                       <div className="shrink-0 w-10">
@@ -185,8 +185,8 @@ export default function EmailsPage() {
                           transition={{ duration: 0.3, ease: "easeInOut" }}
                           className="overflow-hidden bg-white/[0.02]"
                         >
-                          <div className="px-6 pb-8 ml-[64px]">
-                            <div className="p-6 rounded-2xl bg-[#050505] border border-white/5 relative overflow-hidden">
+                          <div className="px-10 pb-12 ml-[90px]">
+                            <div className="p-10 rounded-2xl bg-[#050505] border border-white/5 relative overflow-hidden">
                               <div className="absolute top-0 right-0 p-4 opacity-5">
                                 <Zap size={80} />
                               </div>
