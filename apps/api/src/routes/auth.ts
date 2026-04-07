@@ -8,6 +8,10 @@ import { OUTLOOK_AUTH_URL, OUTLOOK_TOKEN_URL, OUTLOOK_SCOPES } from '../config/o
 
 const router = Router();
 
+/** Escape HTML to prevent XSS injection in inline responses */
+const escapeHtml = (str: string): string =>
+  str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+
 // ─── Gmail OAuth2 
 
 // Step 1: Redirect user to Google consent screen
@@ -94,7 +98,7 @@ router.get('/gmail/callback', async (req, res) => {
         <body style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; background: #0f172a; color: #f8fafc;">
           <div style="text-align: center; padding: 2rem; border-radius: 1rem; background: #1e293b; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);">
             <h1 style="color: #4ade80; margin-bottom: 1rem;">✓ Gmail Connected</h1>
-            <p style="color: #94a3b8; font-size: 1.1rem;">Your account <strong>${gmailAddress}</strong> is now linked.</p>
+            <p style="color: #94a3b8; font-size: 1.1rem;">Your account <strong>${escapeHtml(gmailAddress)}</strong> is now linked.</p>
             <p style="color: #64748b; font-size: 0.9rem; margin-top: 2rem;">You can safely close this window.</p>
           </div>
         </body>
@@ -107,7 +111,7 @@ router.get('/gmail/callback', async (req, res) => {
         <body style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; background: #0f172a; color: #f8fafc;">
           <div style="text-align: center; padding: 2rem; border-radius: 1rem; background: #1e293b; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);">
             <h1 style="color: #f87171; margin-bottom: 1rem;">✗ Connection Failed</h1>
-            <p style="color: #94a3b8;">${error.message || 'Verification timed out or failed.'}</p>
+            <p style="color: #94a3b8;">${escapeHtml(error.message || 'Verification timed out or failed.')}</p>
           </div>
         </body>
       </html>
@@ -197,7 +201,7 @@ router.get('/outlook/callback', async (req, res) => {
         <body style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; background: #0f172a; color: #f8fafc;">
           <div style="text-align: center; padding: 2rem; border-radius: 1rem; background: #1e293b; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);">
             <h1 style="color: #60a5fa; margin-bottom: 1rem;">✓ Outlook Connected</h1>
-            <p style="color: #94a3b8; font-size: 1.1rem;">Your account <strong>${outlookEmail}</strong> is now linked.</p>
+            <p style="color: #94a3b8; font-size: 1.1rem;">Your account <strong>${escapeHtml(outlookEmail)}</strong> is now linked.</p>
             <p style="color: #64748b; font-size: 0.9rem; margin-top: 2rem;">You can safely close this window.</p>
           </div>
         </body>
