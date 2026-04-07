@@ -14,22 +14,25 @@ import logger from '@repo/shared/logger';
 const app = express();
 const PORT = process.env.API_PORT || 3001;
 
+// ── Security & Middleware ───────────────────────────────
 app.use(helmet());
-app.use(cors());
+app.use(cors({
+  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+  credentials: true,
+}));
 app.use(morgan('dev'));
 app.use(express.json());
 
-// Routes
+// Routes 
 app.get('/health', async (req, res) => {
   try {
-    // Verify DB connectivity
     await db.$queryRaw`SELECT 1`;
-    // Verify Redis connectivity
     const redisPing = await redisConnection.ping();
 
     res.json({
       status: 'ok',
       timestamp: new Date().toISOString(),
+      uptime: process.uptime(),
       services: {
         database: 'connected',
         redis: redisPing === 'PONG' ? 'connected' : 'disconnected',
@@ -48,14 +51,39 @@ app.use('/auth', authRoutes);
 app.use('/whatsapp', webhookRoutes);
 app.use('/api', dashboardRoutes);
 
-// Global error handler
+// ── Global Error Handler ────────────────────────────────
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
   logger.error('Unhandled error:', err);
   res.status(500).json({ error: 'Internal server error' });
 });
 
-app.listen(PORT, () => {
-  logger.info(`🚀 EmailBot API (Web Server) running on port ${PORT}`);
+// ── Start Server ────────────────────────────────────────
+const server = app.listen(PORT, () => {
+  logger.info(`🚀 EmailBot API running on port ${PORT}`);
 });
+
+// ── Graceful Shutdown ───────────────────────────────────
+const gracefulShutdown = async (signal: string) => {
+  logger.info(`${signal} received — shutting down gracefully...`);
+  
+  server.close(() => {
+    logger.info('HTTP server closed');
+  });
+
+  try {
+    await redisConnection.quit();
+    logger.info('Redis connection closed');
+  } catch { /* Redis may already be disconnected */ }
+
+  try {
+    await db.$disconnect();
+    logger.info('Database connection closed');
+  } catch { /* Prisma may already be disconnected */ }
+
+  process.exit(0);
+};
+
+process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+process.on('SIGINT', () => gracefulShutdown('SIGINT'));
 
 export default app;

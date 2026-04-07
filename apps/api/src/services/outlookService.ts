@@ -109,7 +109,29 @@ export const sendEmailReply = async (userId: number, originalMessageId: string, 
   }
 
   let accessToken = account.accessToken;
-  // (Potentially reuse refresh logic here if needed, but for simplicity we'll assume it's fresh or about to be handled by the call)
+
+  // Refresh token if expired or about to expire (within 5 mins)
+  const isExpired = account.tokenExpiry && 
+                    (account.tokenExpiry.getTime() - Date.now() < 300000);
+
+  if (isExpired && account.refreshToken) {
+    try {
+      const refreshed = await refreshOutlookToken(account.refreshToken);
+      accessToken = refreshed.access_token;
+      await db.emailAccount.update({
+        where: { id: account.id },
+        data: {
+          accessToken: refreshed.access_token,
+          refreshToken: refreshed.refresh_token || account.refreshToken,
+          tokenExpiry: new Date(Date.now() + (refreshed.expires_in * 1000)),
+        }
+      });
+      logger.info(`Refreshed Outlook token for reply (user ${userId})`);
+    } catch (refreshErr: any) {
+      logger.error(`Failed to refresh Outlook token for reply (user ${userId}):`, refreshErr.message);
+      return false;
+    }
+  }
 
   try {
     // Microsoft Graph has a specific "createReply" action which handle threading headers automatically

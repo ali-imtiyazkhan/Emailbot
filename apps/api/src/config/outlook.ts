@@ -5,7 +5,7 @@ import axios from 'axios';
 export const OUTLOOK_AUTH_URL = `https://login.microsoftonline.com/${process.env.OUTLOOK_TENANT_ID}/oauth2/v2.0/authorize`;
 export const OUTLOOK_TOKEN_URL = `https://login.microsoftonline.com/${process.env.OUTLOOK_TENANT_ID}/oauth2/v2.0/token`;
 
-export const OUTLOOK_SCOPES = 'openid email Mail.Read offline_access';
+export const OUTLOOK_SCOPES = 'openid email Mail.Read Mail.Send offline_access';
 
 export const refreshOutlookToken = async (refreshToken: string) => {
   const response = await axios.post(

@@ -3,14 +3,16 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { fetchStats, fetchFilters, fetchEmails, Stats, FilterRule, ProcessedEmail } from "@/lib/api";
+import { fetchStats, fetchFilters, fetchEmails, fetchAccounts, Stats, FilterRule, ProcessedEmail, EmailAccount } from "@/lib/api";
 import {
   Mail, SlidersHorizontal, Zap, Bell,
-  ArrowRight, CheckCircle2, Activity,
+  ArrowRight, CheckCircle2, Activity, Server, Database, Cpu, Wifi,
 } from "lucide-react";
 import { Card, CardHeader, CardContent } from "@/components/ui/Card";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Badge } from "@/components/ui/Badge";
+
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
 /* ── Animations ──────────────────────────────────────────── */
 const up      = { hidden: { opacity: 0, y: 10 }, show: { opacity: 1, y: 0, transition: { duration: 0.3 } } };
@@ -28,21 +30,31 @@ export default function DashboardPage() {
   const [stats, setStats]     = useState<Stats | null>(null);
   const [filters, setFilters] = useState<FilterRule[]>([]);
   const [emails, setEmails]   = useState<ProcessedEmail[]>([]);
+  const [accounts, setAccounts] = useState<EmailAccount[]>([]);
+  const [health, setHealth]   = useState<{ status: string; services: { database: string; redis: string } } | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => { loadData(); }, []);
 
   const loadData = async () => {
     try {
-      const [s, f, e] = await Promise.all([fetchStats(), fetchFilters(), fetchEmails()]);
+      const [s, f, e, acc] = await Promise.all([fetchStats(), fetchFilters(), fetchEmails(), fetchAccounts()]);
       setStats(s);
       setFilters(f);
       setEmails(e);
+      setAccounts(acc);
     } catch (err) {
       console.error("Failed to load dashboard data:", err);
-    } finally {
-      setLoading(false);
     }
+    
+    // Health check in parallel (non-blocking)
+    try {
+      const res = await fetch(`${API_BASE}/health`);
+      const data = await res.json();
+      setHealth(data);
+    } catch { /* API might be down */ }
+    
+    setLoading(false);
   };
 
   const recentEmails   = emails.slice(0, 5);
@@ -62,7 +74,7 @@ export default function DashboardPage() {
 
         <PageHeader 
           title="Dashboard"
-          description="Your AI agent is monitoring 2 connected accounts and prioritizing your communications."
+          description={`Your AI agent is monitoring ${accounts.length} connected account${accounts.length !== 1 ? 's' : ''} and prioritizing your communications.`}
           actions={
             <div className="flex items-center gap-2 px-4 py-2 rounded-full border border-white/5 bg-white/[0.02]">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500/70 animate-pulse" />
@@ -216,19 +228,23 @@ export default function DashboardPage() {
               <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/15 mb-6">Core Infrastructure</p>
               <div className="flex flex-col gap-5">
                 {[
-                  { name: "Email Parser", status: "Online",  load: "2%"    },
-                  { name: "LLM Worker",   status: "Active",  load: "14%"   },
-                  { name: "Push Gateway", status: "Synced",  load: "Active"},
+                  { name: "API Server", icon: Server, connected: !!health },
+                  { name: "Database", icon: Database, connected: health?.services?.database === 'connected' },
+                  { name: "Redis Queue", icon: Cpu, connected: health?.services?.redis === 'connected' },
                 ].map((svc) => (
                   <div key={svc.name} className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500/50 animate-pulse shrink-0" />
+                      <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${
+                        loading ? 'bg-white/10 animate-pulse' : svc.connected ? 'bg-emerald-500/50 animate-pulse' : 'bg-red-500/50'
+                      }`} />
                       <div>
                         <p className="text-[13px] font-bold text-white/40">{svc.name}</p>
-                        <p className="text-[10px] text-white/15 uppercase tracking-[0.1em] font-medium">{svc.status}</p>
+                        <p className="text-[10px] text-white/15 uppercase tracking-[0.1em] font-medium">
+                          {loading ? 'Checking...' : svc.connected ? 'Online' : 'Offline'}
+                        </p>
                       </div>
                     </div>
-                    <span className="text-[11px] font-black text-white/15">{svc.load}</span>
+                    <svc.icon size={14} className="text-white/10" />
                   </div>
                 ))}
               </div>

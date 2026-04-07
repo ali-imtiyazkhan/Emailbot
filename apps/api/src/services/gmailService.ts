@@ -133,9 +133,9 @@ export const sendEmailReply = async (userId: number, originalMessageId: string, 
     const messageIdHeader = headers?.find(h => h.name?.toLowerCase() === 'message-id')?.value || '';
     const references = headers?.find(h => h.name?.toLowerCase() === 'references')?.value || '';
 
-    // Construct the email manually (RFC 2822)
+    // Construct the reply subject
     const replySubject = subject.toLowerCase().startsWith('re:') ? subject : `Re: ${subject}`;
-    const boundary = `----=_Part_${Date.now()}`;
+    
     
     // Simplest way to send a reply in Gmail API is to construct the raw message
     const emailLines = [

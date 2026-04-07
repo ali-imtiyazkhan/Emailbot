@@ -28,15 +28,29 @@ export const initScheduler = () => {
   // Daily digest — runs every minute and checks each user's configured time
   cron.schedule('* * * * *', async () => {
     try {
-      const now = new Date();
-      const currentTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-
+      // Fetch all enabled digest settings and check against each user's timezone
       const digestSettings = await db.digestSetting.findMany({
-        where: { enabled: true, sendTime: currentTime },
+        where: { enabled: true },
         include: { user: true },
       });
 
-      for (const setting of digestSettings) {
+      // Filter to only settings where the current time matches the user's configured timezone
+      const matchedSettings = digestSettings.filter(setting => {
+        try {
+          const userTime = new Date().toLocaleTimeString('en-GB', {
+            hour: '2-digit', minute: '2-digit', hour12: false,
+            timeZone: setting.timezone,
+          });
+          return userTime === setting.sendTime;
+        } catch {
+          // If timezone is invalid, fall back to UTC
+          const now = new Date();
+          const utcTime = `${String(now.getUTCHours()).padStart(2, '0')}:${String(now.getUTCMinutes()).padStart(2, '0')}`;
+          return utcTime === setting.sendTime;
+        }
+      });
+
+      for (const setting of matchedSettings) {
         if (!setting.user.whatsapp) continue;
 
         const undigestedEmails = await db.processedEmail.findMany({
