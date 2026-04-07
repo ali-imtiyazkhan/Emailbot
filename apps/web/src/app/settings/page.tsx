@@ -13,10 +13,10 @@ import {
 import { 
   Globe, Clock, MessageSquare, Mail, Plus,
   ShieldCheck, CheckCircle2, AlertCircle,
-  Link2, Unlink, WifiOff, CircleDot,
+  Link2, WifiOff, CircleDot,
   Timer, CalendarClock, Sparkles
 } from "lucide-react";
-import { Card, CardHeader, CardContent } from "@/components/ui/Card";
+import { Card } from "@/components/ui/Card";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Badge } from "@/components/ui/Badge";
 import { motion, AnimatePresence } from "framer-motion";
