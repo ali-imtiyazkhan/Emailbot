@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { fetchFilters, createFilter, deleteFilter, FilterRule } from "@/lib/api";
 import { Plus, Trash2, User, Hash, Zap, Settings2, Shield, AlertTriangle, Sparkles, ArrowRight } from "lucide-react";
-import { Card, CardHeader, CardContent } from "@/components/ui/Card";
+import { Card } from "@/components/ui/Card";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Badge } from "@/components/ui/Badge";
 import { motion, AnimatePresence } from "framer-motion";
@@ -108,7 +108,7 @@ export default function RulesPage() {
           }
         />
 
-        {/* ── Rule Type Explainer ─────────────────────── */}
+        {/* Rule Type Explainer*/}
         {!showForm && !loading && (
           <motion.div initial="hidden" animate="show" variants={stagger} className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {Object.entries(RULE_META).map(([type, meta]) => {
@@ -134,7 +134,7 @@ export default function RulesPage() {
           </motion.div>
         )}
 
-        {/* ── Create Rule Form ────────────────────────── */}
+        {/* Create Rule Form */}
         <AnimatePresence>
           {showForm && (
             <motion.div
@@ -231,7 +231,7 @@ export default function RulesPage() {
           )}
         </AnimatePresence>
 
-        {/* ── Rules List ──────────────────────────────── */}
+        {/* Rules List */}
         <div>
           {loading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">

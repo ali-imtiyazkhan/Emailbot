@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { fetchEmails, ProcessedEmail } from "@/lib/api";
 import { Search, Mail, Filter, ChevronDown, Bell, Zap, FileText, ArrowUpDown, Inbox, Sparkles, Clock } from "lucide-react";
-import { Card, CardHeader, CardContent } from "@/components/ui/Card";
+import { Card } from "@/components/ui/Card";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Badge } from "@/components/ui/Badge";
 import { motion, AnimatePresence } from "framer-motion";
