@@ -84,7 +84,7 @@ export default function EmailsPage() {
 
   return (
     <div className="min-h-screen bg-[#050505] text-white">
-      <div className="max-w-[1400px] mx-auto px-6 md:px-10 py-10 md:py-16 flex flex-col gap-10 md:gap-14">
+      <div className="max-w-[1400px] mx-auto px-6 md:px-8 py-8 md:py-10 flex flex-col gap-8 md:gap-10">
         
         <PageHeader 
           badge="Intelligence"
@@ -107,7 +107,7 @@ export default function EmailsPage() {
                     <s.icon size={14} className={s.color} strokeWidth={1.8} />
                   </div>
                 </div>
-                <div className="text-2xl md:text-3xl font-normal italic tracking-tight text-white/60 mb-1" style={{ fontFamily: "'Instrument Serif', serif" }}>
+                <div className="text-2xl md:text-3xl font-semibold tracking-tight text-white/70 mb-1">
                   {loading ? <span className="inline-block w-10 h-7 bg-white/5 rounded-lg animate-pulse" /> : s.value}
                 </div>
                 <p className="text-[9px] font-black uppercase tracking-[0.15em] text-white/15">{s.label}</p>

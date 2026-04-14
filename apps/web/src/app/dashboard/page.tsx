@@ -70,7 +70,7 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-[#050505] text-white">
-      <div className="max-w-[1400px] mx-auto px-10 py-16 flex flex-col gap-16">
+      <div className="max-w-[1400px] mx-auto px-8 py-10 flex flex-col gap-10">
 
         <PageHeader 
           title="Dashboard"
@@ -88,12 +88,12 @@ export default function DashboardPage() {
         {/*  Stats */}
         <motion.div
           initial="hidden" animate="show" variants={cascade}
-          className="grid grid-cols-2 lg:grid-cols-4 gap-8"
+          className="grid grid-cols-2 lg:grid-cols-4 gap-4"
         >
           {statCards.map((s, i) => (
             <motion.div key={i} variants={up}>
-              <Card hoverable className="p-8">
-                <div className="flex items-center justify-between mb-10">
+              <Card hoverable className="p-6">
+                <div className="flex items-center justify-between mb-6">
                   <div className="w-9 h-9 rounded-xl bg-white/[0.03] border border-white/5 flex items-center justify-center">
                     <s.icon size={16} className="text-white/40" strokeWidth={1.8} />
                   </div>
@@ -103,7 +103,7 @@ export default function DashboardPage() {
                     </Badge>
                   )}
                 </div>
-                <div className="text-3xl font-normal italic tracking-tight text-white mb-2" style={{ fontFamily: "'Instrument Serif', serif" }}>
+                <div className="text-3xl font-semibold tracking-tight text-white mb-1">
                   {loading
                     ? <span className="inline-block w-12 h-8 bg-white/5 rounded-lg animate-pulse" />
                     : s.value
@@ -116,7 +116,7 @@ export default function DashboardPage() {
         </motion.div>
 
         {/* ── Main grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
           {/* Recent Intelligence — 2 cols */}
           <motion.div
@@ -193,10 +193,10 @@ export default function DashboardPage() {
           {/* Right column */}
           <motion.div
             initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.30 }}
-            className="flex flex-col gap-12"
+            className="flex flex-col gap-6"
           >
             {/* Management Controls */}
-            <Card hoverable className="p-10">
+            <Card hoverable className="p-6">
               <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/15 mb-6">Management</p>
               <div className="flex flex-col gap-3">
                 {[
@@ -224,8 +224,8 @@ export default function DashboardPage() {
             </Card>
 
             {/* Node Infrastructure */}
-            <Card className="p-10">
-              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/15 mb-6">Core Infrastructure</p>
+            <Card className="p-6">
+              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/15 mb-4">Core Infrastructure</p>
               <div className="flex flex-col gap-5">
                 {[
                   { name: "API Server", icon: Server, connected: !!health },
@@ -251,15 +251,15 @@ export default function DashboardPage() {
             </Card>
 
             {/* Session Stats */}
-            <Card className="p-10">
-              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/15 mb-5">Session Intelligence</p>
+            <Card className="p-6">
+              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/15 mb-4">Session Intelligence</p>
               <div className="grid grid-cols-2 gap-3">
                 {[
                   { v: loading ? "—" : String(stats?.totalProcessed ?? 0), l: "Processed" },
                   { v: loading ? "—" : String(alertsSent),                  l: "Alerts"    },
                 ].map(s => (
                   <div key={s.l} className="bg-white/[0.02] border border-white/5 rounded-xl px-4 py-3.5">
-                    <p className="text-2xl font-normal italic tracking-tight text-white/40 mb-1" style={{ fontFamily: "'Instrument Serif', serif" }}>{s.v}</p>
+                    <p className="text-2xl font-semibold tracking-tight text-white/50 mb-1">{s.v}</p>
                     <p className="text-[9.5px] font-black uppercase tracking-[0.15em] text-white/15">{s.l}</p>
                   </div>
                 ))}

@@ -40,3 +40,6 @@ yarn-error.log*
 apps/logs/*.log
 logs/
 apps/web/out.css
+
+# Scratch / test files
+scratch/
