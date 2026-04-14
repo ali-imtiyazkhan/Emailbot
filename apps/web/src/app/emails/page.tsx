@@ -87,7 +87,7 @@ export default function EmailsPage() {
   const summarizedCount = emails.filter(e => e.summary).length;
 
   return (
-    <div className="min-h-screen bg-[#050505] text-white">
+    <div className="min-h-screen text-white relative z-10">
       <div className="max-w-[1400px] mx-auto px-6 md:px-8 py-8 md:py-10 flex flex-col gap-8 md:gap-10">
         
         <PageHeader 
@@ -105,46 +105,47 @@ export default function EmailsPage() {
             { label: "Summarized", value: summarizedCount, icon: Sparkles, color: "text-blue-400/60" },
           ].map((s, i) => (
             <motion.div key={i} variants={fadeUp}>
-              <Card className="p-5 md:p-7">
-                <div className="flex items-center gap-3 mb-4">
+              <Card className="p-5 md:p-7 h-full flex flex-col relative overflow-hidden group">
+                <div className="absolute -top-10 -right-10 w-32 h-32 bg-white/[0.02] rounded-full blur-2xl group-hover:scale-110 transition-transform duration-500" />
+                <div className="flex items-center gap-3 mb-4 relative z-10">
                   <div className="w-8 h-8 rounded-lg bg-white/[0.03] border border-white/5 flex items-center justify-center">
                     <s.icon size={14} className={s.color} strokeWidth={1.8} />
                   </div>
                 </div>
-                <div className="text-2xl md:text-3xl font-semibold tracking-tight text-white/70 mb-1">
+                <div className="text-2xl md:text-3xl font-semibold tracking-tight text-white/90 mb-1 relative z-10">
                   {loading ? <span className="inline-block w-10 h-7 bg-white/5 rounded-lg animate-pulse" /> : s.value}
                 </div>
-                <p className="text-[9px] font-black uppercase tracking-[0.15em] text-white/15">{s.label}</p>
+                <p className="text-[9px] font-black uppercase tracking-[0.15em] text-white/40 relative z-10">{s.label}</p>
               </Card>
             </motion.div>
           ))}
         </motion.div>
 
         {/* ── Search & Filter Bar ──────────────────────── */}
-        <Card className="p-4 md:p-5">
+        <Card className="p-4 md:p-5 relative z-20 shadow-xl">
           <div className="flex flex-col md:flex-row gap-4">
             {/* Search */}
             <div className="relative flex-1">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/15" />
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30" />
               <input
                 type="text"
                 placeholder="Search subject, sender, or summary..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full bg-white/[0.02] border border-white/5 rounded-xl pl-11 pr-4 py-3 text-[14px] text-white/80 placeholder:text-white/10 focus:outline-none focus:border-white/12 transition-all font-medium"
+                className="w-full bg-[#111] border border-[#2a2a2a] rounded-xl pl-11 pr-4 py-3 text-[14px] text-white/90 placeholder:text-white/20 focus:outline-none focus:border-[#555] focus:bg-[#1a1a1a] transition-all font-medium shadow-inner"
               />
             </div>
             
             {/* Priority Filter */}
-            <div className="flex p-1 bg-white/[0.02] rounded-xl border border-white/5 gap-1">
+            <div className="flex p-1 bg-[#111] rounded-xl border border-[#2a2a2a] gap-1 shadow-inner">
               {["all", "high", "medium", "low"].map((p) => (
                 <button
                   key={p}
                   onClick={() => setFilterPriority(p)}
                   className={`px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all
                     ${filterPriority === p
-                      ? "bg-white text-black shadow-lg"
-                      : "text-white/20 hover:text-white/40"
+                      ? "bg-white text-black shadow-md"
+                      : "text-[#888] hover:text-white hover:bg-white/[0.05]"
                     }`}
                 >
                   {p}
@@ -155,7 +156,7 @@ export default function EmailsPage() {
             {/* Sort */}
             <button
               onClick={() => setSortMode(prev => prev === "newest" ? "oldest" : prev === "oldest" ? "priority" : "newest")}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/[0.02] border border-white/5 text-[10px] font-black uppercase tracking-widest text-white/25 hover:text-white/40 transition-all shrink-0"
+              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#111] border border-[#2a2a2a] text-[10px] font-black uppercase tracking-widest text-[#888] hover:text-white hover:bg-[#1a1a1a] transition-all shrink-0 shadow-inner"
             >
               <ArrowUpDown size={12} />
               {sortMode}
@@ -166,14 +167,14 @@ export default function EmailsPage() {
         {/* ── Results Count ────────────────────────────── */}
         {!loading && (
           <div className="flex items-center justify-between px-1">
-            <p className="text-[11px] font-bold text-white/15 uppercase tracking-widest">
+            <p className="text-[11px] font-bold text-white/30 uppercase tracking-widest">
               {filtered.length} {filtered.length === 1 ? "Email" : "Emails"} 
               {search || filterPriority !== "all" ? " matched" : ""}
             </p>
             {search && (
               <button 
                 onClick={() => { setSearch(""); setFilterPriority("all"); }}
-                className="text-[10px] font-bold text-white/20 hover:text-white/50 uppercase tracking-widest transition-colors"
+                className="text-[10px] font-bold text-[#888] hover:text-white uppercase tracking-widest transition-colors"
               >
                 Clear Filters
               </button>
@@ -184,7 +185,7 @@ export default function EmailsPage() {
         {/* ── Email List ───────────────────────────────── */}
         <Card className="min-h-[400px]">
           {loading ? (
-            <div className="divide-y divide-white/[0.03]">
+            <div className="divide-y divide-[#1c1c1c]">
               {[1,2,3,4,5].map(i => (
                 <div key={i} className="flex items-center gap-6 md:gap-10 p-6 md:p-8 animate-pulse">
                   <div className="w-10 h-10 rounded-xl bg-white/5 shrink-0" />
@@ -198,54 +199,57 @@ export default function EmailsPage() {
             </div>
           ) : filtered.length === 0 ? (
             <div className="flex flex-col items-center justify-center p-20 md:p-32 text-center">
-              <div className="w-20 h-20 rounded-2xl bg-white/[0.02] border border-white/5 flex items-center justify-center mb-8">
-                <Inbox className="w-8 h-8 text-white/10" strokeWidth={1.2} />
+              <div className="w-20 h-20 rounded-2xl bg-[#0f0f0f] border border-[#2a2a2a] flex items-center justify-center mb-8 shadow-inner">
+                <Inbox className="w-8 h-8 text-[#888]" strokeWidth={1.2} />
               </div>
-              <p className="text-white/40 text-[16px] font-medium tracking-tight mb-2">
+              <p className="text-white/80 text-[16px] font-semibold tracking-tight mb-2">
                 {search ? "No emails match your query" : "No processed emails yet"}
               </p>
-              <p className="text-white/15 text-[13px] max-w-[280px] leading-relaxed">
+              <p className="text-[#888] text-[13px] max-w-[280px] leading-relaxed">
                 {search 
                   ? "Try different keywords or adjust your priority filter." 
                   : "Connect a Gmail or Outlook account to begin monitoring."}
               </p>
             </div>
           ) : (
-            <motion.div initial="hidden" animate="show" variants={stagger} className="divide-y divide-white/[0.03]">
+            <motion.div initial="hidden" animate="show" variants={stagger} className="divide-y divide-[#1c1c1c]">
               {filtered.map((email) => {
                 const isExpanded = expandedId === email.id;
                 return (
-                  <motion.div key={email.id} variants={fadeUp} className="group">
+                  <motion.div key={email.id} variants={fadeUp} className="group relative">
+                    {/* Active highlight glow behind Row */}
+                    {isExpanded && <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.015] to-transparent pointer-events-none" />}
+                    
                     <button
                       onClick={() => setExpandedId(isExpanded ? null : email.id)}
-                      className={`w-full flex items-center gap-5 md:gap-8 p-5 md:p-8 hover:bg-white/[0.015] transition-all text-left ${isExpanded ? "bg-white/[0.02]" : ""}`}
+                      className={`relative z-10 w-full flex items-center gap-5 md:gap-8 p-5 md:p-8 hover:bg-white/[0.03] transition-all text-left ${isExpanded ? "bg-[#141414] shadow-inner" : ""}`}
                     >
                       {/* Priority Square */}
                       <div className={`w-10 h-10 rounded-xl border flex items-center justify-center text-[13px] font-bold shrink-0 transition-all ${
                         (email.priorityScore ?? 0) >= 8 
-                          ? "text-red-400 bg-red-400/5 border-red-400/10 shadow-[0_0_20px_-8px] shadow-red-500/20" 
+                          ? "text-red-400 bg-red-400/5 border-red-400/10 shadow-[0_0_20px_-5px] shadow-red-500/30" 
                           : (email.priorityScore ?? 0) >= 5 
-                            ? "text-amber-400 bg-amber-400/5 border-amber-400/10" 
-                            : "text-white/20 bg-white/[0.02] border-white/5"
+                            ? "text-amber-400 bg-amber-400/5 border-amber-400/10 shadow-[0_0_15px_-5px] shadow-amber-500/20" 
+                            : "text-[#888] bg-white/[0.02] border-[#2a2a2a]"
                       }`}>
                         {email.priorityScore ?? "—"}
                       </div>
 
                       {/* Content */}
                       <div className="flex-1 min-w-0">
-                        <p className="text-[13px] md:text-[14px] font-bold text-white/70 truncate group-hover:text-white transition-colors mb-1.5">
+                        <p className={`text-[13px] md:text-[14.5px] font-bold truncate transition-colors mb-1.5 ${isExpanded ? "text-white" : "text-[#e8e8e8] group-hover:text-white"}`}>
                           {email.subject || "No Subject"}
                         </p>
                         <div className="flex items-center gap-2 flex-wrap">
-                          <span className="text-[11px] text-white/25 truncate font-medium max-w-[200px]">{email.sender || "Unknown"}</span>
-                          <span className="text-white/10 text-[8px]">·</span>
-                          <Badge variant="default" className="bg-white/[0.02] py-0 px-1.5 border-white/[0.05] text-[8px]">
+                          <span className="text-[11px] text-[#888] truncate font-medium max-w-[200px]">{email.sender || "Unknown"}</span>
+                          <span className="text-[#444] text-[8px]">·</span>
+                          <Badge variant="default" className="bg-[#111] py-0 px-1.5 border-[#2a2a2a] text-[8px] font-medium tracking-wide text-[#999]">
                             {email.emailAccount.provider}
                           </Badge>
                           {email.notified && (
                             <>
-                              <span className="text-white/10 text-[8px]">·</span>
-                              <span className="text-emerald-500/40 text-[10px] flex items-center gap-1">
+                              <span className="text-[#444] text-[8px]">·</span>
+                              <span className="text-emerald-500/70 text-[10px] font-bold tracking-wide flex items-center gap-1 bg-emerald-500/10 px-1.5 py-0.5 rounded-sm">
                                 <Bell size={9} /> Sent
                               </span>
                             </>
@@ -255,11 +259,11 @@ export default function EmailsPage() {
 
                       {/* Time + Expand */}
                       <div className="hidden sm:flex items-center gap-3 shrink-0">
-                        <span className="text-[10px] text-white/15 font-mono">
+                        <span className="text-[10.5px] text-[#888] font-mono font-medium">
                           {new Date(email.processedAt).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
                         </span>
                       </div>
-                      <ChevronDown size={14} className={`text-white/10 transition-transform duration-300 shrink-0 ${isExpanded ? "rotate-180 text-white/40" : ""}`} />
+                      <ChevronDown size={14} className={`text-[#888] transition-transform duration-300 shrink-0 ${isExpanded ? "rotate-180 text-white" : ""}`} />
                     </button>
 
                     <AnimatePresence>
@@ -269,41 +273,42 @@ export default function EmailsPage() {
                           animate={{ height: "auto", opacity: 1 }}
                           exit={{ height: 0, opacity: 0 }}
                           transition={{ duration: 0.3, ease: "easeInOut" }}
-                          className="overflow-hidden"
+                          className="overflow-hidden relative z-10 bg-[#141414]"
                         >
                           <div className="px-5 md:px-8 pb-8 md:pb-10 md:ml-[72px]">
-                            <div className="p-6 md:p-8 rounded-2xl bg-[#080808] border border-white/5 relative overflow-hidden">
-                              {/* Gradient accent line */}
-                              <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+                            {/* Premium Mockup Panel for Summary */}
+                            <div className="p-6 md:p-8 rounded-2xl bg-[#0a0a0a] border border-[#2a2a2a] relative overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.5),0_0_0_1px_rgba(255,255,255,0.02)_inset]">
+                              {/* Chrome Top Edge */}
+                              <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-50" />
                               
                               <div className="flex items-center gap-3 mb-5">
-                                <Sparkles size={13} className="text-white/15" />
-                                <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-white/20">
+                                <Sparkles size={14} className="text-[#888]" />
+                                <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-[#e8e8e8]">
                                   AI Summary
                                 </h4>
                               </div>
-                              <p className="text-[14px] md:text-[15px] text-white/50 leading-relaxed font-medium">
+                              <p className="text-[14px] md:text-[15px] text-[#d4d4d4] leading-relaxed font-medium">
                                 {email.summary || "No automated summary available for this communication."}
                               </p>
                               
-                              <div className="mt-6 pt-5 border-t border-white/5 flex flex-wrap gap-6 md:gap-10">
+                              <div className="mt-6 pt-5 border-t border-[#1c1c1c] flex flex-wrap gap-6 md:gap-10">
                                 <div>
-                                  <p className="text-[9px] font-black uppercase tracking-widest text-white/10 mb-1.5">Priority</p>
+                                  <p className="text-[9px] font-black uppercase tracking-widest text-[#666] mb-1.5">Priority</p>
                                   <div className="flex items-center gap-2">
                                     {getPriorityBadge(email.priorityScore)}
-                                    <span className="text-[11px] text-white/20">/10</span>
+                                    <span className="text-[11px] text-[#888] font-medium">/10</span>
                                   </div>
                                 </div>
                                 <div>
-                                  <p className="text-[9px] font-black uppercase tracking-widest text-white/10 mb-1.5">Status</p>
-                                  <p className="text-[12px] font-bold text-white/30 flex items-center gap-1.5">
-                                    {email.notified ? <><Bell size={10} className="text-emerald-500/50" /> Notified</> : "Filtered"}
+                                  <p className="text-[9px] font-black uppercase tracking-widest text-[#666] mb-1.5">Status</p>
+                                  <p className="text-[12.5px] font-bold text-[#e8e8e8] flex items-center gap-1.5">
+                                    {email.notified ? <><Bell size={11} className="text-emerald-500/70" /> Notified</> : "Filtered"}
                                   </p>
                                 </div>
                                 <div>
-                                  <p className="text-[9px] font-black uppercase tracking-widest text-white/10 mb-1.5">Processed</p>
-                                  <p className="text-[12px] font-bold text-white/30 flex items-center gap-1.5">
-                                    <Clock size={10} />
+                                  <p className="text-[9px] font-black uppercase tracking-widest text-[#666] mb-1.5">Processed</p>
+                                  <p className="text-[12.5px] font-bold text-[#e8e8e8] flex items-center gap-1.5">
+                                    <Clock size={11} className="text-[#888]" />
                                     {new Date(email.processedAt).toLocaleString("en-US", { 
                                       month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" 
                                     })}
@@ -312,20 +317,20 @@ export default function EmailsPage() {
                               </div>
 
                               {/* ── Reply Section ───── */}
-                              <div className="mt-5 pt-5 border-t border-white/5">
+                              <div className="mt-5 pt-5 border-t border-[#1c1c1c]">
                                 {replyResult?.emailId === email.id ? (
-                                  <div className="flex items-start gap-3 p-4 rounded-xl bg-emerald-500/5 border border-emerald-500/10">
-                                    <CheckCircle2 size={14} className="text-emerald-400/50 mt-0.5 shrink-0" />
+                                  <div className="flex items-start gap-4 p-5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 shadow-inner">
+                                    <CheckCircle2 size={16} className="text-emerald-400 mt-0.5 shrink-0" />
                                     <div>
-                                      <p className="text-[12px] text-emerald-400/60 font-semibold mb-1">{replyResult.message}</p>
+                                      <p className="text-[13px] text-emerald-400 font-bold mb-1.5">{replyResult.message}</p>
                                       {replyResult.aiText && (
-                                        <p className="text-[11px] text-white/20 leading-relaxed italic">
+                                        <p className="text-[12px] text-emerald-400/70 leading-relaxed font-medium italic">
                                           "{replyResult.aiText.substring(0, 150)}{replyResult.aiText.length > 150 ? '...' : ''}"
                                         </p>
                                       )}
                                       <button 
                                         onClick={() => setReplyResult(null)}
-                                        className="text-[10px] text-white/20 hover:text-white/40 mt-2 transition-colors"
+                                        className="text-[11px] font-bold uppercase tracking-wider text-emerald-400/50 hover:text-emerald-400 mt-3 transition-colors"
                                       >
                                         Dismiss
                                       </button>
@@ -337,10 +342,10 @@ export default function EmailsPage() {
                                       value={replyText}
                                       onChange={(e) => setReplyText(e.target.value)}
                                       placeholder="Type your quick reply — AI will polish it into a professional email..."
-                                      className="w-full bg-white/[0.02] border border-white/5 rounded-xl px-4 py-3 text-[13px] text-white/70 placeholder:text-white/15 focus:outline-none focus:border-white/10 transition-all resize-none min-h-[80px]"
+                                      className="w-full bg-[#111] border border-[#2a2a2a] rounded-xl px-4 py-3.5 text-[13.5px] text-[#e8e8e8] placeholder:text-[#666] focus:outline-none focus:border-[#444] focus:bg-[#151515] transition-all resize-none min-h-[90px] shadow-inner"
                                       autoFocus
                                     />
-                                    <div className="flex items-center gap-2">
+                                    <div className="flex items-center gap-3">
                                       <button
                                         onClick={async () => {
                                           if (!replyText.trim()) return;
@@ -357,18 +362,18 @@ export default function EmailsPage() {
                                           }
                                         }}
                                         disabled={replySending || !replyText.trim()}
-                                        className="bg-white text-black px-4 py-2 rounded-lg font-semibold text-[11px] hover:bg-white/90 transition-all disabled:opacity-20 flex items-center gap-1.5"
+                                        className="btn btn-primary px-5 py-2.5 rounded-lg disabled:opacity-20 flex items-center gap-2"
                                       >
-                                        {replySending ? <Loader2 size={12} className="animate-spin" /> : <Send size={12} />}
+                                        {replySending ? <Loader2 size={13} className="animate-spin" /> : <Send size={13} />}
                                         {replySending ? "Sending..." : "Send Reply"}
                                       </button>
                                       <button
                                         onClick={() => { setReplyingTo(null); setReplyText(""); }}
-                                        className="text-[11px] text-white/20 hover:text-white/40 px-3 py-2 transition-colors"
+                                        className="btn btn-ghost px-4 py-2"
                                       >
                                         Cancel
                                       </button>
-                                      <span className="text-[9px] text-white/12 ml-auto hidden md:block">
+                                      <span className="text-[10px] font-medium text-[#666] ml-auto hidden md:block">
                                         AI will polish your message automatically
                                       </span>
                                     </div>
@@ -376,9 +381,9 @@ export default function EmailsPage() {
                                 ) : (
                                   <button
                                     onClick={() => setReplyingTo(email.id)}
-                                    className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-white/[0.02] border border-white/5 hover:border-white/10 text-[11px] font-semibold text-white/25 hover:text-white/50 transition-all"
+                                    className="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-white/[0.03] border border-[#2a2a2a] hover:border-[#444] hover:bg-white/[0.05] text-[11.5px] font-bold text-[#d4d4d4] hover:text-white transition-all shadow-[0_2px_10px_rgba(0,0,0,0.2)]"
                                   >
-                                    <Send size={12} />
+                                    <Send size={13} />
                                     Reply to this email
                                   </button>
                                 )}

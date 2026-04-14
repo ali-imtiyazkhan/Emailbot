@@ -105,7 +105,7 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#050505] text-white">
+    <div className="min-h-screen text-white relative z-10">
       <div className="max-w-[860px] mx-auto px-6 md:px-8 py-8 md:py-10 flex flex-col gap-8">
         
         <PageHeader 
@@ -113,36 +113,38 @@ export default function SettingsPage() {
           description="Manage your accounts, notifications, and preferences."
         />
 
-        <motion.div initial="hidden" animate="show" variants={stagger} className="flex flex-col gap-6">
+        <motion.div initial="hidden" animate="show" variants={stagger} className="flex flex-col gap-8">
 
           {/* ── 1. Profile ────────────────────────────────── */}
           <motion.div variants={fadeUp}>
-            <Card className="p-5">
-              <div className="flex items-center gap-4">
-                <div className="w-11 h-11 rounded-full bg-gradient-to-br from-white/10 to-white/[0.02] border border-white/8 flex items-center justify-center text-[15px] font-semibold text-white/40">
+            <Card className="p-5 shadow-[0_10px_30px_rgba(0,0,0,0.2)]">
+              <div className="flex items-center gap-5">
+                <div className="w-14 h-14 rounded-full bg-gradient-to-br from-white/10 to-white/[0.02] border border-white/10 shadow-inner flex items-center justify-center text-[18px] font-bold text-[#e8e8e8]">
                   {profile?.name?.[0] || profile?.email?.[0] || "?"}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-[14px] font-semibold text-white/80 truncate">{profile?.name || "Unknown"}</p>
-                  <p className="text-[12px] text-white/30 truncate">{profile?.email}</p>
+                  <p className="text-[16px] font-bold text-[#e8e8e8] truncate mb-0.5">{profile?.name || "Unknown"}</p>
+                  <p className="text-[13px] font-medium text-[#888] truncate">{profile?.email}</p>
                 </div>
-                <Badge variant="default" className="shrink-0 text-[9px]">ID {profile?.id}</Badge>
+                <Badge variant="default" className="shrink-0 text-[10px] font-bold tracking-wider bg-[#111] border-[#2a2a2a] text-[#666]">
+                  ID {profile?.id}
+                </Badge>
               </div>
             </Card>
           </motion.div>
 
           {/* ── 2. Connected Accounts ─────────────────────── */}
           <motion.div variants={fadeUp}>
-            <div className="flex items-center justify-between mb-3">
-              <h2 className="text-[13px] font-semibold text-white/50 tracking-tight flex items-center gap-2">
-                <Link2 size={14} className="text-white/25" />
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-[14px] font-bold text-[#e8e8e8] tracking-tight flex items-center gap-2">
+                <Link2 size={16} className="text-[#888]" />
                 Connected Accounts
               </h2>
               <div className="flex gap-2">
                 {!accounts.some(a => a.provider === "gmail") && (
                   <button
                     onClick={() => window.open(`${API_URL}/auth/gmail/connect`, "_blank")}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/[0.03] border border-white/5 hover:border-white/10 text-[11px] font-semibold text-white/30 hover:text-white/60 transition-all"
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/[0.02] border border-[#2a2a2a] hover:border-[#444] text-[11px] font-bold text-[#b0b0b0] hover:text-white transition-all shadow-sm"
                   >
                     <Plus size={11} /> Gmail
                   </button>
@@ -150,7 +152,7 @@ export default function SettingsPage() {
                 {!accounts.some(a => a.provider === "outlook") && (
                   <button
                     onClick={() => window.open(`${API_URL}/auth/outlook/connect`, "_blank")}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/[0.03] border border-white/5 hover:border-white/10 text-[11px] font-semibold text-white/30 hover:text-white/60 transition-all"
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/[0.02] border border-[#2a2a2a] hover:border-[#444] text-[11px] font-bold text-[#b0b0b0] hover:text-white transition-all shadow-sm"
                   >
                     <Plus size={11} /> Outlook
                   </button>
@@ -159,58 +161,58 @@ export default function SettingsPage() {
             </div>
 
             {accounts.length === 0 ? (
-              <Card className="p-8 text-center">
-                <div className="w-12 h-12 mx-auto mb-4 rounded-xl bg-white/[0.03] border border-white/5 flex items-center justify-center">
-                  <WifiOff size={18} className="text-white/10" />
+              <Card className="p-10 text-center bg-transparent border-dashed border-[#2a2a2a]">
+                <div className="w-14 h-14 mx-auto mb-6 rounded-2xl bg-white/[0.02] border border-white/5 flex items-center justify-center shadow-inner">
+                  <WifiOff size={20} className="text-[#666]" />
                 </div>
-                <p className="text-[14px] font-semibold text-white/50 mb-1">No Accounts Connected</p>
-                <p className="text-[12px] text-white/20 max-w-xs mx-auto leading-relaxed mb-6">
+                <p className="text-[16px] font-bold text-[#e8e8e8] mb-2">No Accounts Connected</p>
+                <p className="text-[13px] text-[#888] font-medium max-w-xs mx-auto leading-relaxed mb-8">
                   Connect your email to start AI-powered monitoring.
                 </p>
-                <div className="flex gap-3 justify-center">
+                <div className="flex gap-4 justify-center">
                   <button
                     onClick={() => window.open(`${API_URL}/auth/gmail/connect`, "_blank")}
-                    className="bg-white text-black px-5 py-2.5 rounded-lg font-semibold text-[12px] transition-all hover:bg-white/90 flex items-center gap-2"
+                    className="btn btn-primary px-6 py-2.5 rounded-xl font-bold text-[13px] inline-flex items-center gap-2 shadow-lg"
                   >
-                    <Mail size={14} /> Connect Gmail
+                    <Mail size={15} /> Connect Gmail
                   </button>
                   <button
                     onClick={() => window.open(`${API_URL}/auth/outlook/connect`, "_blank")}
-                    className="bg-white/[0.05] text-white border border-white/10 px-5 py-2.5 rounded-lg font-semibold text-[12px] transition-all hover:bg-white/10 flex items-center gap-2"
+                    className="bg-[#141414] text-[#d4d4d4] border border-[#333] px-6 py-2.5 rounded-xl font-bold text-[13px] transition-all hover:bg-[#1a1a1a] hover:text-white inline-flex items-center gap-2 shadow-sm"
                   >
-                    <Mail size={14} /> Connect Outlook
+                    <Mail size={15} /> Connect Outlook
                   </button>
                 </div>
               </Card>
             ) : (
-              <div className="space-y-2">
+              <div className="space-y-3">
                 {accounts.map((acc) => (
-                  <Card key={acc.id} hoverable className="p-4 flex items-center gap-4">
-                    <div className={`w-9 h-9 rounded-lg border flex items-center justify-center shrink-0 ${
+                  <Card key={acc.id} hoverable className="p-5 flex items-center gap-5 group">
+                    <div className={`w-11 h-11 rounded-xl border flex items-center justify-center shrink-0 shadow-inner ${
                       acc.provider === "gmail" 
-                        ? "bg-red-500/5 border-red-500/10 text-red-400/60" 
-                        : "bg-blue-500/5 border-blue-500/10 text-blue-400/60"
+                        ? "bg-red-500/5 border-red-500/10 text-red-400" 
+                        : "bg-blue-500/5 border-blue-500/10 text-blue-400"
                     }`}>
-                      <Mail size={15} />
+                      <Mail size={18} />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-[13px] font-semibold text-white/70 truncate">{acc.email}</p>
-                      <div className="flex items-center gap-2 mt-0.5">
-                        <span className="text-[10px] text-white/20 font-semibold uppercase tracking-wide">
+                      <p className="text-[14.5px] font-bold text-[#e8e8e8] truncate group-hover:text-white transition-colors">{acc.email}</p>
+                      <div className="flex items-center gap-2 mt-1">
+                        <span className="text-[10px] text-[#888] font-black uppercase tracking-widest">
                           {acc.provider}
                         </span>
                         {acc.lastSynced && (
                           <>
-                            <span className="text-white/10 text-[6px]">●</span>
-                            <span className="text-[10px] text-white/20 flex items-center gap-1">
-                              <Timer size={9} />
+                            <span className="text-[#444] text-[6px]">●</span>
+                            <span className="text-[10.5px] font-medium text-[#888] flex items-center gap-1.5">
+                              <Timer size={11} className="text-[#666]" />
                               {new Date(acc.lastSynced).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
                             </span>
                           </>
                         )}
                       </div>
                     </div>
-                    <Badge variant={acc.isActive ? "success" : "default"} dot>
+                    <Badge variant={acc.isActive ? "success" : "default"} dot className={acc.isActive ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-400" : "bg-[#111] border-[#2a2a2a] text-[#888]"}>
                       {acc.isActive ? "Active" : "Paused"}
                     </Badge>
                   </Card>
@@ -221,57 +223,58 @@ export default function SettingsPage() {
 
           {/* ── 3. WhatsApp Relay ─────────────────────────── */}
           <motion.div variants={fadeUp}>
-            <div className="mb-3">
-              <h2 className="text-[13px] font-semibold text-white/50 tracking-tight flex items-center gap-2">
-                <MessageSquare size={14} className="text-white/25" />
+            <div className="mb-4">
+              <h2 className="text-[14px] font-bold text-[#e8e8e8] tracking-tight flex items-center gap-2">
+                <MessageSquare size={16} className="text-[#888]" />
                 WhatsApp Notifications
               </h2>
             </div>
 
-            <Card className={`p-5 ${profile?.whatsapp ? "border-emerald-500/8" : ""}`}>
-              <div className="flex items-center gap-4">
-                <div className={`w-9 h-9 rounded-lg border flex items-center justify-center shrink-0 ${
+            <Card className={`p-6 md:p-8 relative overflow-hidden ${profile?.whatsapp ? "border-emerald-500/20 shadow-[0_10px_30px_-10px_rgba(16,185,129,0.15)]" : "shadow-lg"}`}>
+              {profile?.whatsapp && <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/5 rounded-full blur-3xl pointer-events-none" />}
+              <div className="flex flex-col md:flex-row md:items-center gap-6 relative z-10">
+                <div className={`w-12 h-12 rounded-xl border flex items-center justify-center shrink-0 shadow-inner ${
                   profile?.whatsapp 
-                    ? "bg-emerald-500/8 border-emerald-500/12 text-emerald-500/60"
-                    : "bg-white/[0.03] border-white/5 text-white/20"
+                    ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-400"
+                    : "bg-[#141414] border-[#2a2a2a] text-[#666]"
                 }`}>
-                  <MessageSquare size={16} strokeWidth={1.8} />
+                  <MessageSquare size={20} strokeWidth={2} />
                 </div>
                 <div className="flex-1 min-w-0">
                   {profile?.whatsapp ? (
                     <>
-                      <div className="flex items-center gap-2.5">
-                        <span className="text-[15px] text-white/70 font-mono font-semibold tracking-tight">{profile.whatsapp}</span>
-                        <ShieldCheck size={14} className="text-emerald-500/40" />
+                      <div className="flex items-center gap-3 mb-1.5">
+                        <span className="text-[17px] text-[#e8e8e8] font-mono font-bold tracking-tight">{profile.whatsapp}</span>
+                        <ShieldCheck size={16} className="text-emerald-400" />
                       </div>
-                      <p className="text-[11px] text-white/20 mt-0.5">
+                      <p className="text-[12.5px] font-medium text-[#c0c0c0] leading-relaxed max-w-sm">
                         Urgent emails forwarded as AI summaries. Reply directly to respond.
                       </p>
                     </>
                   ) : (
                     <>
-                      <p className="text-[13px] font-semibold text-white/50">Not Configured</p>
-                      <p className="text-[11px] text-white/20 mt-0.5">
+                      <p className="text-[15px] font-bold text-[#e8e8e8] mb-1">Not Configured</p>
+                      <p className="text-[12.5px] font-medium text-[#888] leading-relaxed max-w-sm">
                         Set your WhatsApp number in the database to enable push notifications.
                       </p>
                     </>
                   )}
                 </div>
-                <Badge variant={profile?.whatsapp ? "success" : "default"} dot>
+                <Badge variant={profile?.whatsapp ? "success" : "default"} dot className={`shrink-0 self-start md:self-auto ${profile?.whatsapp ? "bg-emerald-500/20 border-emerald-500/30 text-emerald-400" : "bg-[#111] border-[#2a2a2a] text-[#888]"}`}>
                   {profile?.whatsapp ? "Connected" : "Inactive"}
                 </Badge>
               </div>
 
               {profile?.whatsapp && (
-                <div className="grid grid-cols-3 gap-2 mt-4 pt-4 border-t border-white/5">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-8 pt-6 border-t border-[#2a2a2a] relative z-10">
                   {[
                     { icon: Sparkles, label: "AI Summaries" },
                     { icon: MessageSquare, label: "Reply via Chat" },
                     { icon: CalendarClock, label: "Daily Digest" },
                   ].map((feat, i) => (
-                    <div key={i} className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/[0.02]">
-                      <feat.icon size={12} className="text-white/15 shrink-0" />
-                      <span className="text-[10px] font-semibold text-white/25">{feat.label}</span>
+                    <div key={i} className="flex items-center gap-3 px-4 py-3 rounded-xl bg-[#111] border border-[#1a1a1a] shadow-inner">
+                      <feat.icon size={14} className="text-emerald-400/70 shrink-0" />
+                      <span className="text-[11.5px] font-bold text-[#b0b0b0]">{feat.label}</span>
                     </div>
                   ))}
                 </div>
@@ -282,84 +285,87 @@ export default function SettingsPage() {
           {/* ── 4. Daily Digest ───────────────────────────── */}
           {digest && (
             <motion.div variants={fadeUp}>
-              <div className="mb-3">
-                <h2 className="text-[13px] font-semibold text-white/50 tracking-tight flex items-center gap-2">
-                  <CalendarClock size={14} className="text-white/25" />
+              <div className="mb-4">
+                <h2 className="text-[14px] font-bold text-[#e8e8e8] tracking-tight flex items-center gap-2">
+                  <CalendarClock size={16} className="text-[#888]" />
                   Daily Digest
                 </h2>
               </div>
 
-              <Card className="p-5">
+              <Card className="p-6 md:p-8 shadow-[0_10px_30px_rgba(0,0,0,0.3)]">
                 {/* Enable Toggle Row */}
-                <div className="flex items-center justify-between mb-5">
+                <div className="flex items-center justify-between mb-8 pb-6 border-b border-[#2a2a2a]">
                   <div>
-                    <p className="text-[13px] font-semibold text-white/60">Send Daily Summary</p>
-                    <p className="text-[11px] text-white/20 mt-0.5">Automated 24-hour email recap via WhatsApp</p>
+                    <p className="text-[15px] font-bold text-[#e8e8e8] mb-1">Send Daily Summary</p>
+                    <p className="text-[12.5px] font-medium text-[#888]">Automated 24-hour email recap via WhatsApp</p>
                   </div>
                   <button
                     onClick={() => setDigest({ ...digest, enabled: !digest.enabled })}
-                    className={`relative w-11 h-6 rounded-full transition-all duration-300 shrink-0 ${
-                      digest.enabled ? "bg-white" : "bg-white/5 border border-white/8"
+                    className={`relative w-12 h-6 rounded-full transition-all duration-300 shrink-0 shadow-inner ${
+                      digest.enabled ? "bg-white" : "bg-[#1a1a1a] border border-[#333]"
                     }`}
                   >
                     <span
-                      className={`absolute top-1 left-1 w-4 h-4 rounded-full transition-transform duration-300 ${
-                        digest.enabled ? "translate-x-5 bg-[#050505]" : "translate-x-0 bg-white/40"
+                      className={`absolute top-1 left-1 w-4 h-4 rounded-full transition-transform duration-300 shadow-sm ${
+                        digest.enabled ? "translate-x-6 bg-[#000]" : "translate-x-0 bg-[#666]"
                       }`}
                     />
                   </button>
                 </div>
 
-                <div className={`transition-opacity duration-300 ${digest.enabled ? "" : "opacity-25 pointer-events-none"}`}>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className={`transition-opacity duration-300 ${digest.enabled ? "" : "opacity-30 pointer-events-none"}`}>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     {/* Send Time */}
-                    <div className="space-y-1.5">
-                      <label className="flex items-center gap-1.5 text-[10px] font-semibold uppercase text-white/20 tracking-wider">
-                        <Clock size={10} className="text-white/15" />
+                    <div className="space-y-2.5">
+                      <label className="flex items-center gap-2 text-[10.5px] font-black uppercase text-[#888] tracking-widest">
+                        <Clock size={12} className="text-[#666]" />
                         Time
                       </label>
                       <input
                         type="time"
                         value={digest.sendTime}
                         onChange={(e) => setDigest({ ...digest, sendTime: e.target.value })}
-                        className="w-full bg-white/[0.03] border border-white/5 rounded-lg px-3 py-2.5 text-[13px] text-white focus:outline-none focus:border-white/10 transition-all font-semibold"
+                        className="w-full bg-[#111] border border-[#2a2a2a] rounded-xl px-4 py-3.5 text-[14px] text-[#e8e8e8] focus:outline-none focus:border-[#555] transition-all font-bold shadow-inner"
                       />
                     </div>
 
                     {/* Timezone */}
-                    <div className="space-y-1.5">
-                      <label className="flex items-center gap-1.5 text-[10px] font-semibold uppercase text-white/20 tracking-wider">
-                        <Globe size={10} className="text-white/15" />
+                    <div className="space-y-2.5">
+                      <label className="flex items-center gap-2 text-[10.5px] font-black uppercase text-[#888] tracking-widest">
+                        <Globe size={12} className="text-[#666]" />
                         Timezone
                       </label>
-                      <select
-                        value={digest.timezone}
-                        onChange={(e) => setDigest({ ...digest, timezone: e.target.value })}
-                        className="w-full bg-white/[0.03] border border-white/5 rounded-lg px-3 py-2.5 text-[13px] text-white focus:outline-none focus:border-white/10 transition-all font-semibold appearance-none"
-                      >
-                        {TIMEZONES.map(tz => (
-                          <option key={tz.value} value={tz.value}>
-                            {tz.label} (UTC{tz.offset})
-                          </option>
-                        ))}
-                      </select>
+                      <div className="relative">
+                        <select
+                          value={digest.timezone}
+                          onChange={(e) => setDigest({ ...digest, timezone: e.target.value })}
+                          className="w-full bg-[#111] border border-[#2a2a2a] rounded-xl pl-4 pr-10 py-3.5 text-[13.5px] text-[#e8e8e8] focus:outline-none focus:border-[#555] transition-all font-semibold appearance-none shadow-inner"
+                        >
+                          {TIMEZONES.map(tz => (
+                            <option key={tz.value} value={tz.value} className="bg-[#111] text-white">
+                              {tz.label} (UTC{tz.offset})
+                            </option>
+                          ))}
+                        </select>
+                        <ChevronRight size={14} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[#666] rotate-90 pointer-events-none" />
+                      </div>
                     </div>
 
                     {/* Min Emails */}
-                    <div className="space-y-1.5">
-                      <label className="flex items-center gap-1.5 text-[10px] font-semibold uppercase text-white/20 tracking-wider">
-                        <Mail size={10} className="text-white/15" />
+                    <div className="space-y-2.5">
+                      <label className="flex items-center gap-2 text-[10.5px] font-black uppercase text-[#888] tracking-widest">
+                        <Mail size={12} className="text-[#666]" />
                         Min. Emails
                       </label>
-                      <div className="flex items-center gap-1.5">
+                      <div className="flex items-center gap-1.5 h-[48px]">
                         {[1, 3, 5, 10].map(num => (
                           <button
                             key={num}
                             onClick={() => setDigest({ ...digest, minEmails: num })}
-                            className={`flex-1 py-2.5 rounded-lg text-[12px] font-semibold transition-all border ${
+                            className={`flex-1 h-full rounded-xl text-[13px] font-bold transition-all border ${
                               digest.minEmails === num 
-                                ? "bg-white text-black border-white" 
-                                : "bg-white/[0.02] text-white/25 border-white/5 hover:border-white/10"
+                                ? "bg-white text-black border-white shadow-md" 
+                                : "bg-[#111] text-[#888] border-[#2a2a2a] hover:border-[#444] hover:text-white"
                             }`}
                           >
                             {num}
@@ -370,16 +376,16 @@ export default function SettingsPage() {
                   </div>
 
                   {/* Save Row */}
-                  <div className="flex items-center gap-3 mt-5 pt-4 border-t border-white/5">
+                  <div className="flex items-center gap-4 mt-8 pt-6 border-t border-[#2a2a2a]">
                     <button
                       onClick={handleSaveDigest}
                       disabled={saving}
-                      className="bg-white text-black px-6 py-2.5 rounded-lg font-semibold text-[12px] hover:bg-white/90 transition-all disabled:opacity-20 flex items-center gap-2"
+                      className="btn btn-primary px-8 py-3 rounded-xl font-bold text-[13.5px] disabled:opacity-20 flex items-center justify-center gap-2 shadow-lg min-w-[140px]"
                     >
                       {saving ? (
-                        <div className="w-3.5 h-3.5 border-2 border-black/10 border-t-black rounded-full animate-spin" />
+                        <div className="w-4 h-4 border-2 border-black/10 border-t-black rounded-full animate-spin" />
                       ) : saved ? (
-                        <><CheckCircle2 size={14} /> Saved</>
+                        <><CheckCircle2 size={16} /> Saved</>
                       ) : (
                         "Save Changes"
                       )}
@@ -391,14 +397,14 @@ export default function SettingsPage() {
                           initial={{ opacity: 0, x: -5 }}
                           animate={{ opacity: 1, x: 0 }}
                           exit={{ opacity: 0 }}
-                          className="text-[11px] text-emerald-400/50 font-medium flex items-center gap-1.5"
+                          className="text-[12.5px] text-emerald-400 font-bold flex items-center gap-2"
                         >
-                          <CheckCircle2 size={12} /> Settings updated
+                          <CheckCircle2 size={14} /> Settings updated
                         </motion.span>
                       )}
                     </AnimatePresence>
 
-                    <p className="text-[10px] text-white/15 ml-auto hidden md:block">
+                    <p className="text-[11.5px] font-medium text-[#666] ml-auto hidden md:block">
                       Digests include AI summaries of all unread emails.
                     </p>
                   </div>

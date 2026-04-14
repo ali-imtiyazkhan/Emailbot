@@ -89,11 +89,11 @@ export default function AnalyticsPage() {
     : 0;
 
   return (
-    <div className="min-h-screen bg-[#050505] text-white">
+    <div className="min-h-screen text-[var(--text-1)] relative z-10">
       <div className="max-w-[1400px] mx-auto px-8 py-10 flex flex-col gap-8">
         
         <PageHeader 
-          title="Analytics"
+          title="Data Analytics"
           description="Email processing insights over the last 30 days."
         />
 
@@ -115,7 +115,7 @@ export default function AnalyticsPage() {
               { 
                 icon: TrendingUp, label: "7-Day Trend", 
                 value: `${trendUp ? "+" : ""}${trendPct}%`, 
-                sub: trendUp ? "More emails than last week" : "Fewer emails than last week",
+                sub: trendUp ? "More emails than last week" : "Fewer than last week",
                 trend: trendUp 
               },
               { 
@@ -124,23 +124,24 @@ export default function AnalyticsPage() {
                 sub: data.topSenders[0] ? `Top: ${data.topSenders[0].sender.split(" ")[0]}` : "No data" 
               },
             ].map((s, i) => (
-              <Card key={i} hoverable className="p-5">
-                <div className="flex items-center justify-between mb-4">
+              <Card key={i} hoverable className="p-5 flex flex-col relative overflow-hidden group">
+                <div className="absolute -bottom-6 -right-6 w-24 h-24 bg-white/[0.02] rounded-full blur-xl group-hover:scale-150 transition-transform duration-500 pointer-events-none" />
+                <div className="flex items-center justify-between mb-4 relative z-10">
                   <div className="w-8 h-8 rounded-lg bg-white/[0.03] border border-white/5 flex items-center justify-center">
-                    <s.icon size={15} className="text-white/30" strokeWidth={1.8} />
+                    <s.icon size={15} className="text-[#888]" strokeWidth={1.8} />
                   </div>
                   {s.trend !== undefined && (
-                    <span className={`flex items-center gap-1 text-[10px] font-semibold ${s.trend ? "text-emerald-400/60" : "text-red-400/60"}`}>
+                    <span className={`flex items-center gap-1 text-[10px] font-semibold ${s.trend ? "text-emerald-400" : "text-red-400"}`}>
                       {s.trend ? <ArrowUpRight size={11} /> : <ArrowDownRight size={11} />}
                       {s.value}
                     </span>
                   )}
                 </div>
                 {s.trend === undefined && (
-                  <p className="text-2xl font-semibold tracking-tight text-white mb-1">{s.value}</p>
+                  <p className="text-3xl font-semibold tracking-tight text-[#e8e8e8] mb-1 relative z-10">{s.value}</p>
                 )}
-                <p className="text-[10px] font-semibold uppercase tracking-wider text-white/15">{s.label}</p>
-                <p className="text-[10px] text-white/20 mt-1">{s.sub}</p>
+                <p className="text-[10px] font-black uppercase tracking-wider text-[#999] relative z-10">{s.label}</p>
+                <p className="text-[10px] text-[#555] mt-1 font-medium relative z-10">{s.sub}</p>
               </Card>
             ))}
           </motion.div>
@@ -151,34 +152,34 @@ export default function AnalyticsPage() {
             {/* Emails Per Day */}
             <Card className="p-5">
               <div className="flex items-center gap-2 mb-5">
-                <BarChart3 size={14} className="text-white/25" />
-                <h3 className="text-[13px] font-semibold text-white/50">Email Volume</h3>
-                <span className="text-[10px] text-white/20 ml-auto">Last 30 days</span>
+                <BarChart3 size={14} className="text-[#888]" />
+                <h3 className="text-[13px] font-bold text-[#e8e8e8]">Email Volume</h3>
+                <span className="text-[10px] text-[#666] ml-auto font-medium">Last 30 days</span>
               </div>
               <div className="h-[200px]">
                 <ResponsiveContainer width="100%" height="100%">
                   <AreaChart data={data.emailsPerDay}>
                     <defs>
                       <linearGradient id="colorEmails" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#6366f1" stopOpacity={0.3} />
+                        <stop offset="5%" stopColor="#6366f1" stopOpacity={0.4} />
                         <stop offset="95%" stopColor="#6366f1" stopOpacity={0} />
                       </linearGradient>
                     </defs>
                     <XAxis 
                       dataKey="date" 
-                      tick={{ fontSize: 9, fill: "rgba(255,255,255,0.15)" }}
+                      tick={{ fontSize: 9, fill: "#666" }}
                       tickFormatter={(v) => new Date(v).toLocaleDateString("en", { month: "short", day: "numeric" })}
                       axisLine={false} tickLine={false}
                       interval="preserveStartEnd"
                     />
                     <YAxis 
-                      tick={{ fontSize: 9, fill: "rgba(255,255,255,0.15)" }} 
+                      tick={{ fontSize: 9, fill: "#666" }} 
                       axisLine={false} tickLine={false} width={25}
                     />
                     <Tooltip content={<CustomTooltip />} />
                     <Area 
                       type="monotone" dataKey="count" name="Emails"
-                      stroke="#6366f1" strokeWidth={2} 
+                      stroke="#818cf8" strokeWidth={2} 
                       fill="url(#colorEmails)" 
                     />
                   </AreaChart>
@@ -189,19 +190,19 @@ export default function AnalyticsPage() {
             {/* Priority Distribution */}
             <Card className="p-5">
               <div className="flex items-center gap-2 mb-5">
-                <TrendingUp size={14} className="text-white/25" />
-                <h3 className="text-[13px] font-semibold text-white/50">Priority Distribution</h3>
+                <TrendingUp size={14} className="text-[#888]" />
+                <h3 className="text-[13px] font-bold text-[#e8e8e8]">Priority Distribution</h3>
               </div>
               <div className="h-[200px]">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={data.priorityDistribution}>
                     <XAxis 
                       dataKey="score" 
-                      tick={{ fontSize: 9, fill: "rgba(255,255,255,0.15)" }}
+                      tick={{ fontSize: 9, fill: "#666" }}
                       axisLine={false} tickLine={false}
                     />
                     <YAxis 
-                      tick={{ fontSize: 9, fill: "rgba(255,255,255,0.15)" }} 
+                      tick={{ fontSize: 9, fill: "#666" }} 
                       axisLine={false} tickLine={false} width={25}
                     />
                     <Tooltip content={<CustomTooltip />} />
@@ -209,8 +210,8 @@ export default function AnalyticsPage() {
                       {data.priorityDistribution.map((entry, i) => (
                         <Cell 
                           key={i} 
-                          fill={entry.score >= 8 ? "#ef4444" : entry.score >= 5 ? "#f59e0b" : "#6366f1"} 
-                          fillOpacity={0.7}
+                          fill={entry.score >= 8 ? "#f87171" : entry.score >= 5 ? "#fbbf24" : "#818cf8"} 
+                          fillOpacity={0.85}
                         />
                       ))}
                     </Bar>
@@ -226,29 +227,29 @@ export default function AnalyticsPage() {
             {/* Top Senders */}
             <Card className="p-5">
               <div className="flex items-center gap-2 mb-5">
-                <Users size={14} className="text-white/25" />
-                <h3 className="text-[13px] font-semibold text-white/50">Top Senders</h3>
+                <Users size={14} className="text-[#888]" />
+                <h3 className="text-[13px] font-bold text-[#e8e8e8]">Top Senders</h3>
               </div>
               {data.topSenders.length === 0 ? (
-                <p className="text-[12px] text-white/20 py-8 text-center">No sender data available.</p>
+                <p className="text-[12px] text-[#666] py-8 text-center">No sender data available.</p>
               ) : (
-                <div className="space-y-3">
+                <div className="space-y-4">
                   {data.topSenders.slice(0, 7).map((s, i) => {
                     const maxCount = data.topSenders[0]?.count || 1;
                     const pct = (s.count / maxCount) * 100;
                     return (
-                      <div key={i} className="flex items-center gap-3">
-                        <span className="text-[10px] text-white/20 w-4 text-right font-mono">{i + 1}</span>
+                      <div key={i} className="flex items-center gap-4">
+                        <span className="text-[10px] text-[#666] w-4 text-right font-mono font-bold">{i + 1}</span>
                         <div className="flex-1 min-w-0">
-                          <div className="flex items-center justify-between mb-1">
-                            <span className="text-[11px] text-white/50 font-medium truncate max-w-[200px]">
+                          <div className="flex items-center justify-between mb-1.5">
+                            <span className="text-[12px] text-[#d4d4d4] font-medium truncate max-w-[200px]">
                               {s.sender}
                             </span>
-                            <span className="text-[10px] text-white/25 font-mono shrink-0">{s.count}</span>
+                            <span className="text-[10.5px] text-[#888] font-mono shrink-0 font-bold">{s.count}</span>
                           </div>
-                          <div className="h-1 bg-white/[0.03] rounded-full overflow-hidden">
+                          <div className="h-1.5 bg-[#1a1a1a] rounded-full overflow-hidden">
                             <div 
-                              className="h-full rounded-full bg-indigo-500/40 transition-all"
+                              className="h-full rounded-full bg-indigo-500 transition-all shadow-[0_0_10px_rgba(99,102,241,0.5)]"
                               style={{ width: `${pct}%` }} 
                             />
                           </div>
@@ -263,16 +264,16 @@ export default function AnalyticsPage() {
             {/* Category Breakdown */}
             <Card className="p-5">
               <div className="flex items-center gap-2 mb-5">
-                <Tag size={14} className="text-white/25" />
-                <h3 className="text-[13px] font-semibold text-white/50">Categories</h3>
+                <Tag size={14} className="text-[#888]" />
+                <h3 className="text-[13px] font-bold text-[#e8e8e8]">Categories</h3>
               </div>
               {data.categoryBreakdown.length === 0 ? (
                 <div className="py-8 text-center">
-                  <p className="text-[12px] text-white/20">No category data yet.</p>
-                  <p className="text-[10px] text-white/12 mt-1">Categories will appear as new emails are processed.</p>
+                  <p className="text-[12px] text-[#666]">No category data yet.</p>
+                  <p className="text-[10px] text-[#444] mt-1">Categories will appear as new emails are processed.</p>
                 </div>
               ) : (
-                <div className="flex items-center gap-6">
+                <div className="flex items-center gap-6 py-2">
                   <div className="w-[140px] h-[140px] shrink-0">
                     <ResponsiveContainer width="100%" height="100%">
                       <PieChart>
@@ -281,7 +282,7 @@ export default function AnalyticsPage() {
                           dataKey="count"
                           nameKey="category"
                           cx="50%" cy="50%"
-                          innerRadius={40} outerRadius={65}
+                          innerRadius={45} outerRadius={68}
                           paddingAngle={3}
                           strokeWidth={0}
                         >
@@ -289,23 +290,23 @@ export default function AnalyticsPage() {
                             <Cell 
                               key={i} 
                               fill={CATEGORY_COLORS[entry.category] || COLORS[i % COLORS.length]} 
-                              fillOpacity={0.8}
+                              fillOpacity={0.9}
                             />
                           ))}
                         </Pie>
                         <Tooltip content={<CustomTooltip />} />
-                      </PieChart>
+                       </PieChart>
                     </ResponsiveContainer>
                   </div>
-                  <div className="flex-1 space-y-2">
+                  <div className="flex-1 space-y-2.5">
                     {data.categoryBreakdown.map((cat, i) => (
-                      <div key={i} className="flex items-center gap-2.5">
+                      <div key={i} className="flex items-center gap-3">
                         <span 
-                          className="w-2 h-2 rounded-full shrink-0"
+                          className="w-2.5 h-2.5 rounded-full shrink-0 shadow-[0_0_8px_rgba(255,255,255,0.1)]"
                           style={{ backgroundColor: CATEGORY_COLORS[cat.category] || COLORS[i % COLORS.length] }} 
                         />
-                        <span className="text-[11px] text-white/40 flex-1">{cat.category}</span>
-                        <span className="text-[11px] text-white/25 font-mono">{cat.count}</span>
+                        <span className="text-[12px] font-medium text-[#d4d4d4] flex-1">{cat.category}</span>
+                        <span className="text-[11.5px] text-[#888] font-mono font-bold">{cat.count}</span>
                       </div>
                     ))}
                   </div>
@@ -319,35 +320,35 @@ export default function AnalyticsPage() {
             <motion.div variants={fadeUp}>
               <Card className="p-5">
                 <div className="flex items-center gap-2 mb-5">
-                  <TrendingUp size={14} className="text-white/25" />
-                  <h3 className="text-[13px] font-semibold text-white/50">Priority Trend</h3>
-                  <span className="text-[10px] text-white/20 ml-auto">Daily average priority score</span>
+                  <TrendingUp size={14} className="text-[#888]" />
+                  <h3 className="text-[13px] font-bold text-[#e8e8e8]">Priority Trend</h3>
+                  <span className="text-[10px] text-[#666] ml-auto font-medium">Daily average priority score</span>
                 </div>
                 <div className="h-[160px]">
                   <ResponsiveContainer width="100%" height="100%">
                     <AreaChart data={data.averagePriorityByDay}>
                       <defs>
                         <linearGradient id="colorPriority" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.3} />
-                          <stop offset="95%" stopColor="#f59e0b" stopOpacity={0} />
+                          <stop offset="5%" stopColor="#fbbf24" stopOpacity={0.4} />
+                          <stop offset="95%" stopColor="#fbbf24" stopOpacity={0} />
                         </linearGradient>
                       </defs>
                       <XAxis 
                         dataKey="date" 
-                        tick={{ fontSize: 9, fill: "rgba(255,255,255,0.15)" }}
+                        tick={{ fontSize: 9, fill: "#666" }}
                         tickFormatter={(v) => new Date(v).toLocaleDateString("en", { month: "short", day: "numeric" })}
                         axisLine={false} tickLine={false}
                         interval="preserveStartEnd"
                       />
                       <YAxis 
                         domain={[0, 10]}
-                        tick={{ fontSize: 9, fill: "rgba(255,255,255,0.15)" }} 
+                        tick={{ fontSize: 9, fill: "#666" }} 
                         axisLine={false} tickLine={false} width={25}
                       />
                       <Tooltip content={<CustomTooltip />} />
                       <Area 
                         type="monotone" dataKey="avgPriority" name="Avg Priority"
-                        stroke="#f59e0b" strokeWidth={2} 
+                        stroke="#fbbf24" strokeWidth={2} 
                         fill="url(#colorPriority)" 
                       />
                     </AreaChart>
