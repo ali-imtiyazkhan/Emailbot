@@ -55,6 +55,7 @@ model ProcessedEmail {
   subject        String?
   sender         String?
   summary        String?
+  category       String?
   priorityScore  Int?   
   notified       Boolean      @default(false)
   digestIncluded Boolean      @default(false)

@@ -123,3 +123,42 @@ export async function fetchProfile(): Promise<User> {
   return response.json();
 }
 
+// ── Analytics ────────────────────────────────────────────
+
+export interface AnalyticsData {
+  emailsPerDay: { date: string; count: number }[];
+  priorityDistribution: { score: number; count: number }[];
+  topSenders: { sender: string; count: number }[];
+  categoryBreakdown: { category: string; count: number }[];
+  averagePriorityByDay: { date: string; avgPriority: number }[];
+  totalEmails: number;
+  totalNotified: number;
+}
+
+export async function fetchAnalytics(): Promise<AnalyticsData> {
+  const response = await fetch(`${API_BASE_URL}/analytics`);
+  if (!response.ok) throw new Error('Failed to fetch analytics');
+  return response.json();
+}
+
+// ── Reply ────────────────────────────────────────────────
+
+export interface ReplyResult {
+  success: boolean;
+  message: string;
+  aiImproved: boolean;
+  finalText: string;
+}
+
+export async function replyToEmail(emailId: number, text: string): Promise<ReplyResult> {
+  const response = await fetch(`${API_BASE_URL}/emails/${emailId}/reply`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ text }),
+  });
+  if (!response.ok) {
+    const err = await response.json().catch(() => ({}));
+    throw new Error(err.error || 'Failed to send reply');
+  }
+  return response.json();
+}

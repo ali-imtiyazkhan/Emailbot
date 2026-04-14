@@ -1,4 +1,4 @@
-import { summarizeEmail } from './aiService.js';
+import { summarizeEmail } from '@repo/shared/ai';
 import { sendNotification } from './whatsappService.js';
 import db from '../config/db.js';
 import logger from '../utils/logger.js';
@@ -17,7 +17,20 @@ export const handleEmailJob = async (jobData: EmailJobData): Promise<void> => {
   const priorityRule = rules.find(r => r.ruleType === 'priority_min');
   const minPriority = priorityRule ? parseInt(priorityRule.value) : 5;
 
-  const shouldNotify = analysis.priority >= minPriority;
+  // Check sender rules
+  const senderRules = rules.filter(r => r.ruleType === 'sender');
+  const senderMatch = senderRules.some(r => 
+    email.sender.toLowerCase().includes(r.value.toLowerCase())
+  );
+
+  // Check keyword rules
+  const keywordRules = rules.filter(r => r.ruleType === 'keyword');
+  const keywordMatch = keywordRules.some(r => 
+    (email.subject || '').toLowerCase().includes(r.value.toLowerCase())
+  );
+
+  const aiFailed = analysis.category === 'error';
+  const shouldNotify = aiFailed || senderMatch || keywordMatch || analysis.priority >= minPriority;
 
   if (shouldNotify && whatsapp) {
     await sendNotification(whatsapp, email.subject, analysis.summary, analysis.priority);
@@ -32,6 +45,7 @@ export const handleEmailJob = async (jobData: EmailJobData): Promise<void> => {
       subject: email.subject,
       sender: email.sender,
       summary: analysis.summary,
+      category: analysis.category,
       priorityScore: analysis.priority,
       notified: shouldNotify,
       processedAt: new Date()
