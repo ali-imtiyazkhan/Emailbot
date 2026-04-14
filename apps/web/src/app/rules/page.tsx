@@ -88,7 +88,7 @@ export default function RulesPage() {
 
   return (
     <div className="min-h-screen bg-[#050505] text-white">
-      <div className="max-w-[1280px] mx-auto px-6 md:px-10 py-10 md:py-16 flex flex-col gap-10 md:gap-12">
+      <div className="max-w-[1280px] mx-auto px-6 md:px-8 py-8 md:py-10 flex flex-col gap-8 md:gap-10">
         
         <PageHeader 
           badge="Automation"
