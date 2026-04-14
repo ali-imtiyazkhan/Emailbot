@@ -1,10 +1,11 @@
 import { Router } from 'express';
 import { prisma as db } from '@repo/db';
-import { sendTextMessage } from '@repo/shared/whatsapp';
+import { sendTextMessage, sendNotification } from '@repo/shared/whatsapp';
 import logger from '@repo/shared/logger';
 import { sendEmailReply as sendGmailReply } from '../services/gmailService.js';
 import { sendEmailReply as sendOutlookReply } from '../services/outlookService.js';
 import { refineEmailReply } from '../services/aiService.js';
+import { emailQueue } from '../services/queueService.js';
 
 
 const router = Router();
@@ -111,6 +112,39 @@ router.post('/webhook', async (req, res) => {
       await sendTextMessage(from, '▶️ Notifications resumed!');
     } else if (command === 'SKIP') {
       await sendTextMessage(from, '⏭️ Current alert skipped.');
+    } else if (command?.startsWith('SNOOZE')) {
+      // Parse snooze duration: SNOOZE 2h, SNOOZE 30m, SNOOZE 1h30m
+      const match = text?.match(/snooze\s+(\d+)\s*(h|m|hr|min)/i);
+      if (match) {
+        const amount = parseInt(match[1]);
+        const unit = match[2].toLowerCase();
+        const delayMs = unit.startsWith('h') ? amount * 60 * 60 * 1000 : amount * 60 * 1000;
+        const delayLabel = unit.startsWith('h') ? `${amount} hour(s)` : `${amount} minute(s)`;
+
+        const lastEmail = await db.processedEmail.findFirst({
+          where: { userId: user.id, notified: true },
+          orderBy: { processedAt: 'desc' },
+        });
+
+        if (lastEmail) {
+          // Use BullMQ delayed job to re-send notification
+          await emailQueue.add(
+            `snooze-${lastEmail.id}`,
+            {
+              userId: user.id,
+              accountId: lastEmail.emailAccountId,
+              whatsapp: from,
+              email: { id: lastEmail.messageId, subject: lastEmail.subject || 'No Subject', sender: lastEmail.sender || 'Unknown', body: lastEmail.summary || '' },
+            },
+            { delay: delayMs }
+          );
+          await sendTextMessage(from, `⏰ Got it! I'll remind you about "*${lastEmail.subject}*" in ${delayLabel}.`);
+        } else {
+          await sendTextMessage(from, '❌ No recent email to snooze.');
+        }
+      } else {
+        await sendTextMessage(from, '⚠️ Usage: SNOOZE 2h or SNOOZE 30m');
+      }
     }
   }
 

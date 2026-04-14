@@ -4,13 +4,14 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { fetchProfile, User } from "@/lib/api";
-import { LayoutDashboard, Mail, SlidersHorizontal, Settings } from "lucide-react";
+import { LayoutDashboard, Mail, SlidersHorizontal, Settings, BarChart3 } from "lucide-react";
 
 const navItems = [
-  { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-  { label: "Emails",    href: "/emails",    icon: Mail              },
-  { label: "Rules",     href: "/rules",     icon: SlidersHorizontal },
-  { label: "Settings",  href: "/settings",  icon: Settings          },
+  { label: "Dashboard",  href: "/dashboard",  icon: LayoutDashboard },
+  { label: "Emails",     href: "/emails",     icon: Mail              },
+  { label: "Analytics",  href: "/analytics",  icon: BarChart3         },
+  { label: "Rules",      href: "/rules",      icon: SlidersHorizontal },
+  { label: "Settings",   href: "/settings",   icon: Settings          },
 ];
 
 const LogoMark = () => (

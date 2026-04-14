@@ -1,8 +1,8 @@
 "use client";
 
 import React, { useState, useEffect, useMemo } from "react";
-import { fetchEmails, ProcessedEmail } from "@/lib/api";
-import { Search, Mail, Filter, ChevronDown, Bell, Zap, FileText, ArrowUpDown, Inbox, Sparkles, Clock } from "lucide-react";
+import { fetchEmails, replyToEmail, ProcessedEmail } from "@/lib/api";
+import { Search, Mail, Filter, ChevronDown, Bell, Zap, FileText, ArrowUpDown, Inbox, Sparkles, Clock, Send, CheckCircle2, Loader2 } from "lucide-react";
 import { Card } from "@/components/ui/Card";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Badge } from "@/components/ui/Badge";
@@ -21,6 +21,10 @@ export default function EmailsPage() {
   const [filterPriority, setFilterPriority] = useState<string>("all");
   const [expandedId, setExpandedId] = useState<number | null>(null);
   const [sortMode, setSortMode] = useState<SortMode>("newest");
+  const [replyText, setReplyText] = useState("");
+  const [replyingTo, setReplyingTo] = useState<number | null>(null);
+  const [replySending, setReplySending] = useState(false);
+  const [replyResult, setReplyResult] = useState<{ emailId: number; message: string; aiText?: string } | null>(null);
 
   useEffect(() => {
     loadEmails();
@@ -305,6 +309,79 @@ export default function EmailsPage() {
                                     })}
                                   </p>
                                 </div>
+                              </div>
+
+                              {/* ── Reply Section ───── */}
+                              <div className="mt-5 pt-5 border-t border-white/5">
+                                {replyResult?.emailId === email.id ? (
+                                  <div className="flex items-start gap-3 p-4 rounded-xl bg-emerald-500/5 border border-emerald-500/10">
+                                    <CheckCircle2 size={14} className="text-emerald-400/50 mt-0.5 shrink-0" />
+                                    <div>
+                                      <p className="text-[12px] text-emerald-400/60 font-semibold mb-1">{replyResult.message}</p>
+                                      {replyResult.aiText && (
+                                        <p className="text-[11px] text-white/20 leading-relaxed italic">
+                                          "{replyResult.aiText.substring(0, 150)}{replyResult.aiText.length > 150 ? '...' : ''}"
+                                        </p>
+                                      )}
+                                      <button 
+                                        onClick={() => setReplyResult(null)}
+                                        className="text-[10px] text-white/20 hover:text-white/40 mt-2 transition-colors"
+                                      >
+                                        Dismiss
+                                      </button>
+                                    </div>
+                                  </div>
+                                ) : replyingTo === email.id ? (
+                                  <div className="space-y-3">
+                                    <textarea
+                                      value={replyText}
+                                      onChange={(e) => setReplyText(e.target.value)}
+                                      placeholder="Type your quick reply — AI will polish it into a professional email..."
+                                      className="w-full bg-white/[0.02] border border-white/5 rounded-xl px-4 py-3 text-[13px] text-white/70 placeholder:text-white/15 focus:outline-none focus:border-white/10 transition-all resize-none min-h-[80px]"
+                                      autoFocus
+                                    />
+                                    <div className="flex items-center gap-2">
+                                      <button
+                                        onClick={async () => {
+                                          if (!replyText.trim()) return;
+                                          setReplySending(true);
+                                          try {
+                                            const result = await replyToEmail(email.id, replyText);
+                                            setReplyResult({ emailId: email.id, message: result.message, aiText: result.aiImproved ? result.finalText : undefined });
+                                            setReplyText("");
+                                            setReplyingTo(null);
+                                          } catch (err: any) {
+                                            alert(err.message || "Failed to send reply");
+                                          } finally {
+                                            setReplySending(false);
+                                          }
+                                        }}
+                                        disabled={replySending || !replyText.trim()}
+                                        className="bg-white text-black px-4 py-2 rounded-lg font-semibold text-[11px] hover:bg-white/90 transition-all disabled:opacity-20 flex items-center gap-1.5"
+                                      >
+                                        {replySending ? <Loader2 size={12} className="animate-spin" /> : <Send size={12} />}
+                                        {replySending ? "Sending..." : "Send Reply"}
+                                      </button>
+                                      <button
+                                        onClick={() => { setReplyingTo(null); setReplyText(""); }}
+                                        className="text-[11px] text-white/20 hover:text-white/40 px-3 py-2 transition-colors"
+                                      >
+                                        Cancel
+                                      </button>
+                                      <span className="text-[9px] text-white/12 ml-auto hidden md:block">
+                                        AI will polish your message automatically
+                                      </span>
+                                    </div>
+                                  </div>
+                                ) : (
+                                  <button
+                                    onClick={() => setReplyingTo(email.id)}
+                                    className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-white/[0.02] border border-white/5 hover:border-white/10 text-[11px] font-semibold text-white/25 hover:text-white/50 transition-all"
+                                  >
+                                    <Send size={12} />
+                                    Reply to this email
+                                  </button>
+                                )}
                               </div>
                             </div>
                           </div>

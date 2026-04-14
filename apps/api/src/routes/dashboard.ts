@@ -182,4 +182,144 @@ router.put('/digest-settings', async (req, res) => {
   }
 });
 
+// ── Analytics ──────────────────────────────────────────
+
+router.get('/analytics', async (req, res) => {
+  try {
+    const userId = 1;
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+    const emails = await db.processedEmail.findMany({
+      where: { userId, processedAt: { gte: thirtyDaysAgo } },
+      select: {
+        processedAt: true,
+        priorityScore: true,
+        sender: true,
+        category: true,
+        notified: true,
+      },
+      orderBy: { processedAt: 'asc' },
+    });
+
+    // Emails per day
+    const emailsByDay: Record<string, number> = {};
+    const priorityByDay: Record<string, { total: number; count: number }> = {};
+    const senderCount: Record<string, number> = {};
+    const categoryCount: Record<string, number> = {};
+    const priorityDist: Record<number, number> = {};
+
+    for (const e of emails) {
+      const day = e.processedAt.toISOString().split('T')[0]!;
+      emailsByDay[day] = (emailsByDay[day] || 0) + 1;
+
+      if (e.priorityScore != null) {
+        priorityDist[e.priorityScore] = (priorityDist[e.priorityScore] || 0) + 1;
+        if (!priorityByDay[day]) priorityByDay[day] = { total: 0, count: 0 };
+        priorityByDay[day].total += e.priorityScore;
+        priorityByDay[day].count += 1;
+      }
+
+      if (e.sender) {
+        const cleanSender = e.sender.replace(/<[^>]+>/g, '').trim();
+        senderCount[cleanSender] = (senderCount[cleanSender] || 0) + 1;
+      }
+
+      if (e.category) {
+        categoryCount[e.category] = (categoryCount[e.category] || 0) + 1;
+      }
+    }
+
+    res.json({
+      emailsPerDay: Object.entries(emailsByDay).map(([date, count]) => ({ date, count })),
+      priorityDistribution: Object.entries(priorityDist)
+        .map(([score, count]) => ({ score: Number(score), count }))
+        .sort((a, b) => a.score - b.score),
+      topSenders: Object.entries(senderCount)
+        .map(([sender, count]) => ({ sender, count }))
+        .sort((a, b) => b.count - a.count)
+        .slice(0, 10),
+      categoryBreakdown: Object.entries(categoryCount).map(([category, count]) => ({ category, count })),
+      averagePriorityByDay: Object.entries(priorityByDay).map(([date, d]) => ({
+        date,
+        avgPriority: Math.round((d.total / d.count) * 10) / 10,
+      })),
+      totalEmails: emails.length,
+      totalNotified: emails.filter(e => e.notified).length,
+    });
+  } catch (error) {
+    logger.error('Error fetching analytics:', error);
+    res.status(500).json({ error: 'Failed to fetch analytics' });
+  }
+});
+
+// ── Reply to Email ─────────────────────────────────────
+
+router.post('/emails/:id/reply', async (req, res) => {
+  try {
+    const userId = 1;
+    const emailId = parseInt(req.params.id);
+    const { text } = req.body;
+
+    if (!text || typeof text !== 'string' || text.trim().length === 0) {
+      res.status(400).json({ error: 'Reply text is required' });
+      return;
+    }
+
+    const email = await db.processedEmail.findFirst({
+      where: { id: emailId, userId },
+      include: { emailAccount: true },
+    });
+
+    if (!email) {
+      res.status(404).json({ error: 'Email not found' });
+      return;
+    }
+
+    // Dynamically import reply services
+    const { refineEmailReply } = await import('../services/aiService.js');
+    
+    // AI polish the reply
+    let finalText = text.trim();
+    let wasImproved = false;
+    try {
+      const improved = await refineEmailReply(
+        email.subject || 'No Subject',
+        email.summary || '',
+        finalText
+      );
+      if (improved && improved !== finalText) {
+        finalText = improved;
+        wasImproved = true;
+      }
+    } catch (aiErr) {
+      logger.error('AI reply refinement failed, using original text:', aiErr);
+    }
+
+    // Send via correct provider
+    let success = false;
+    if (email.emailAccount.provider === 'gmail') {
+      const { sendEmailReply } = await import('../services/gmailService.js');
+      success = await sendEmailReply(userId, email.messageId, finalText);
+    } else if (email.emailAccount.provider === 'outlook') {
+      const { sendEmailReply } = await import('../services/outlookService.js');
+      success = await sendEmailReply(userId, email.messageId, finalText);
+    }
+
+    if (success) {
+      res.json({ 
+        success: true, 
+        message: `Reply sent to ${email.sender}`,
+        aiImproved: wasImproved,
+        finalText 
+      });
+    } else {
+      res.status(500).json({ error: 'Failed to send email reply' });
+    }
+  } catch (error) {
+    logger.error('Error sending email reply:', error);
+    res.status(500).json({ error: 'Failed to send reply' });
+  }
+});
+
 export default router;

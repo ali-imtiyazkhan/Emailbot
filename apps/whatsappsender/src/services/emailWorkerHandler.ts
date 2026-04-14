@@ -17,12 +17,30 @@ export const handleEmailJob = async (jobData: any): Promise<void> => {
     const priorityRule = rules.find((r: any) => r.ruleType === 'priority_min');
     const minPriority = priorityRule ? parseInt(priorityRule.value) : 5;
 
+    // Check sender rules — always notify if sender matches
+    const senderRules = rules.filter((r: any) => r.ruleType === 'sender');
+    const senderMatch = senderRules.some((r: any) => 
+      email.sender.toLowerCase().includes(r.value.toLowerCase())
+    );
+
+    // Check keyword rules — always notify if keyword found in subject
+    const keywordRules = rules.filter((r: any) => r.ruleType === 'keyword');
+    const keywordMatch = keywordRules.some((r: any) => 
+      (email.subject || '').toLowerCase().includes(r.value.toLowerCase())
+    );
+
     // Fail-open: If AI failed (category 'error'), we force notification
     const aiFailed = analysis.category === 'error';
-    const shouldNotify = aiFailed || analysis.priority >= minPriority;
+    const shouldNotify = aiFailed || senderMatch || keywordMatch || analysis.priority >= minPriority;
 
     if (aiFailed) {
       logger.warn(`AI Analysis failed for email ${email.id}. Falling back to default notification.`);
+    }
+    if (senderMatch) {
+      logger.info(`Sender rule matched for email ${email.id}`);
+    }
+    if (keywordMatch) {
+      logger.info(`Keyword rule matched for email ${email.id}`);
     }
 
     let whatsappMessageId: string | undefined;
@@ -42,6 +60,7 @@ export const handleEmailJob = async (jobData: any): Promise<void> => {
         subject: email.subject,
         sender: email.sender,
         summary: analysis.summary,
+        category: analysis.category,
         priorityScore: analysis.priority,
         notified: shouldNotify,
         whatsappMessageId,
