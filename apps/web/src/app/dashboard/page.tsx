@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { motion } from "framer-motion";
+import { motion, useSpring, useTransform, animate } from "framer-motion";
 import { fetchStats, fetchFilters, fetchEmails, fetchAccounts, Stats, FilterRule, ProcessedEmail, EmailAccount } from "@/lib/api";
 import {
   Mail, SlidersHorizontal, Zap, Bell,
@@ -24,6 +24,27 @@ function getPriorityStyle(score: number | null) {
   if (score >= 8) return { variant: "danger" as const, label: `${score}` };
   if (score >= 5) return { variant: "warning" as const, label: `${score}` };
   return { variant: "default" as const, label: `${score}` };
+}
+
+/* ── Counter Animation ───────────────────────────────────── */
+function AnimatedCounter({ value }: { value: number }) {
+  const nodeRef = React.useRef<HTMLSpanElement>(null);
+
+  React.useEffect(() => {
+    const node = nodeRef.current;
+    if (node) {
+      const controls = animate(0, value, {
+        duration: 1,
+        ease: "easeOut",
+        onUpdate(v) {
+          node.textContent = Math.round(v).toString();
+        },
+      });
+      return () => controls.stop();
+    }
+  }, [value]);
+
+  return <span ref={nodeRef}>{value}</span>;
 }
 
 export default function DashboardPage() {
@@ -76,9 +97,11 @@ export default function DashboardPage() {
           title="Dashboard"
           description={`Your AI agent is monitoring ${accounts.length} connected account${accounts.length !== 1 ? 's' : ''} and prioritizing your communications.`}
           actions={
-            <div className="flex items-center gap-2 px-4 py-2 rounded-full border border-white/5 bg-white/[0.02] shadow-[0_0_15px_rgba(255,255,255,0.05)]">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500/70 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.8)]" />
-              <span className="text-[10px] font-bold text-white/60 uppercase tracking-widest whitespace-nowrap">
+            <div className="flex items-center gap-2 px-4 py-2 rounded-full border border-white/5 bg-white/[0.02] shadow-[0_0_15px_rgba(255,255,255,0.05)] relative overflow-hidden">
+              {/* Radar Ping Animation */}
+              <span className="absolute left-4 top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-emerald-500/30 animate-[ping_2s_cubic-bezier(0,0,0.2,1)_infinite]" />
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500/70 shadow-[0_0_8px_rgba(16,185,129,0.8)] relative z-10" />
+              <span className="text-[10px] font-bold text-white/60 uppercase tracking-widest whitespace-nowrap pl-2 relative z-10">
                 System Live
               </span>
             </div>
@@ -88,7 +111,7 @@ export default function DashboardPage() {
         {/*  Stats */}
         <motion.div
           initial="hidden" animate="show" variants={cascade}
-          className="grid grid-cols-2 lg:grid-cols-4 gap-4"
+          className="grid grid-cols-2 lg:grid-cols-4 gap-6"
         >
           {statCards.map((s, i) => (
             <motion.div key={i} variants={up}>
@@ -107,7 +130,7 @@ export default function DashboardPage() {
                   <div className="text-3xl font-semibold tracking-tight text-white mb-1 drop-shadow-sm">
                     {loading
                       ? <span className="inline-block w-12 h-8 bg-white/5 rounded-lg animate-pulse" />
-                      : s.value
+                      : <AnimatedCounter value={s.value} />
                     }
                   </div>
                   <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#888]">{s.label}</p>
@@ -118,7 +141,7 @@ export default function DashboardPage() {
         </motion.div>
 
         {/* ── Main grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
           {/* Recent Intelligence — 2 cols */}
           <motion.div
@@ -195,7 +218,7 @@ export default function DashboardPage() {
           {/* Right column */}
           <motion.div
             initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.30 }}
-            className="flex flex-col gap-6"
+            className="flex flex-col gap-8"
           >
             {/* Management Controls */}
             <Card hoverable className="p-6">

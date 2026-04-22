@@ -97,7 +97,7 @@ export default function EmailsPage() {
         />
 
         {/* ── Stats Grid ───────────────────────────────── */}
-        <motion.div initial="hidden" animate="show" variants={stagger} className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <motion.div initial="hidden" animate="show" variants={stagger} className="grid grid-cols-2 lg:grid-cols-4 gap-6">
           {[
             { label: "Total", value: emails.length, icon: Mail, color: "text-white/40" },
             { label: "High Priority", value: highCount, icon: Zap, color: "text-red-400/60" },
@@ -137,14 +137,14 @@ export default function EmailsPage() {
             </div>
             
             {/* Priority Filter */}
-            <div className="flex p-1 bg-[#111] rounded-xl border border-[#2a2a2a] gap-1 shadow-inner">
+            <div className="flex p-1.5 bg-[#111] rounded-xl border border-[#2a2a2a] gap-2 shadow-inner">
               {["all", "high", "medium", "low"].map((p) => (
                 <button
                   key={p}
                   onClick={() => setFilterPriority(p)}
                   className={`px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all
                     ${filterPriority === p
-                      ? "bg-white text-black shadow-md"
+                      ? "bg-white text-black shadow-md scale-105"
                       : "text-[#888] hover:text-white hover:bg-white/[0.05]"
                     }`}
                 >
@@ -199,9 +199,13 @@ export default function EmailsPage() {
             </div>
           ) : filtered.length === 0 ? (
             <div className="flex flex-col items-center justify-center p-20 md:p-32 text-center">
-              <div className="w-20 h-20 rounded-2xl bg-[#0f0f0f] border border-[#2a2a2a] flex items-center justify-center mb-8 shadow-inner">
+              <motion.div 
+                animate={{ y: [0, -10, 0] }} 
+                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                className="w-20 h-20 rounded-2xl bg-[#0f0f0f] border border-[#2a2a2a] flex items-center justify-center mb-8 shadow-inner"
+              >
                 <Inbox className="w-8 h-8 text-[#888]" strokeWidth={1.2} />
-              </div>
+              </motion.div>
               <p className="text-white/80 text-[16px] font-semibold tracking-tight mb-2">
                 {search ? "No emails match your query" : "No processed emails yet"}
               </p>
@@ -272,7 +276,7 @@ export default function EmailsPage() {
                           initial={{ height: 0, opacity: 0 }}
                           animate={{ height: "auto", opacity: 1 }}
                           exit={{ height: 0, opacity: 0 }}
-                          transition={{ duration: 0.3, ease: "easeInOut" }}
+                          transition={{ type: "spring", stiffness: 300, damping: 30 }}
                           className="overflow-hidden relative z-10 bg-[#141414]"
                         >
                           <div className="px-5 md:px-8 pb-8 md:pb-10 md:ml-[72px]">
