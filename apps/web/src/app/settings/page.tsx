@@ -113,7 +113,7 @@ export default function SettingsPage() {
           description="Manage your accounts, notifications, and preferences."
         />
 
-        <motion.div initial="hidden" animate="show" variants={stagger} className="flex flex-col gap-8">
+        <motion.div initial="hidden" animate="show" variants={stagger} className="flex flex-col gap-10">
 
           {/* ── 1. Profile ────────────────────────────────── */}
           <motion.div variants={fadeUp}>
@@ -221,7 +221,6 @@ export default function SettingsPage() {
             )}
           </motion.div>
 
-          {/* ── 3. WhatsApp Relay ─────────────────────────── */}
           <motion.div variants={fadeUp}>
             <div className="mb-4">
               <h2 className="text-[14px] font-bold text-[#e8e8e8] tracking-tight flex items-center gap-2">
@@ -232,7 +231,7 @@ export default function SettingsPage() {
 
             <Card className={`p-6 md:p-8 relative overflow-hidden ${profile?.whatsapp ? "border-emerald-500/20 shadow-[0_10px_30px_-10px_rgba(16,185,129,0.15)]" : "shadow-lg"}`}>
               {profile?.whatsapp && <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/5 rounded-full blur-3xl pointer-events-none" />}
-              <div className="flex flex-col md:flex-row md:items-center gap-6 relative z-10">
+              <div className="flex flex-col md:flex-row md:items-center gap-8 relative z-10">
                 <div className={`w-12 h-12 rounded-xl border flex items-center justify-center shrink-0 shadow-inner ${
                   profile?.whatsapp 
                     ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-400"
@@ -314,7 +313,7 @@ export default function SettingsPage() {
                 </div>
 
                 <div className={`transition-opacity duration-300 ${digest.enabled ? "" : "opacity-30 pointer-events-none"}`}>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                     {/* Send Time */}
                     <div className="space-y-2.5">
                       <label className="flex items-center gap-2 text-[10.5px] font-black uppercase text-[#888] tracking-widest">
@@ -375,21 +374,44 @@ export default function SettingsPage() {
                     </div>
                   </div>
 
-                  {/* Save Row */}
                   <div className="flex items-center gap-4 mt-8 pt-6 border-t border-[#2a2a2a]">
-                    <button
+                    <motion.button
+                      layout
                       onClick={handleSaveDigest}
                       disabled={saving}
                       className="btn btn-primary px-8 py-3 rounded-xl font-bold text-[13.5px] disabled:opacity-20 flex items-center justify-center gap-2 shadow-lg min-w-[140px]"
                     >
-                      {saving ? (
-                        <div className="w-4 h-4 border-2 border-black/10 border-t-black rounded-full animate-spin" />
-                      ) : saved ? (
-                        <><CheckCircle2 size={16} /> Saved</>
-                      ) : (
-                        "Save Changes"
-                      )}
-                    </button>
+                      <AnimatePresence mode="popLayout">
+                        {saving ? (
+                          <motion.div 
+                            key="saving"
+                            initial={{ opacity: 0, scale: 0.8 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.8 }}
+                            className="w-4 h-4 border-2 border-black/10 border-t-black rounded-full animate-spin" 
+                          />
+                        ) : saved ? (
+                          <motion.div
+                            key="saved"
+                            initial={{ opacity: 0, scale: 0.8 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.8 }}
+                            className="flex items-center gap-2"
+                          >
+                            <CheckCircle2 size={16} /> Saved
+                          </motion.div>
+                        ) : (
+                          <motion.span
+                            key="default"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                          >
+                            Save Changes
+                          </motion.span>
+                        )}
+                      </AnimatePresence>
+                    </motion.button>
 
                     <AnimatePresence>
                       {saved && (

@@ -1,4 +1,6 @@
-import React from "react";
+"use client";
+
+import React, { useRef, useState } from "react";
 
 interface CardProps {
   children: React.ReactNode;
@@ -7,8 +9,32 @@ interface CardProps {
 }
 
 export function Card({ children, className = "", hoverable = false }: CardProps) {
+  const divRef = useRef<HTMLDivElement>(null);
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [opacity, setOpacity] = useState(0);
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!divRef.current || !hoverable) return;
+    const rect = divRef.current.getBoundingClientRect();
+    setPosition({ x: e.clientX - rect.left, y: e.clientY - rect.top });
+  };
+
+  const handleMouseEnter = () => {
+    if (hoverable) setOpacity(1);
+  };
+
+  const handleMouseLeave = () => {
+    if (hoverable) setOpacity(0);
+  };
+
   return (
-    <div className="relative group/card w-full">
+    <div 
+      ref={divRef}
+      onMouseMove={handleMouseMove}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+      className="relative group/card w-full"
+    >
       <div 
         className={`
           relative w-full rounded-2xl border border-[#2a2a2a] bg-[#0f0f0f] overflow-hidden
@@ -23,6 +49,17 @@ export function Card({ children, className = "", hoverable = false }: CardProps)
           {children}
         </div>
       </div>
+      
+      {/* Interactive Spotlight Hover */}
+      {hoverable && (
+        <div 
+          className="absolute inset-0 pointer-events-none rounded-2xl transition-opacity duration-300"
+          style={{
+            opacity,
+            background: `radial-gradient(400px circle at ${position.x}px ${position.y}px, rgba(255,255,255,0.04), transparent 40%)`
+          }}
+        />
+      )}
       
       {/* Ambient Floor Glow on Hover */}
       {hoverable && (

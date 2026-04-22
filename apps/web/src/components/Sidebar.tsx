@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { fetchProfile, User } from "@/lib/api";
 import { LayoutDashboard, Mail, SlidersHorizontal, Settings, BarChart3 } from "lucide-react";
+import { motion } from "framer-motion";
 
 const navItems = [
   { label: "Dashboard",  href: "/dashboard",  icon: LayoutDashboard },
@@ -58,7 +59,7 @@ export default function Sidebar() {
           </Link>
 
           {/* Nav */}
-          <nav className="flex flex-col gap-1.5 flex-1 w-full relative z-10">
+          <nav className="flex flex-col gap-2.5 flex-1 w-full relative z-10">
             {navItems.map(({ label, href, icon: Icon }) => {
               const active = pathname === href;
               return (
@@ -71,9 +72,14 @@ export default function Sidebar() {
                       : "text-[#888] hover:text-white hover:bg-[#0f0f0f]"
                     }`}
                 >
-                  {/* Active highlight background */}
+                  {/* Active highlight background via Framer Motion */}
                   {active && (
-                    <div className="absolute inset-0 bg-white/[0.05] border border-white/10 rounded-xl" />
+                    <motion.div 
+                      layoutId="sidebarActiveIndicator"
+                      className="absolute inset-0 bg-white/[0.05] border border-white/10 rounded-xl"
+                      initial={false}
+                      transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                    />
                   )}
                   {active && (
                     <div className="absolute -left-10 top-1/2 -translate-y-1/2 w-20 h-20 bg-white/10 blur-xl pointer-events-none rounded-full" />
@@ -81,7 +87,13 @@ export default function Sidebar() {
 
                   <Icon size={16} className={`relative z-10 ${active ? "text-white" : "text-[#888] group-hover:text-[#d4d4d4]"}`} strokeWidth={active ? 2 : 1.8} />
                   <span className="relative z-10 tracking-tight">{label}</span>
-                  {active && <span className="relative z-10 ml-auto w-1.5 h-1.5 rounded-full bg-[#e8e8e8] shadow-[0_0_8px_rgba(255,255,255,0.5)]" />}
+                  {active && (
+                    <motion.span 
+                      layoutId="sidebarActiveDot"
+                      className="relative z-10 ml-auto w-1.5 h-1.5 rounded-full bg-[#e8e8e8] shadow-[0_0_8px_rgba(255,255,255,0.5)]" 
+                      transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                    />
+                  )}
                 </Link>
               );
             })}
