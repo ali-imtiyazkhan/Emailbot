@@ -6,6 +6,7 @@ import morgan from 'morgan';
 
 import authRoutes from './routes/auth.js';
 import webhookRoutes from './routes/webhook.js';
+import whatsappWebhookRouter from './routes/whatsappWebhook.js';
 import dashboardRoutes from './routes/dashboard.js';
 import { redisConnection } from './config/redis.js';
 import { prisma as db } from '@repo/db';
@@ -14,7 +15,7 @@ import logger from '@repo/shared/logger';
 const app = express();
 const PORT = process.env.API_PORT || 3001;
 
-// ── Security & Middleware ───────────────────────────────
+// Security & Middleware
 app.use(helmet());
 app.use(cors({
   origin: process.env.FRONTEND_URL || 'http://localhost:3000',
@@ -49,20 +50,21 @@ app.get('/health', async (req, res) => {
 
 app.use('/auth', authRoutes);
 app.use('/whatsapp', webhookRoutes);
+app.use('/', whatsappWebhookRouter);
 app.use('/api', dashboardRoutes);
 
-// ── Global Error Handler ────────────────────────────────
+// Global Error Handler
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
   logger.error('Unhandled error:', err);
   res.status(500).json({ error: 'Internal server error' });
 });
 
-// ── Start Server ────────────────────────────────────────
+// Start Server
 const server = app.listen(PORT, () => {
-  logger.info(`🚀 EmailBot API running on port ${PORT}`);
+  logger.info(`EmailBot API running on port ${PORT}`);
 });
 
-// ── Graceful Shutdown ───────────────────────────────────
+// Graceful Shutdown
 const gracefulShutdown = async (signal: string) => {
   logger.info(`${signal} received — shutting down gracefully...`);
   
