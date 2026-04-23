@@ -32,8 +32,9 @@ export const handleEmailJob = async (jobData: EmailJobData): Promise<void> => {
   const aiFailed = analysis.category === 'error';
   const shouldNotify = aiFailed || senderMatch || keywordMatch || analysis.priority >= minPriority;
 
+  let whatsappMessageId: string | undefined = undefined;
   if (shouldNotify && whatsapp) {
-    await sendNotification(whatsapp, email.subject, analysis.summary, analysis.priority);
+    whatsappMessageId = await sendNotification(whatsapp, email.subject, analysis.summary, analysis.priority);
   }
 
   // Mark as processed with full metadata
@@ -48,6 +49,7 @@ export const handleEmailJob = async (jobData: EmailJobData): Promise<void> => {
       category: analysis.category,
       priorityScore: analysis.priority,
       notified: shouldNotify,
+      whatsappMessageId,
       processedAt: new Date()
     }
   });

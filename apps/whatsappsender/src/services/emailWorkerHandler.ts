@@ -9,7 +9,7 @@ export const handleEmailJob = async (jobData: any): Promise<void> => {
   logger.info(`Processing email ${email.id} for user ${userId}...`);
 
   try {
-    // AI Analysis (Gemini)
+    // AI Analysis
     const analysis = await summarizeEmail(email.subject, email.body);
 
     // Check filter rules
