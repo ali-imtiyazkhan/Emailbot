@@ -133,7 +133,6 @@ export default function SettingsPage() {
             </Card>
           </motion.div>
 
-          {/* ── 2. Connected Accounts ─────────────────────── */}
           <motion.div variants={fadeUp}>
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-[14px] font-bold text-[#e8e8e8] tracking-tight flex items-center gap-2">

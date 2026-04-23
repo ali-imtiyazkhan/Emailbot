@@ -6,16 +6,6 @@
     "auditLog": "D:\\projects\\EmailBot\\apps\\logs\\.864376ea95f0ecbdebcfa3212dbacf45fa15c37d-audit.json",
     "files": [
         {
-            "date": 1774988237297,
-            "name": "D:\\projects\\EmailBot\\apps\\logs\\combined-2026-04-01.log",
-            "hash": "df28ea7ae72c9186a07d8ca1df30232762b05de2a72d11e6a9b9636f27e16102"
-        },
-        {
-            "date": 1775593487398,
-            "name": "D:\\projects\\EmailBot\\apps\\logs\\combined-2026-04-08.log",
-            "hash": "09d83932b386803c03f81066cbee00d3321330f475fabfa9d17d066511d341f9"
-        },
-        {
             "date": 1776190919944,
             "name": "D:\\projects\\EmailBot\\apps\\logs\\combined-2026-04-14.log",
             "hash": "4e4cc6603b3bf700b2c511b29cf6c006afd2b76af40bd9e8ee570a72109b73c9"
@@ -24,6 +14,11 @@
             "date": 1776192154775,
             "name": "D:\\projects\\EmailBot\\apps\\logs\\combined-2026-04-15.log",
             "hash": "45e56c6a96d09990f5b19d2dca1a8f5679b4c28b7351746c7febb69db42c40a0"
+        },
+        {
+            "date": 1776935568456,
+            "name": "D:\\projects\\EmailBot\\apps\\logs\\combined-2026-04-23.log",
+            "hash": "3943d33a12d03482566f3ee3773bfef26ed70b33da71d43e9aaa454de0431a3d"
         }
     ],
     "hashType": "sha256"
