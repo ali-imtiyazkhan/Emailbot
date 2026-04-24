@@ -102,9 +102,6 @@ async function sendOutlookReply(
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      message: {
-        body: { contentType: 'Text', content: body },
-      },
       comment: body,
     }),
   });

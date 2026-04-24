@@ -20,7 +20,6 @@ export const fetchLatestEmails = async (userId: number): Promise<FetchedEmail[]>
     return [];
   }
 
-  // Create a NEW OAuth2 client per-call to avoid multi-user race condition
   const oauthClient = createGoogleOAuth2Client();
 
   oauthClient.setCredentials({
@@ -29,7 +28,6 @@ export const fetchLatestEmails = async (userId: number): Promise<FetchedEmail[]>
     expiry_date: account.tokenExpiry ? account.tokenExpiry.getTime() : undefined,
   });
 
-  // Handle token refresh — use a one-time listener to avoid memory leak
   const tokenRefreshHandler = async (tokens: { access_token?: string | null; refresh_token?: string | null; expiry_date?: number | null }) => {
     if (tokens.access_token) {
       await db.emailAccount.update({
@@ -44,7 +42,6 @@ export const fetchLatestEmails = async (userId: number): Promise<FetchedEmail[]>
     }
   };
 
-  // Use `once` instead of `on` to prevent listener accumulation
   oauthClient.once('tokens', tokenRefreshHandler);
 
   const gmail = google.gmail({ version: 'v1', auth: oauthClient });
@@ -73,10 +70,8 @@ export const fetchLatestEmails = async (userId: number): Promise<FetchedEmail[]>
       const subject = headers?.find(h => h.name?.toLowerCase() === 'subject')?.value || 'No Subject';
       const from = headers?.find(h => h.name?.toLowerCase() === 'from')?.value || 'Unknown';
       
-      // Extract snippet or body
       let body = detail.data.snippet || '';
       
-      // Attempt to get full body if available
       if (payload?.parts) {
         const textPart = payload.parts.find(p => p.mimeType === 'text/plain');
         if (textPart?.body?.data) {
@@ -94,7 +89,6 @@ export const fetchLatestEmails = async (userId: number): Promise<FetchedEmail[]>
     const err = error as { code?: number; message?: string };
     logger.error(`Error fetching Gmail for user ${userId}:`, err.message);
     
-    // If it's an auth error, deactivate the account
     if (err.code === 401) {
       await db.emailAccount.update({
         where: { id: account.id },
@@ -125,7 +119,6 @@ export const sendEmailReply = async (userId: number, originalMessageId: string, 
   const gmail = google.gmail({ version: 'v1', auth: oauthClient });
 
   try {
-    // Get the original message to extract headers for threading
     const original = await gmail.users.messages.get({ userId: 'me', id: originalMessageId });
     const headers = original.data.payload?.headers;
     const subject = headers?.find(h => h.name?.toLowerCase() === 'subject')?.value || '';
@@ -133,11 +126,9 @@ export const sendEmailReply = async (userId: number, originalMessageId: string, 
     const messageIdHeader = headers?.find(h => h.name?.toLowerCase() === 'message-id')?.value || '';
     const references = headers?.find(h => h.name?.toLowerCase() === 'references')?.value || '';
 
-    // Construct the reply subject
     const replySubject = subject.toLowerCase().startsWith('re:') ? subject : `Re: ${subject}`;
     
     
-    // Simplest way to send a reply in Gmail API is to construct the raw message
     const emailLines = [
       `To: ${from}`,
       `Subject: ${replySubject}`,

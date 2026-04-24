@@ -7,7 +7,6 @@ import fs from 'fs';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Logs directory at the root of the project
 const LOGS_DIR = path.resolve(__dirname, '../../../logs');
 if (!fs.existsSync(LOGS_DIR)) {
   fs.mkdirSync(LOGS_DIR, { recursive: true });

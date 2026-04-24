@@ -1,7 +1,6 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import logger from './logger.js';
 
-// getAIModel is a function that returns the AI model
 const getAIModel = (() => {
   let model: any;
   return () => {
@@ -20,7 +19,6 @@ export interface EmailSummary {
   category: string;
 }
 
-// summarizeEmail is a function that summarizes the email
 export const summarizeEmail = async (subject: string, body: string): Promise<EmailSummary> => {
   if (!process.env.GOOGLE_API_KEY) {
     logger.warn('GOOGLE_API_KEY not set, skipping AI summarization');
@@ -46,7 +44,6 @@ export const summarizeEmail = async (subject: string, body: string): Promise<Ema
     const response = await result.response;
     let text = response.text();
 
-    // Clean up potential markdown formatting if Gemini wraps in ```json
     text = text.replace(/```json\n?|```/g, '').trim();
 
     try {
@@ -63,7 +60,6 @@ export const summarizeEmail = async (subject: string, body: string): Promise<Ema
     }
   } catch (err: any) {
     logger.error('Error calling Google Gemini service:', { error: err.message || err });
-    // Default to priority 10 to ensure the user gets a notification if AI is down (fail-open)
     return {
       summary: `[AI Error] ${body.substring(0, 150)}...`,
       priority: 10,
