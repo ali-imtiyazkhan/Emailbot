@@ -45,7 +45,7 @@ export const summarizeEmail = async (subject: string, body: string): Promise<Ema
     const result = await model.generateContent(prompt);
     const response = await result.response;
     let text = response.text();
-    
+
     // Clean up potential markdown formatting if Gemini wraps in ```json
     text = text.replace(/```json\n?|```/g, '').trim();
 
@@ -55,19 +55,19 @@ export const summarizeEmail = async (subject: string, body: string): Promise<Ema
       return parsed;
     } catch (parseError) {
       logger.error('Failed to parse Gemini JSON response:', { text, error: parseError });
-      return { 
-        summary: body.substring(0, 150) + (body.length > 150 ? '...' : ''), 
-        priority: 7, 
-        category: 'unanalyzed' 
+      return {
+        summary: body.substring(0, 150) + (body.length > 150 ? '...' : ''),
+        priority: 7,
+        category: 'unanalyzed'
       };
     }
   } catch (err: any) {
     logger.error('Error calling Google Gemini service:', { error: err.message || err });
     // Default to priority 10 to ensure the user gets a notification if AI is down (fail-open)
-    return { 
-      summary: `[AI Error] ${body.substring(0, 150)}...`, 
-      priority: 10, 
-      category: 'error' 
+    return {
+      summary: `[AI Error] ${body.substring(0, 150)}...`,
+      priority: 10,
+      category: 'error'
     };
   }
 };
