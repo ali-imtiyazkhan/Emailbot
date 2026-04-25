@@ -63,6 +63,5 @@ services:
 databases:
   - name: emailbot-db
     databaseName: emailbot
-    user: postgres
     region: oregon
     plan: free
