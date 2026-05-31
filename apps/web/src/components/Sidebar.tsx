@@ -43,7 +43,7 @@ export default function Sidebar() {
   return (
     <>
       {/* ── Desktop Sidebar */}
-      <aside className="hidden lg:flex w-[260px] h-screen shrink-0 flex-col bg-[rgba(5,5,5,0.82)] backdrop-blur-[20px] border-r border-[#1c1c1c] sticky top-0 z-50">
+      <aside className="hidden lg:flex w-[260px] h-screen shrink-0 flex-col bg-[rgba(5,5,5,0.82)] backdrop-blur-[20px] border-r border-[#1c1c1c] fixed top-0 left-0 z-50">
         <div className="flex flex-col h-full px-5 py-7 relative">
           
           {/* Subtle accent line */}
@@ -59,7 +59,7 @@ export default function Sidebar() {
           </Link>
 
           {/* Nav */}
-          <nav className="flex flex-col gap-2.5 flex-1 w-full relative z-10">
+          <nav className="flex flex-col gap-2.5 pt-10 flex-1 w-full relative z-10">
             {navItems.map(({ label, href, icon: Icon }) => {
               const active = pathname === href;
               return (

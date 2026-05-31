@@ -62,7 +62,7 @@ body {
   background: var(--bg);
   color: var(--text-1);
   overflow-x: hidden;
-  line-height: 1;
+  line-height: 1.5;
 }
 a {
   text-decoration: none;
@@ -1264,7 +1264,7 @@ footer {
 
 /* ══════ RESPONSIVE ══════ */
 @media (max-width: 900px) {
-  nav {
+  .landing-nav {
     padding: 0 20px;
   }
   .nav-links {
@@ -1341,13 +1341,13 @@ footer {
     color: var(--text-3);
   }
   .comparison-col:nth-child(2)::before {
-    content: "Intron";
+    content: "EmailBot";
   }
   .comparison-col:nth-child(3)::before {
-    content: "Operator";
+    content: "Zapier";
   }
   .comparison-col:nth-child(4)::before {
-    content: "Claude";
+    content: "Manual Filters";
   }
   .comparison-header {
     display: none;
@@ -1380,5 +1380,12 @@ footer {
   }
   .metric + .metric::before {
     display: none;
+  }
+}
+
+/* Dashboard main offset to prevent overlapping fixed sidebar */
+@media (min-width: 1024px) {
+  .dashboard-main {
+    margin-left: 260px !important;
   }
 }

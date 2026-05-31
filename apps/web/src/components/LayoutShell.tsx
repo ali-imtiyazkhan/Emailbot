@@ -9,7 +9,7 @@ export default function LayoutShell({ children }: { children: React.ReactNode })
   const isLanding = pathname === "/";
 
   return (
-    <div className="flex min-h-screen bg-[#050505] text-white selection:bg-white/20 relative">
+    <div className="min-h-screen bg-[#050505] text-white selection:bg-white/20 relative">
       {!isLanding && (
         <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
           {/* Subtle dot grid */}
@@ -29,7 +29,7 @@ export default function LayoutShell({ children }: { children: React.ReactNode })
       
       {!isLanding && <Sidebar />}
       
-      <main className={`flex-1 min-w-0 relative z-10 min-h-screen overflow-x-hidden ${isLanding ? "" : "pb-20 lg:pb-0"}`}>
+      <main className={`relative z-10 min-h-screen overflow-x-hidden ${isLanding ? "" : "dashboard-main pb-24 lg:pb-0"}`}>
         {children}
       </main>
     </div>
