@@ -55,6 +55,20 @@
 
 ### Data Flow
 
+### structure
+
+flowchart LR
+  Gmail[Gmail / Outlook] --> Receiver[emailreceiver]
+  Receiver --> Queue[Redis / BullMQ]
+  Queue --> Sender[whatsappsender]
+  Sender --> AI[Gemini: score + summarize]
+  AI --> WA[WhatsApp notification]
+  AI --> DB[(PostgreSQL)]
+  User[User] --> Web[Next.js dashboard]
+  Web --> API[Express API]
+  WA --> API
+
+
 ```
 Gmail/Outlook → [emailreceiver] polls every 60s
                         ↓
