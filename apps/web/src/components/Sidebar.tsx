@@ -59,7 +59,7 @@ export default function Sidebar() {
           </Link>
 
           {/* Nav */}
-          <nav className="flex flex-col gap-2.5 pt-10 flex-1 w-full relative z-10">
+          <nav className="flex flex-col gap-2.5 mt-10  flex-1 w-full relative z-10">
             {navItems.map(({ label, href, icon: Icon }) => {
               const active = pathname === href;
               return (
@@ -71,7 +71,7 @@ export default function Sidebar() {
                       ? "text-white shadow-[0_0_20px_rgba(255,255,255,0.03)]"
                       : "text-[#888] hover:text-white hover:bg-[#0f0f0f]"
                     }`}
-                >
+                > 
                   {/* Active highlight background via Framer Motion */}
                   {active && (
                     <motion.div 
