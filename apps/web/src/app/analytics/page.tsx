@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { fetchAnalytics, AnalyticsData } from "@/lib/api";
-import { BarChart3, TrendingUp, Users, Tag, Mail, Bell, ArrowUpRight, ArrowDownRight } from "lucide-react";
+import { BarChart3, TrendingUp, Users, Tag, ArrowUpRight, ArrowDownRight } from "lucide-react";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { AppPage, AppMetrics } from "@/components/app/AppPage";
 import { motion } from "framer-motion";
@@ -23,8 +23,6 @@ import {
 const SILVER = "#9a9a9a";
 const MUTED = "#484848";
 const CHART_STROKE = "#c8c8c8";
-const CHART_FILL = "rgba(255, 255, 255, 0.06)";
-
 const CustomTooltip = ({ active, payload, label }: { active?: boolean; payload?: { name: string; value: number }[]; label?: string }) => {
   if (!active || !payload?.length) return null;
   return (

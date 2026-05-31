@@ -20,7 +20,6 @@ import {
   WifiOff,
   CalendarClock,
   CheckCircle2,
-  ChevronRight,
 } from "lucide-react";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { AppPage } from "@/components/app/AppPage";

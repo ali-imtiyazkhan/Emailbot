@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { motion, animate } from "framer-motion";
+import { animate } from "framer-motion";
 import {
   fetchStats,
   fetchFilters,

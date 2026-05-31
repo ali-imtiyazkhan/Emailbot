@@ -29,7 +29,7 @@ export default function LayoutShell({ children }: { children: React.ReactNode })
       
       {!isLanding && <Sidebar />}
       
-      <main className={`relative z-10 min-h-screen overflow-x-hidden ${isLanding ? "" : "dashboard-main pb-24 lg:pb-0"}`}>
+      <main className={`relative z-10 min-h-screen overflow-x-hidden ${isLanding ? "" : "dashboard-main pb-28 lg:pb-0"}`}>
         {children}
       </main>
     </div>
