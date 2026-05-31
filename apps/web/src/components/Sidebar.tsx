@@ -42,7 +42,7 @@ export default function Sidebar() {
 
   return (
     <>
-      <aside className="app-sidebar hidden lg:flex">
+      <aside className="app-sidebar">
         <div className="app-sidebar-inner">
           <Link href="/" className="app-sidebar-brand">
             <LogoMark />
@@ -77,18 +77,6 @@ export default function Sidebar() {
           </div>
         </div>
       </aside>
-
-      <nav className="app-mobile-nav lg:hidden">
-        {navItems.map(({ label, href, icon: Icon }) => {
-          const active = pathname === href;
-          return (
-            <Link key={href} href={href} className={`app-mobile-nav-link ${active ? "app-mobile-nav-link--active" : ""}`}>
-              <Icon size={18} strokeWidth={active ? 2.2 : 1.6} />
-              <span>{label}</span>
-            </Link>
-          );
-        })}
-      </nav>
     </>
   );
 }

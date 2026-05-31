@@ -1524,35 +1524,38 @@ footer {
   margin-top: 4px;
 }
 
-.app-mobile-nav {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  z-index: 50;
-  display: flex;
-  border-top: 1px solid var(--border);
-  background: rgba(5, 5, 5, 0.9);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-}
-.app-mobile-nav-link {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-  padding: 14px 8px;
-  font-size: 9px;
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--text-3);
-  text-decoration: none;
-  transition: color var(--dur-sm);
-}
-.app-mobile-nav-link--active {
-  color: var(--text-1);
+@media (max-width: 1023px) {
+  .app-sidebar {
+    width: 100%;
+    height: auto;
+    position: sticky;
+    top: 0;
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+  }
+  .app-sidebar-inner {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 16px;
+    padding: 16px 20px;
+  }
+  .app-sidebar-brand {
+    margin-bottom: 0;
+  }
+  .app-sidebar-nav {
+    flex: 1;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 2px;
+    min-width: 0;
+  }
+  .app-sidebar-user {
+    display: none;
+  }
+  .dashboard-main {
+    margin-left: 0 !important;
+  }
 }
 
 /* ══════ APP PAGES (dashboard, emails, etc.) ══════ */
