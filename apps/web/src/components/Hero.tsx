@@ -72,7 +72,7 @@ export default function Hero() {
         transition={{ duration: 0.4, ease: "easeOut", delay: 0.1 }}
       >
         <span className="badge-dot" />
-        Early access · Chrome Extension
+        AI-Powered · Email Intelligence
       </motion.div>
 
       <motion.h1
@@ -148,51 +148,50 @@ export default function Hero() {
             <div className="tc tc-r" />
             <div className="tc tc-a" />
             <div className="tc tc-g" />
-            <span className="mock-url">notion.so/workspace/My-Tasks</span>
+            <span className="mock-url">mail.google.com · Priority inbox</span>
           </div>
           <div className="mock-body">
             <div className="mock-page">
-              <div className="sk sk-h" />
-              <div className="sk" />
-              <div className="sk sk-s" />
-              <div className="sk-sep" />
-              <div className="sk sk-xs" />
-              <div className="sk" />
-              <div className="sk sk-hl" />
-              <div className="sk sk-hl2" />
-              <div className="sk sk-s" />
-              <div className="sk-sep" />
-              <div className="sk sk-xs" />
-              <div className="sk" />
-              <div className="sk sk-s" />
-              <div className="sk" />
+              <p className="mock-page-label">Processed today</p>
+              {[
+                { score: 9, subject: "Q4 board review — need numbers by 5pm", from: "ceo@acme.com" },
+                { score: 7, subject: "Invoice #4021 — payment failed", from: "billing@stripe.com" },
+                { score: 4, subject: "Your weekly digest is ready", from: "newsletter@tech.io" },
+              ].map((row) => (
+                <div key={row.subject} className="mock-email-row">
+                  <span className="mock-email-score">{row.score}</span>
+                  <div className="mock-email-text">
+                    <p className="mock-email-subject">{row.subject}</p>
+                    <p className="mock-email-from">{row.from}</p>
+                  </div>
+                </div>
+              ))}
             </div>
             <div className="mock-panel">
               <div className="panel-hd">
                 <SmallLogo />
-                EmailBot
+                <span>EmailBot</span>
+                <span className="panel-hd-tag">WhatsApp</span>
               </div>
               <div className="panel-msgs">
-                <div className="pm pm-u">Mark all overdue tasks as done</div>
                 <div className="pm pm-a">
-                  Scanning for overdue tasks…
-                  <br />
-                  <span className="tt">↗ get_page_content()</span>
+                  <span className="pm-meta">Alert · Priority 9</span>
+                  <p>
+                    <strong>Q4 board review</strong> — CEO needs final numbers by 5 PM. Reply if you need a draft.
+                  </p>
+                </div>
+                <div className="pm pm-u">
+                  <span className="pm-meta">You</span>
+                  <p>Reply: I&apos;ll send the sheet in 20 minutes.</p>
                 </div>
                 <div className="pm pm-a">
-                  Found 4. Clicking each checkbox now.
-                  <br />
-                  <span className="tt">
-                    ↗ click(&quot;.task-checkbox&quot;, {"{index: 0}"})
-                  </span>
-                </div>
-                <div className="pm pm-u">Good. Now export to CSV</div>
-                <div className="pm pm-a">
-                  <span className="pb" />
+                  <span className="pm-meta">EmailBot</span>
+                  <p>Polished your reply and sent via Gmail.</p>
+                  <span className="tt">✓ Delivered · AI refined</span>
                 </div>
               </div>
               <div className="panel-in">
-                <div className="pin">Ask EmailBot anything…</div>
+                <div className="pin">Message on WhatsApp…</div>
               </div>
             </div>
           </div>

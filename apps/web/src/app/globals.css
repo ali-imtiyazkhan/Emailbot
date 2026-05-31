@@ -442,7 +442,10 @@ a {
   position: relative;
   z-index: 2;
   width: 100%;
-  max-width: 940px;
+  max-width: min(1060px, 100%);
+  margin-left: auto;
+  margin-right: auto;
+  padding: 0 4px;
 }
 
 /* Soft ambient backlight — barely visible, just adds depth */
@@ -516,6 +519,7 @@ a {
   padding: 12px 16px;
   background: rgba(0, 0, 0, 0.35);
   border-bottom: 1px solid var(--border);
+  overflow: hidden;
 }
 .tc {
   width: 11px;
@@ -533,6 +537,9 @@ a {
 }
 .mock-url {
   margin-left: 10px;
+  flex: 1;
+  min-width: 0;
+  max-width: 420px;
   background: var(--surface-2);
   border: 1px solid var(--border);
   border-radius: 3px;
@@ -540,18 +547,72 @@ a {
   font-size: 11.5px;
   color: var(--text-3);
   font-family: var(--font-mono);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .mock-body {
   display: grid;
-  grid-template-columns: 1fr 300px;
-  min-height: 440px;
+  grid-template-columns: minmax(0, 1.15fr) minmax(260px, 320px);
+  min-height: 400px;
+  max-height: min(480px, 70vh);
 }
 .mock-page {
-  padding: 36px 40px;
+  padding: 28px 32px 32px;
   border-right: 1px solid var(--border);
   display: flex;
   flex-direction: column;
-  gap: 11px;
+  gap: 0;
+  min-width: 0;
+  overflow: hidden;
+}
+.mock-page-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  margin-bottom: 20px;
+}
+.mock-email-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 18px;
+  padding: 18px 0;
+  border-bottom: 1px solid var(--border);
+}
+.mock-email-row:last-child {
+  border-bottom: none;
+}
+.mock-email-score {
+  font-size: 12px;
+  font-weight: 600;
+  font-family: var(--font-mono);
+  color: var(--silver);
+  width: 20px;
+  flex-shrink: 0;
+  padding-top: 2px;
+}
+.mock-email-text {
+  min-width: 0;
+  flex: 1;
+}
+.mock-email-subject {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-1);
+  line-height: 1.45;
+  margin-bottom: 6px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.mock-email-from {
+  font-size: 11.5px;
+  color: var(--text-3);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .sk {
   height: 10px;
@@ -592,69 +653,92 @@ a {
   display: flex;
   flex-direction: column;
   background: var(--bg);
+  min-width: 0;
+  min-height: 0;
 }
 .panel-hd {
   display: flex;
   align-items: center;
-  gap: 7px;
-  padding: 12px 14px;
+  gap: 8px;
+  padding: 16px 24px;
   border-bottom: 1px solid var(--border);
   font-size: 12px;
   font-weight: 600;
-  color: var(--text-2);
+  color: var(--text-1);
+  flex-shrink: 0;
+}
+.panel-hd-tag {
+  margin-left: auto;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-3);
 }
 .panel-msgs {
   flex: 1;
-  padding: 12px 14px;
+  padding: 24px;
   display: flex;
   flex-direction: column;
-  gap: 9px;
-  overflow: hidden;
+  gap: 28px;
+  overflow-y: auto;
+  min-height: 0;
 }
 .pm {
-  font-size: 11.5px;
-  line-height: 1.55;
-  padding: 7px 10px;
-  border-radius: var(--r-sm);
-  max-width: 95%;
+  font-size: 12.5px;
+  line-height: 1.65;
+  padding: 0;
+  border: none;
+  background: none;
+  border-radius: 0;
+  max-width: 100%;
+}
+.pm strong {
+  font-weight: 600;
+  color: var(--text-1);
 }
 .pm-u {
   align-self: flex-end;
-  background: var(--surface-2);
-  border: 1px solid var(--border-light);
-  color: var(--text-1);
-  border-radius: 3px 3px 1px 3px;
+  text-align: right;
+  max-width: 92%;
+  color: var(--text-2);
 }
 .pm-a {
   align-self: flex-start;
-  background: rgba(255, 255, 255, 0.025);
-  border: 1px solid var(--border);
+  max-width: 100%;
   color: var(--text-2);
-  border-radius: 3px 3px 3px 1px;
+}
+.pm-meta {
+  display: block;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  margin-bottom: 8px;
 }
 .tt {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid var(--border-light);
-  color: var(--silver);
+  display: block;
+  color: var(--text-3);
   font-size: 10px;
   font-family: var(--font-mono);
-  padding: 2px 7px;
-  border-radius: var(--r-xs);
-  margin-top: 5px;
+  margin-top: 10px;
+  padding: 0;
+  border: none;
+  background: none;
 }
 .panel-in {
-  padding: 10px 12px;
+  padding: 16px 24px 20px;
   border-top: 1px solid var(--border);
+  flex-shrink: 0;
 }
 .pin {
-  background: var(--surface-2);
-  border: 1px solid var(--border-light);
-  border-radius: var(--r-sm);
-  padding: 8px 12px;
-  font-size: 11.5px;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--border-light);
+  border-radius: 0;
+  padding: 10px 0;
+  font-size: 12px;
   color: var(--text-3);
   width: 100%;
 }
@@ -1300,9 +1384,22 @@ footer {
   }
   .mock-body {
     grid-template-columns: 1fr;
+    max-height: none;
+  }
+  .mock-page {
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+    padding: 24px 20px;
   }
   .mock-panel {
-    display: none;
+    min-height: 280px;
+  }
+  .panel-msgs {
+    padding: 20px;
+    gap: 24px;
+  }
+  .mockup-wrap {
+    padding: 0;
   }
   .cta-box {
     padding: 56px 24px;
