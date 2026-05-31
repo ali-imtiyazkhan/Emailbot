@@ -115,9 +115,9 @@ export default function DashboardPage() {
         >
           {statCards.map((s, i) => (
             <motion.div key={i} variants={up}>
-              <Card hoverable className="p-6 h-full flex flex-col justify-between">
+              <Card hoverable className="p-5 h-full flex flex-col justify-between">
                 <div className="flex items-center justify-between mb-4">
-                  <div className="w-9 h-9 rounded-xl bg-white/[0.03] border border-white/5 flex items-center justify-center shadow-[0_0_10px_rgba(255,255,255,0.03)]">
+                  <div className="w-8 h-8 rounded-lg bg-white/[0.03] border border-white/5 flex items-center justify-center">
                     <s.icon size={16} className="text-white/60" strokeWidth={1.8} />
                   </div>
                   {s.trend && (
@@ -164,8 +164,8 @@ export default function DashboardPage() {
 
               <div className="flex-1">
                 {loading && [1,2,3,4,5].map(i => (
-                  <div key={i} className="flex items-center gap-8 px-10 py-8 border-b border-[#1c1c1c] last:border-0 animate-pulse">
-                    <div className="w-10 h-10 rounded-xl bg-white/5" />
+                  <div key={i} className="flex items-center gap-5 px-6 py-4 border-b border-white/5 last:border-0 animate-pulse">
+                    <div className="w-8 h-8 rounded-lg bg-white/5" />
                     <div className="flex-1 space-y-2">
                       <div className="h-3 bg-white/5 rounded-full w-3/4" />
                       <div className="h-2.5 bg-white/5 rounded-full w-1/2 opacity-50" />
@@ -186,14 +186,14 @@ export default function DashboardPage() {
                   return (
                     <div
                       key={email.id}
-                      className="group flex items-center gap-8 px-10 py-8 border-b border-[#1c1c1c] last:border-0 hover:bg-white/[0.04] hover:shadow-[0_0_20px_rgba(255,255,255,0.01)] transition-all cursor-pointer relative"
+                      className="group flex items-center gap-5 px-6 py-4.5 border-b border-white/5 last:border-0 hover:bg-white/[0.02] transition-all cursor-pointer relative"
                     >
-                      <div className={`w-10 h-10 rounded-xl border flex items-center justify-center text-[13px] font-bold shrink-0 transition-all ${p.variant === 'danger' ? 'text-red-400 bg-red-400/5 border-red-400/10 shadow-[0_0_15px_rgba(248,113,113,0.15)]' : p.variant === 'warning' ? 'text-amber-400 bg-amber-400/5 border-amber-400/10 shadow-[0_0_15px_rgba(251,191,36,0.1)]' : 'text-white/40 bg-white/[0.02] border-[#2a2a2a]'}`}>
+                      <div className={`w-8 h-8 rounded-lg border flex items-center justify-center text-[12px] font-bold shrink-0 transition-all ${p.variant === 'danger' ? 'text-red-400 bg-red-400/5 border-red-400/10' : p.variant === 'warning' ? 'text-amber-400 bg-amber-400/5 border-amber-400/10' : 'text-white/40 bg-white/[0.02] border-[#2a2a2a]'}`}>
                         {p.label}
                       </div>
 
                       <div className="flex-1 min-w-0">
-                        <p className="text-[14px] font-bold text-white/80 truncate group-hover:text-white transition-colors mb-1 shadow-sm">
+                        <p className="text-[13.5px] font-bold text-white/80 truncate group-hover:text-white transition-colors mb-0.5">
                           {email.subject || "No Subject"}
                         </p>
                         <div className="flex items-center gap-2">
@@ -221,9 +221,9 @@ export default function DashboardPage() {
             className="flex flex-col gap-8"
           >
             {/* Management Controls */}
-            <Card hoverable className="p-6">
+            <Card className="p-6">
               <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#888] mb-6">Management</p>
-              <div className="flex flex-col gap-3">
+              <div className="flex flex-col gap-1.5">
                 {[
                   { href: "/rules",    label: "Automation Rules", icon: SlidersHorizontal, desc: `${filters.length} active` },
                   { href: "/settings", label: "System Settings",  icon: CheckCircle2,       desc: "Configure" },
@@ -231,10 +231,10 @@ export default function DashboardPage() {
                   <Link
                     key={href}
                     href={href}
-                    className="flex items-center justify-between p-4 rounded-xl bg-white/[0.02] border border-[#2a2a2a] hover:border-[#444] hover:bg-white/[0.04] hover:shadow-[0_0_15px_rgba(255,255,255,0.03)] transition-all no-underline group"
+                    className="flex items-center justify-between p-3 rounded-lg hover:bg-white/[0.03] transition-all no-underline group"
                   >
                     <div className="flex items-center gap-4">
-                      <div className="w-8 h-8 rounded-lg bg-white/[0.04] border border-white/5 flex items-center justify-center">
+                      <div className="w-8 h-8 rounded-lg bg-white/[0.03] border border-white/5 flex items-center justify-center">
                         <Icon size={14} className="text-[#888] group-hover:text-[#e8e8e8] transition-colors" strokeWidth={1.8} />
                       </div>
                       <div>
@@ -283,8 +283,8 @@ export default function DashboardPage() {
                   { v: loading ? "—" : String(stats?.totalProcessed ?? 0), l: "Processed" },
                   { v: loading ? "—" : String(alertsSent),                  l: "Alerts"    },
                 ].map(s => (
-                  <div key={s.l} className="bg-white/[0.02] border border-[#2a2a2a] rounded-xl px-4 py-3.5 relative overflow-hidden group">
-                    <div className="absolute top-0 right-0 w-16 h-16 bg-white/[0.03] rounded-full blur-2xl group-hover:scale-150 transition-transform duration-500 pointer-events-none" />
+                  <div key={s.l} className="bg-white/[0.01] border border-white/5 rounded-xl px-4 py-3.5 relative overflow-hidden group">
+                    <div className="absolute top-0 right-0 w-16 h-16 bg-white/[0.02] rounded-full blur-2xl group-hover:scale-150 transition-transform duration-500 pointer-events-none" />
                     <p className="text-2xl font-semibold tracking-tight text-[#e8e8e8] mb-1 relative z-10">{s.v}</p>
                     <p className="text-[9.5px] font-black uppercase tracking-[0.15em] text-[#888] relative z-10">{s.l}</p>
                   </div>

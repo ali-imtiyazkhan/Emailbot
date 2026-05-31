@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useState } from "react";
+import React from "react";
 
 interface CardProps {
   children: React.ReactNode;
@@ -9,69 +9,24 @@ interface CardProps {
 }
 
 export function Card({ children, className = "", hoverable = false }: CardProps) {
-  const divRef = useRef<HTMLDivElement>(null);
-  const [position, setPosition] = useState({ x: 0, y: 0 });
-  const [opacity, setOpacity] = useState(0);
-
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!divRef.current || !hoverable) return;
-    const rect = divRef.current.getBoundingClientRect();
-    setPosition({ x: e.clientX - rect.left, y: e.clientY - rect.top });
-  };
-
-  const handleMouseEnter = () => {
-    if (hoverable) setOpacity(1);
-  };
-
-  const handleMouseLeave = () => {
-    if (hoverable) setOpacity(0);
-  };
-
   return (
     <div 
-      ref={divRef}
-      onMouseMove={handleMouseMove}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
-      className="relative group/card w-full"
+      className={`
+        w-full rounded-xl border border-white/5 bg-white/[0.01] overflow-hidden
+        ${hoverable ? "transition-all duration-300 ease-out hover:bg-white/[0.03] hover:border-white/10" : ""}
+        ${className}
+      `}
     >
-      <div 
-        className={`
-          relative w-full rounded-2xl border border-[#2a2a2a] bg-[#0f0f0f] overflow-hidden
-          shadow-[0_0_0_1px_rgba(255,255,255,0.04)_inset,0_20px_40px_-10px_rgba(0,0,0,0.6)]
-          ${hoverable ? "transition-all duration-500 ease-out hover:border-[#9a9a9a] hover:shadow-[0_0_0_1px_rgba(255,255,255,0.08)_inset,0_40px_80px_-20px_rgba(0,0,0,0.8),0_0_40px_rgba(255,255,255,0.03)] hover:-translate-y-1" : ""}
-          ${className}
-        `}
-      >
-        {/* Chrome Shimmer Top Edge */}
-        <div className="absolute top-0 left-0 right-0 h-[1px] z-10 bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-60" />
-        <div className="relative z-20">
-          {children}
-        </div>
+      <div className="relative z-10">
+        {children}
       </div>
-      
-      {/* Interactive Spotlight Hover */}
-      {hoverable && (
-        <div 
-          className="absolute inset-0 pointer-events-none rounded-2xl transition-opacity duration-300"
-          style={{
-            opacity,
-            background: `radial-gradient(400px circle at ${position.x}px ${position.y}px, rgba(255,255,255,0.04), transparent 40%)`
-          }}
-        />
-      )}
-      
-      {/* Ambient Floor Glow on Hover */}
-      {hoverable && (
-        <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 w-[70%] h-12 bg-white/5 blur-2xl opacity-0 group-hover/card:opacity-100 transition-opacity duration-500 pointer-events-none rounded-full" />
-      )}
     </div>
   );
 }
 
 export function CardHeader({ children, className = "" }: { children: React.ReactNode; className?: string }) {
   return (
-    <div className={`px-8 py-6 border-b border-[#1c1c1c] bg-gradient-to-b from-white/[0.03] to-transparent ${className}`}>
+    <div className={`px-6 py-4 border-b border-white/5 bg-transparent ${className}`}>
       {children}
     </div>
   );
@@ -79,7 +34,7 @@ export function CardHeader({ children, className = "" }: { children: React.React
 
 export function CardContent({ children, className = "" }: { children: React.ReactNode; className?: string }) {
   return (
-    <div className={`px-8 py-7 ${className}`}>
+    <div className={`px-6 py-5 ${className}`}>
       {children}
     </div>
   );
