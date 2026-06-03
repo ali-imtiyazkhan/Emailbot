@@ -15,19 +15,9 @@ services:
           name: emailbot-db   
           property: connectionString
       - key: REDIS_URL
-        fromService:
-          type: redis
-          name: emailbot-redis
-          property: connectionString
+        sync: false
       - key: PORT
         value: 10000
-
-  # Managed Redis
-  - type: redis
-    name: emailbot-redis
-    region: oregon
-    ipAllowList: [] # Empty means internal network only
-    plan: free
 
 # Managed PostgreSQL
 databases:
