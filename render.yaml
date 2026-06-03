@@ -6,7 +6,7 @@ services:
     region: oregon
     plan: free
     # Build all applications in the Turborepo
-    buildCommand: npm install && npm run generate -w @repo/db && npx turbo run build
+    buildCommand: npm install && npm run generate -w @repo/db && npm run push -w @repo/db && npx turbo run build
     # Boot the Email Receiver and WhatsApp Sender in the background, then boot the API in the foreground
     startCommand: npm start -w emailreceiver & npm start -w whatsappsender & npm start -w api
     envVars:
