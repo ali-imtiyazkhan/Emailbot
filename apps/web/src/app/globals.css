@@ -442,43 +442,16 @@ a {
   position: relative;
   z-index: 2;
   width: 100%;
-  max-width: min(1060px, 100%);
+  max-width: min(1160px, 100%);
   margin-left: auto;
   margin-right: auto;
-  padding: 0 4px;
+  padding: 0;
 }
 
-/* Soft ambient backlight — barely visible, just adds depth */
-.mockup-wrap::before {
-  content: "";
-  position: absolute;
-  inset: -30px -40px;
-  background: radial-gradient(
-    ellipse 80% 55% at 50% 45%,
-    rgba(255, 255, 255, 0.045) 0%,
-    rgba(255, 255, 255, 0.015) 50%,
-    transparent 75%
-  );
-  pointer-events: none;
-  z-index: -1;
-}
-
-/* Faint screen-glow pooling under mockup — like monitor light on a desk */
+/* Remove ambient glow pseudo-elements for seamless flow diagram */
+.mockup-wrap::before,
 .mockup-wrap::after {
-  content: "";
-  position: absolute;
-  bottom: -40px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 55%;
-  height: 60px;
-  background: radial-gradient(
-    ellipse at 50% 0%,
-    rgba(255, 255, 255, 0.04) 0%,
-    transparent 75%
-  );
-  pointer-events: none;
-  z-index: -1;
+  display: none;
 }
 
 /* ── Mockup ── */
@@ -758,6 +731,455 @@ a {
   50% {
     opacity: 0.8;
   }
+}
+
+/* ═══════ FLOW DIAGRAM SHOWCASE ═══════ */
+.flow-showcase {
+  position: relative;
+  width: 100%;
+  padding: 48px 32px;
+  background: transparent;
+  border-radius: 0;
+  overflow: hidden;
+  border: none;
+  box-shadow: none;
+}
+/* Subtle dot grid */
+.flow-showcase::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.025) 1px,
+    transparent 1px
+  );
+  background-size: 28px 28px;
+  mask-image: radial-gradient(
+    ellipse 80% 80% at 50% 50%,
+    black 20%,
+    transparent 75%
+  );
+  pointer-events: none;
+}
+/* Ambient glow behind hub */
+.flow-showcase::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 420px;
+  height: 420px;
+  background: radial-gradient(
+    circle,
+    rgba(120, 100, 255, 0.07) 0%,
+    rgba(56, 138, 221, 0.03) 40%,
+    transparent 70%
+  );
+  pointer-events: none;
+  z-index: 0;
+}
+/* Chrome shimmer on top edge */
+.flow-showcase > .flow-heading::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  z-index: 10;
+  background: linear-gradient(
+    90deg,
+    transparent 5%,
+    rgba(255, 255, 255, 0.1) 35%,
+    rgba(255, 255, 255, 0.2) 50%,
+    rgba(255, 255, 255, 0.1) 65%,
+    transparent 95%
+  );
+}
+
+/* ── Flow heading ── */
+.flow-heading {
+  text-align: center;
+  margin-bottom: 36px;
+  position: relative;
+  z-index: 1;
+}
+.flow-heading-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(120, 100, 255, 0.08);
+  border: 1px solid rgba(120, 100, 255, 0.15);
+  border-radius: 20px;
+  padding: 4px 12px;
+  font-size: 10px;
+  font-weight: 600;
+  color: #a78bfa;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-bottom: 14px;
+}
+.flow-heading-title {
+  font-size: 22px;
+  font-weight: 600;
+  color: #f0f0ef;
+  letter-spacing: -0.02em;
+  line-height: 1.3;
+}
+.flow-heading-title em {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 400;
+  color: #7a7a78;
+}
+
+/* ── Main flow layout ── */
+.flow-main {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  position: relative;
+  z-index: 1;
+  min-height: 380px;
+}
+
+/* ── Columns ── */
+.flow-col {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  flex-shrink: 0;
+}
+.flow-col-left {
+  width: 200px;
+}
+.flow-col-right {
+  width: 240px;
+}
+
+/* ── Column flow labels ── */
+.flow-label {
+  text-align: center;
+  margin-bottom: 4px;
+}
+.flow-label-text {
+  font-size: 11px;
+  font-weight: 500;
+  color: rgba(120, 100, 255, 0.45);
+  letter-spacing: 0.06em;
+  font-style: italic;
+}
+
+/* ── SVG connections ── */
+.flow-svg-connections {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  width: 100%;
+  height: 100%;
+}
+@keyframes flow-dash {
+  to {
+    stroke-dashoffset: -20;
+  }
+}
+.flow-line-in {
+  stroke: rgba(120, 100, 255, 0.13);
+  stroke-width: 1.5;
+  fill: none;
+  stroke-dasharray: 6 4;
+  animation: flow-dash 1.5s linear infinite;
+}
+.flow-line-out {
+  stroke: rgba(37, 211, 102, 0.13);
+  stroke-width: 1.5;
+  fill: none;
+  stroke-dasharray: 6 4;
+  animation: flow-dash 1.5s linear infinite;
+}
+
+/* ── Email source cards (left) ── */
+.flow-email-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #111114;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 10px;
+  padding: 10px 14px;
+  cursor: default;
+  transition: all 0.2s ease;
+  position: relative;
+}
+.flow-email-card:hover {
+  background: #1a1a1f;
+  border-color: rgba(255, 255, 255, 0.12);
+  transform: translateX(4px);
+}
+.flow-email-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  flex-shrink: 0;
+}
+.flow-email-text {
+  min-width: 0;
+}
+.flow-email-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #e0e0de;
+  line-height: 1.3;
+}
+.flow-email-sub {
+  font-size: 10px;
+  color: #5a5a58;
+  margin-top: 1px;
+}
+/* Connector dot (right side) */
+.flow-dot-r {
+  position: absolute;
+  right: -6px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #1e1e2e;
+  border: 1.5px solid rgba(120, 100, 255, 0.3);
+}
+
+/* ── Center hub ── */
+.flow-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  position: relative;
+  z-index: 2;
+  min-width: 280px;
+  padding: 0 40px;
+}
+.flow-hub {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: linear-gradient(145deg, #1a1a2e, #16162a);
+  border: 1px solid rgba(120, 100, 255, 0.25);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  box-shadow:
+    0 0 40px rgba(120, 100, 255, 0.12),
+    0 0 80px rgba(56, 138, 221, 0.06),
+    inset 0 0 20px rgba(120, 100, 255, 0.05);
+}
+/* Pulsing rings */
+@keyframes hub-pulse {
+  0%,
+  100% {
+    opacity: 0.4;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.04);
+  }
+}
+.flow-hub-ring {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  border-radius: 50%;
+  pointer-events: none;
+}
+.flow-hub-ring-1 {
+  width: 124px;
+  height: 124px;
+  border: 1px dashed rgba(120, 100, 255, 0.15);
+  animation: hub-pulse 3s ease-in-out infinite;
+}
+.flow-hub-ring-2 {
+  width: 152px;
+  height: 152px;
+  border: 1px dashed rgba(120, 100, 255, 0.08);
+  animation: hub-pulse 3s ease-in-out infinite 0.5s;
+}
+.flow-hub-icon {
+  color: #a78bfa;
+  line-height: 1;
+}
+.flow-hub-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #c4b5fd;
+  letter-spacing: 0.04em;
+  text-align: center;
+}
+.flow-hub-sublabel {
+  font-size: 9px;
+  color: rgba(167, 139, 250, 0.5);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.flow-hub-desc {
+  text-align: center;
+}
+.flow-hub-desc-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #e8e8e6;
+  letter-spacing: -0.01em;
+  margin-bottom: 4px;
+}
+.flow-hub-desc-sub {
+  font-size: 11px;
+  color: #6a6a68;
+  line-height: 1.5;
+}
+
+/* ── WhatsApp output cards (right) ── */
+.flow-wa-card {
+  background: #111114;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 10px;
+  padding: 14px 16px;
+  position: relative;
+  transition: all 0.2s ease;
+  cursor: default;
+}
+.flow-wa-card:hover {
+  background: #1a1a1f;
+  border-color: rgba(255, 255, 255, 0.12);
+  transform: translateX(-4px);
+}
+/* Connector dot (left side) */
+.flow-dot-l {
+  position: absolute;
+  left: -6px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #1e1e2e;
+  border: 1.5px solid rgba(37, 211, 102, 0.4);
+}
+.flow-wa-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.flow-wa-icon {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  flex-shrink: 0;
+}
+.flow-wa-source {
+  font-size: 11px;
+  font-weight: 600;
+  color: #d0d0ce;
+}
+.flow-wa-tag {
+  margin-left: auto;
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  padding: 2px 7px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.flow-tag-urgent {
+  background: rgba(239, 68, 68, 0.15);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+.flow-tag-opportunity {
+  background: rgba(34, 197, 94, 0.12);
+  color: #4ade80;
+  border: 1px solid rgba(34, 197, 94, 0.2);
+}
+.flow-tag-reply {
+  background: rgba(56, 138, 221, 0.12);
+  color: #60a5fa;
+  border: 1px solid rgba(56, 138, 221, 0.2);
+}
+.flow-wa-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: #e8e8e6;
+  line-height: 1.35;
+  margin-bottom: 4px;
+}
+.flow-wa-preview {
+  font-size: 11px;
+  color: #5a5a58;
+  line-height: 1.4;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ── Reply flow strip ── */
+.flow-reply {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 36px;
+  padding: 16px 24px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+  position: relative;
+  z-index: 1;
+}
+.flow-reply-step-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+}
+.flow-reply-step {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.flow-reply-icon {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+.flow-reply-label {
+  font-size: 11px;
+  font-weight: 500;
+  color: #888;
+}
+.flow-reply-arrow {
+  color: #3a3a38;
+  font-size: 14px;
 }
 
 /* ═════ METRICS ═════ */

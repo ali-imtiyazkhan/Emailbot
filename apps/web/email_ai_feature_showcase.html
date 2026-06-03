@@ -1,107 +1,572 @@
 
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
-.wrap{display:grid;grid-template-columns:repeat(3,1fr);gap:0;background:#0e0e10;border-radius:16px;overflow:hidden;font-family:var(--font-sans);min-height:320px}
-.panel{padding:28px 24px;border-right:0.5px solid rgba(255,255,255,0.07);display:flex;flex-direction:column;gap:16px}
-.panel:last-child{border-right:none}
-.panel-title{font-size:18px;font-weight:500;color:#f0f0ef;line-height:1.2}
-.panel-sub{font-size:13px;color:#7a7a78;line-height:1.5;margin-top:-8px}
-.rec-item{display:flex;align-items:center;gap:12px;background:#1a1a1c;border:0.5px solid rgba(255,255,255,0.08);border-radius:10px;padding:11px 14px;cursor:pointer;transition:background .15s}
-.rec-item:hover{background:#222226}
-.rec-icon{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:16px}
-.rec-label{font-size:13px;font-weight:500;color:#e8e8e6}
-.rec-sub{font-size:11px;color:#6a6a68;margin-top:1px}
-.orbit-wrap{flex:1;display:flex;align-items:center;justify-content:center;position:relative;min-height:200px}
-.orbit-center{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:17px;font-weight:500;color:#e8e8e6;white-space:nowrap;text-align:center;z-index:2}
-.orbit-center span{display:block;font-size:12px;color:#7a7a78;font-weight:400;margin-top:2px}
-.orbit-ring{position:absolute;left:50%;top:50%;border-radius:50%;border:0.5px dashed rgba(255,255,255,0.1);transform:translate(-50%,-50%)}
-.orbit-dot{position:absolute;width:38px;height:38px;border-radius:10px;background:#1e1e22;border:0.5px solid rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;font-size:15px}
-@keyframes spin1{from{transform:translate(-50%,-50%) rotate(0deg)}to{transform:translate(-50%,-50%) rotate(360deg)}}
-@keyframes spin2{from{transform:translate(-50%,-50%) rotate(180deg)}to{transform:translate(-50%,-50%) rotate(540deg)}}
-@keyframes counter1{from{transform:rotate(0deg)}to{transform:rotate(-360deg)}}
-@keyframes counter2{from{transform:rotate(-180deg)}to{transform:rotate(-540deg)}}
-.ring1{animation:spin1 8s linear infinite}
-.ring2{animation:spin2 13s linear infinite}
-.ring1 .orbit-dot{animation:counter1 8s linear infinite}
-.ring2 .orbit-dot{animation:counter2 13s linear infinite}
-.filter-box{background:#1a1a1c;border:0.5px solid rgba(255,255,255,0.08);border-radius:12px;padding:16px}
-.filter-label{font-size:11px;color:#7a7a78;margin-bottom:10px;display:flex;align-items:center;gap:6px}
-.filter-label i{color:#378ADD;font-size:13px}
-.filter-chips{display:flex;flex-wrap:wrap;gap:6px}
-.chip{display:flex;align-items:center;gap:5px;padding:5px 10px;border-radius:20px;border:0.5px solid rgba(255,255,255,0.1);background:#252528;font-size:12px;color:#c8c8c6;cursor:pointer;transition:background .15s}
-.chip:hover{background:#2e2e32}
-.chip-dot{width:7px;height:7px;border-radius:50%}
-.search-bar{display:flex;align-items:center;gap:8px;background:#1a1a1c;border:0.5px solid rgba(255,255,255,0.1);border-radius:8px;padding:9px 14px}
-.search-bar input{background:none;border:none;outline:none;font-size:13px;color:#e8e8e6;flex:1;font-family:var(--font-sans)}
-.search-bar input::placeholder{color:#5a5a58}
-.search-bar i{color:#5a5a58;font-size:16px}
+/* ── Reset for showcase ── */
+.flow-showcase *{box-sizing:border-box;margin:0;padding:0}
+
+/* ── Container ── */
+.flow-showcase{
+  position:relative;
+  width:100%;
+  padding:48px 32px;
+  background:#0a0a0c;
+  border-radius:16px;
+  overflow:hidden;
+  font-family:var(--font-sans, 'Inter', system-ui, sans-serif);
+}
+
+/* Subtle grid background */
+.flow-showcase::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background-image:
+    radial-gradient(circle, rgba(255,255,255,0.03) 1px, transparent 1px);
+  background-size:28px 28px;
+  mask-image:radial-gradient(ellipse 80% 80% at 50% 50%, black 20%, transparent 75%);
+  pointer-events:none;
+}
+
+/* Ambient glow behind center */
+.flow-showcase::after{
+  content:"";
+  position:absolute;
+  top:50%;left:50%;
+  transform:translate(-50%,-50%);
+  width:420px;height:420px;
+  background:radial-gradient(circle, rgba(120,100,255,0.08) 0%, rgba(56,138,221,0.04) 40%, transparent 70%);
+  pointer-events:none;
+  z-index:0;
+}
+
+/* ── Main Flow Layout ── */
+.flow-main{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:0;
+  position:relative;
+  z-index:1;
+  min-height:380px;
+}
+
+/* ── Column styling ── */
+.flow-col{
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+  flex-shrink:0;
+}
+.flow-col-left{width:200px}
+.flow-col-right{width:220px}
+
+/* ── SVG connection layer ── */
+.flow-connections{
+  position:absolute;
+  inset:0;
+  z-index:0;
+  pointer-events:none;
+}
+
+/* ── Center Hub ── */
+.flow-center{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:24px;
+  position:relative;
+  z-index:2;
+  min-width:280px;
+  padding:0 40px;
+}
+
+.hub-node{
+  position:relative;
+  width:100px;height:100px;
+  border-radius:50%;
+  background:linear-gradient(145deg, #1a1a2e, #16162a);
+  border:1px solid rgba(120,100,255,0.25);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-direction:column;
+  gap:2px;
+  box-shadow:
+    0 0 40px rgba(120,100,255,0.12),
+    0 0 80px rgba(56,138,221,0.06),
+    inset 0 0 20px rgba(120,100,255,0.05);
+}
+
+/* Pulsing ring */
+.hub-node::before{
+  content:"";
+  position:absolute;
+  inset:-12px;
+  border-radius:50%;
+  border:1px dashed rgba(120,100,255,0.15);
+  animation:hub-pulse 3s ease-in-out infinite;
+}
+.hub-node::after{
+  content:"";
+  position:absolute;
+  inset:-26px;
+  border-radius:50%;
+  border:1px dashed rgba(120,100,255,0.08);
+  animation:hub-pulse 3s ease-in-out infinite 0.5s;
+}
+@keyframes hub-pulse{
+  0%,100%{opacity:0.4;transform:scale(1)}
+  50%{opacity:1;transform:scale(1.04)}
+}
+
+.hub-icon{
+  font-size:28px;
+  color:#a78bfa;
+  line-height:1;
+}
+.hub-label{
+  font-size:11px;
+  font-weight:600;
+  color:#c4b5fd;
+  letter-spacing:0.04em;
+  text-align:center;
+}
+.hub-sublabel{
+  font-size:9px;
+  color:rgba(167,139,250,0.5);
+  letter-spacing:0.06em;
+  text-transform:uppercase;
+}
+
+/* ── Descriptive text under hub ── */
+.hub-desc{
+  text-align:center;
+}
+.hub-desc-title{
+  font-size:14px;
+  font-weight:600;
+  color:#e8e8e6;
+  letter-spacing:-0.01em;
+  margin-bottom:4px;
+}
+.hub-desc-sub{
+  font-size:11px;
+  color:#6a6a68;
+  line-height:1.5;
+}
+
+/* ── Email Source Cards (Left) ── */
+.email-card{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  background:#111114;
+  border:1px solid rgba(255,255,255,0.06);
+  border-radius:10px;
+  padding:10px 14px;
+  cursor:default;
+  transition:all .2s ease;
+  position:relative;
+}
+.email-card:hover{
+  background:#1a1a1f;
+  border-color:rgba(255,255,255,0.12);
+  transform:translateX(4px);
+}
+.email-card-icon{
+  width:32px;height:32px;
+  border-radius:8px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:15px;
+  flex-shrink:0;
+}
+.email-card-text{
+  min-width:0;
+}
+.email-card-label{
+  font-size:12px;
+  font-weight:600;
+  color:#e0e0de;
+  line-height:1.3;
+}
+.email-card-sub{
+  font-size:10px;
+  color:#5a5a58;
+  margin-top:1px;
+}
+/* Dot connector on right side of card */
+.email-card::after{
+  content:"";
+  position:absolute;
+  right:-6px;
+  top:50%;
+  transform:translateY(-50%);
+  width:8px;height:8px;
+  border-radius:50%;
+  background:#1e1e2e;
+  border:1.5px solid rgba(120,100,255,0.3);
+}
+
+/* ── WhatsApp/Output Cards (Right) ── */
+.wa-card{
+  background:#111114;
+  border:1px solid rgba(255,255,255,0.06);
+  border-radius:10px;
+  padding:14px 16px;
+  position:relative;
+  transition:all .2s ease;
+  cursor:default;
+}
+.wa-card:hover{
+  background:#1a1a1f;
+  border-color:rgba(255,255,255,0.12);
+  transform:translateX(-4px);
+}
+/* Dot connector on left side */
+.wa-card::before{
+  content:"";
+  position:absolute;
+  left:-6px;
+  top:50%;
+  transform:translateY(-50%);
+  width:8px;height:8px;
+  border-radius:50%;
+  background:#1e1e2e;
+  border:1.5px solid rgba(37,211,102,0.4);
+}
+
+.wa-card-header{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  margin-bottom:8px;
+}
+.wa-card-icon{
+  width:24px;height:24px;
+  border-radius:6px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:12px;
+  flex-shrink:0;
+}
+.wa-card-source{
+  font-size:11px;
+  font-weight:600;
+  color:#d0d0ce;
+}
+.wa-card-tag{
+  margin-left:auto;
+  font-size:9px;
+  font-weight:600;
+  letter-spacing:0.04em;
+  padding:2px 7px;
+  border-radius:4px;
+  text-transform:uppercase;
+}
+.wa-card-body{
+  font-size:12px;
+  font-weight:600;
+  color:#e8e8e6;
+  line-height:1.35;
+  margin-bottom:4px;
+}
+.wa-card-preview{
+  font-size:11px;
+  color:#5a5a58;
+  line-height:1.4;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+/* ── Tag colors ── */
+.tag-urgent{background:rgba(239,68,68,0.15);color:#f87171;border:1px solid rgba(239,68,68,0.2)}
+.tag-promo{background:rgba(234,179,8,0.12);color:#fbbf24;border:1px solid rgba(234,179,8,0.2)}
+.tag-opportunity{background:rgba(34,197,94,0.12);color:#4ade80;border:1px solid rgba(34,197,94,0.2)}
+.tag-reply{background:rgba(56,138,221,0.12);color:#60a5fa;border:1px solid rgba(56,138,221,0.2)}
+
+/* ── Flow Direction Labels ── */
+.flow-label{
+  text-align:center;
+  margin-bottom:12px;
+}
+.flow-label-text{
+  font-size:11px;
+  font-weight:500;
+  color:rgba(120,100,255,0.5);
+  letter-spacing:0.06em;
+  font-style:italic;
+}
+
+/* ── Bottom: Reply Flow Strip ── */
+.reply-flow{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:16px;
+  margin-top:36px;
+  padding:16px 24px;
+  background:rgba(255,255,255,0.02);
+  border:1px solid rgba(255,255,255,0.05);
+  border-radius:10px;
+  position:relative;
+  z-index:1;
+}
+.reply-flow-step{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  font-size:12px;
+  color:#7a7a78;
+}
+.reply-flow-icon{
+  width:30px;height:30px;
+  border-radius:8px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:14px;
+  border:1px solid rgba(255,255,255,0.08);
+}
+.reply-flow-arrow{
+  color:#3a3a38;
+  font-size:14px;
+}
+.reply-flow-label{
+  font-size:11px;
+  font-weight:500;
+  color:#888;
+}
+
+/* ── Score badges ── */
+.score-badge{
+  display:inline-flex;
+  align-items:center;
+  gap:4px;
+  font-size:10px;
+  font-weight:700;
+  font-family:var(--font-mono, monospace);
+  padding:2px 6px;
+  border-radius:4px;
+  margin-top:6px;
+}
+.score-high{background:rgba(239,68,68,0.12);color:#f87171}
+.score-med{background:rgba(234,179,8,0.1);color:#fbbf24}
+.score-low{background:rgba(56,138,221,0.1);color:#60a5fa}
+
+/* ── Animated connection lines ── */
+@keyframes dash-flow{
+  to{stroke-dashoffset:-20}
+}
+.conn-line{
+  stroke:rgba(120,100,255,0.15);
+  stroke-width:1.5;
+  fill:none;
+  stroke-dasharray:6 4;
+  animation:dash-flow 1.5s linear infinite;
+}
+.conn-line-out{
+  stroke:rgba(37,211,102,0.15);
+  stroke-width:1.5;
+  fill:none;
+  stroke-dasharray:6 4;
+  animation:dash-flow 1.5s linear infinite;
+}
+
+/* ── Section heading ── */
+.flow-heading{
+  text-align:center;
+  margin-bottom:36px;
+  position:relative;
+  z-index:1;
+}
+.flow-heading-badge{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  background:rgba(120,100,255,0.08);
+  border:1px solid rgba(120,100,255,0.15);
+  border-radius:20px;
+  padding:4px 12px;
+  font-size:10px;
+  font-weight:600;
+  color:#a78bfa;
+  letter-spacing:0.06em;
+  text-transform:uppercase;
+  margin-bottom:14px;
+}
+.flow-heading-title{
+  font-size:22px;
+  font-weight:600;
+  color:#f0f0ef;
+  letter-spacing:-0.02em;
+  line-height:1.3;
+}
+.flow-heading-title em{
+  font-style:italic;
+  font-weight:400;
+  color:#7a7a78;
+}
 </style>
 
-<h2 class="sr-only">Email AI workflow feature overview: personalized recommendations, seamless search, and precision filters</h2>
-
-<div class="wrap">
-
-  <div class="panel">
-    <div>
-      <div class="panel-title">Personalized recommendations</div>
-      <div class="panel-sub">Emails routed to the right tools automatically.</div>
+<div class="flow-showcase">
+  <!-- Heading -->
+  <div class="flow-heading">
+    <div class="flow-heading-badge">
+      <i class="ti ti-route" aria-hidden="true"></i>
+      How It Works
     </div>
-    <div class="rec-item">
-      <div class="rec-icon" style="background:#1c1c3a;color:#7F77DD"><i class="ti ti-mail-forward" aria-hidden="true"></i></div>
-      <div><div class="rec-label">Based on your workflow</div><div class="rec-sub">Smart inbox routing</div></div>
-    </div>
-    <div class="rec-item">
-      <div class="rec-icon" style="background:#1a2e1a;color:#639922"><i class="ti ti-robot" aria-hidden="true"></i></div>
-      <div><div class="rec-label">AI worker active</div><div class="rec-sub">Scoring & replying</div></div>
-    </div>
-    <div class="rec-item">
-      <div class="rec-icon" style="background:#2a1a1a;color:#D85A30"><i class="ti ti-brand-whatsapp" aria-hidden="true"></i></div>
-      <div><div class="rec-label">WhatsApp alerts on</div><div class="rec-sub">Push when score &gt; 6</div></div>
+    <div class="flow-heading-title">
+      EmailBot picks <em>what matters most</em>
     </div>
   </div>
 
-  <div class="panel">
-    <div>
-      <div class="panel-title">Seamless AI pipeline</div>
-      <div class="panel-sub">All your tools orbit one AI brain.</div>
-    </div>
-    <div class="orbit-wrap">
-      <div style="width:180px;height:180px;position:relative">
-        <div class="orbit-ring ring1" style="width:160px;height:160px">
-          <div class="orbit-dot" style="top:-19px;left:50%;margin-left:-19px"><i class="ti ti-mail" aria-hidden="true" style="color:#85B7EB"></i></div>
-          <div class="orbit-dot" style="bottom:-19px;left:50%;margin-left:-19px"><i class="ti ti-brand-whatsapp" aria-hidden="true" style="color:#639922"></i></div>
+  <!-- Main Flow -->
+  <div class="flow-main" id="flow-main">
+
+    <!-- Left: Email Sources -->
+    <div class="flow-col flow-col-left">
+      <div class="flow-label">
+        <div class="flow-label-text">Incoming emails</div>
+      </div>
+
+      <div class="email-card" data-type="spam">
+        <div class="email-card-icon" style="background:#2a1520;color:#f87171">
+          <i class="ti ti-alert-triangle" aria-hidden="true"></i>
         </div>
-        <div class="orbit-ring ring2" style="width:100px;height:100px">
-          <div class="orbit-dot" style="top:-19px;left:50%;margin-left:-19px"><i class="ti ti-robot" aria-hidden="true" style="color:#7F77DD"></i></div>
-          <div class="orbit-dot" style="bottom:-19px;left:50%;margin-left:-19px"><i class="ti ti-sparkles" aria-hidden="true" style="color:#EF9F27"></i></div>
+        <div class="email-card-text">
+          <div class="email-card-label">Spam</div>
+          <div class="email-card-sub">Auto-filtered out</div>
         </div>
-        <div class="orbit-center">Email AI<span>worker</span></div>
+      </div>
+
+      <div class="email-card" data-type="promo">
+        <div class="email-card-icon" style="background:#2a2510;color:#fbbf24">
+          <i class="ti ti-tag" aria-hidden="true"></i>
+        </div>
+        <div class="email-card-text">
+          <div class="email-card-label">Promotions</div>
+          <div class="email-card-sub">Sales & marketing</div>
+        </div>
+      </div>
+
+      <div class="email-card" data-type="internship">
+        <div class="email-card-icon" style="background:#102a1a;color:#4ade80">
+          <i class="ti ti-briefcase" aria-hidden="true"></i>
+        </div>
+        <div class="email-card-text">
+          <div class="email-card-label">Internships</div>
+          <div class="email-card-sub">Opportunities & jobs</div>
+        </div>
+      </div>
+
+      <div class="email-card" data-type="other">
+        <div class="email-card-icon" style="background:#10192a;color:#60a5fa">
+          <i class="ti ti-mail" aria-hidden="true"></i>
+        </div>
+        <div class="email-card-text">
+          <div class="email-card-label">Other</div>
+          <div class="email-card-sub">Updates & notices</div>
+        </div>
       </div>
     </div>
-  </div>
 
-  <div class="panel">
-    <div>
-      <div class="panel-title">Precision filters</div>
-      <div class="panel-sub">Zero in on messages by priority and score.</div>
-    </div>
-    <div class="search-bar">
-      <i class="ti ti-search" aria-hidden="true"></i>
-      <input type="text" placeholder="Search emails..." readonly>
-    </div>
-    <div class="filter-box">
-      <div class="filter-label"><i class="ti ti-adjustments-horizontal" aria-hidden="true"></i> Filter by: PRIORITY SCORE</div>
-      <div class="filter-chips">
-        <div class="chip"><div class="chip-dot" style="background:#E24B4A"></div>Very high (8–10)</div>
-        <div class="chip"><div class="chip-dot" style="background:#EF9F27"></div>High (7)</div>
-        <div class="chip"><div class="chip-dot" style="background:#1D9E75"></div>Moderate (5–6)</div>
-        <div class="chip"><div class="chip-dot" style="background:#378ADD"></div>Low (&lt;5)</div>
+    <!-- SVG Connections will be rendered via JS or static -->
+    <svg class="flow-connections" viewBox="0 0 1000 400" preserveAspectRatio="none" aria-hidden="true">
+      <!-- Left to center lines -->
+      <path class="conn-line" d="M 210 85 C 320 85, 350 195, 430 195"/>
+      <path class="conn-line" d="M 210 145 C 300 145, 350 195, 430 195"/>
+      <path class="conn-line" d="M 210 215 C 300 215, 350 200, 430 200"/>
+      <path class="conn-line" d="M 210 285 C 300 285, 360 205, 430 205"/>
+      <!-- Center to right lines -->
+      <path class="conn-line-out" d="M 570 190 C 640 190, 680 90, 780 90"/>
+      <path class="conn-line-out" d="M 570 195 C 640 195, 680 195, 780 195"/>
+      <path class="conn-line-out" d="M 570 205 C 640 205, 680 300, 780 300"/>
+    </svg>
+
+    <!-- Center: AI Hub -->
+    <div class="flow-center">
+      <div class="hub-node">
+        <div class="hub-icon">
+          <i class="ti ti-brain" aria-hidden="true"></i>
+        </div>
+        <div class="hub-label">EmailBot</div>
+        <div class="hub-sublabel">AI Worker</div>
+      </div>
+      <div class="hub-desc">
+        <div class="hub-desc-title">AI scores & ranks</div>
+        <div class="hub-desc-sub">Reads, understands, and prioritizes<br>every email automatically</div>
       </div>
     </div>
-    <div style="font-size:12px;color:#5a5a58;margin-top:auto">
-      <i class="ti ti-info-circle" aria-hidden="true" style="vertical-align:-2px;margin-right:4px"></i>
-      Only scores &gt; 6 are pushed to WhatsApp
+
+    <!-- Right: WhatsApp Output Cards -->
+    <div class="flow-col flow-col-right">
+      <div class="flow-label">
+        <div class="flow-label-text">WhatsApp alerts</div>
+      </div>
+
+      <div class="wa-card">
+        <div class="wa-card-header">
+          <div class="wa-card-icon" style="background:#2a1520;color:#f87171">
+            <i class="ti ti-urgent" aria-hidden="true"></i>
+          </div>
+          <div class="wa-card-source">CEO Direct</div>
+          <div class="wa-card-tag tag-urgent">Urgent · Score 9</div>
+        </div>
+        <div class="wa-card-body">Board review — numbers needed</div>
+        <div class="wa-card-preview">"Q4 board review — need numbers by 5pm"</div>
+      </div>
+
+      <div class="wa-card">
+        <div class="wa-card-header">
+          <div class="wa-card-icon" style="background:#102a1a;color:#4ade80">
+            <i class="ti ti-briefcase" aria-hidden="true"></i>
+          </div>
+          <div class="wa-card-source">Internship Alert</div>
+          <div class="wa-card-tag tag-opportunity">Opportunity · Score 8</div>
+        </div>
+        <div class="wa-card-body">Google SWE Internship</div>
+        <div class="wa-card-preview">"Application deadline: June 15th..."</div>
+      </div>
+
+      <div class="wa-card">
+        <div class="wa-card-header">
+          <div class="wa-card-icon" style="background:#10192a;color:#60a5fa">
+            <i class="ti ti-mail-forward" aria-hidden="true"></i>
+          </div>
+          <div class="wa-card-source">Auto-Reply Sent</div>
+          <div class="wa-card-tag tag-reply">Replied · AI</div>
+        </div>
+        <div class="wa-card-body">Invoice payment confirmation</div>
+        <div class="wa-card-preview">"Polished reply sent via Gmail ✓"</div>
+      </div>
     </div>
+
   </div>
 
+  <!-- Reply Flow Strip -->
+  <div class="reply-flow">
+    <div class="reply-flow-step">
+      <div class="reply-flow-icon" style="background:#0d2b10;color:#25d366">
+        <i class="ti ti-brand-whatsapp" aria-hidden="true"></i>
+      </div>
+      <div class="reply-flow-label">Reply on WhatsApp</div>
+    </div>
+    <div class="reply-flow-arrow">→</div>
+    <div class="reply-flow-step">
+      <div class="reply-flow-icon" style="background:#1a1a2e;color:#a78bfa">
+        <i class="ti ti-brain" aria-hidden="true"></i>
+      </div>
+      <div class="reply-flow-label">AI refines reply</div>
+    </div>
+    <div class="reply-flow-arrow">→</div>
+    <div class="reply-flow-step">
+      <div class="reply-flow-icon" style="background:#1a1520;color:#f87171">
+        <i class="ti ti-mail-forward" aria-hidden="true"></i>
+      </div>
+      <div class="reply-flow-label">Sent via Email</div>
+    </div>
+  </div>
 </div>
