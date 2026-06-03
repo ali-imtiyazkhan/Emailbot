@@ -30,8 +30,8 @@ async function sendGmailReply(
   threadMessageId: string
 ): Promise<void> {
   const oauth2Client = new google.auth.OAuth2(
-    process.env.GOOGLE_CLIENT_ID,
-    process.env.GOOGLE_CLIENT_SECRET
+    process.env.GMAIL_CLIENT_ID,
+    process.env.GMAIL_CLIENT_SECRET
   );
 
   oauth2Client.setCredentials({
@@ -82,8 +82,8 @@ async function sendOutlookReply(
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body: new URLSearchParams({
-      client_id: process.env.MICROSOFT_CLIENT_ID!,
-      client_secret: process.env.MICROSOFT_CLIENT_SECRET!,
+      client_id: process.env.OUTLOOK_CLIENT_ID!,
+      client_secret: process.env.OUTLOOK_CLIENT_SECRET!,
       refresh_token: account.refreshToken,
       grant_type: 'refresh_token',
     }),
