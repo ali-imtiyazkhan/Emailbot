@@ -1,9 +1,6 @@
 import type { Metadata } from "next";
-import { Inter, Instrument_Serif } from "next/font/google";
+import { Inter } from "next/font/google";
 import "./globals.css";
-
-
-import LayoutShell from "../components/LayoutShell";
 
 const inter = Inter({
   variable: "--font-sans",
@@ -11,16 +8,9 @@ const inter = Inter({
   weight: ["300", "400", "500", "600", "700"],
 });
 
-const instrumentSerif = Instrument_Serif({
-  variable: "--font-serif",
-  subsets: ["latin"],
-  weight: ["400"],
-  style: ["italic"],
-});
-
 export const metadata: Metadata = {
-  title: "EmailBot | AI-Powered Email Intelligence",
-  description: "Automate your inbox with AI-powered prioritization, WhatsApp alerts, and custom forwarding rules. The AI agent that manages your inbox.",
+  title: "Aura — Your email. Revitalized.",
+  description: "Aura is the premier inbox platform for the current era. It leverages powerful AI to organize, prioritize, and refine your messages into total clarity.",
 };
 
 export default function RootLayout({
@@ -31,11 +21,9 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${instrumentSerif.variable} h-full antialiased dark`}
+      className={`${inter.variable} h-full antialiased dark`}
     >
-      <body className="font-sans">
-        <LayoutShell>{children}</LayoutShell>
-      </body>
+      <body className="font-sans">{children}</body>
     </html>
   );
 }
