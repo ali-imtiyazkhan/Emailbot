@@ -4,7 +4,7 @@ import { ChevronRight } from "lucide-react";
 import AppleLogo from "./AppleLogo";
 
 export default function AppleButton({
-  label = "Download Aura",
+  label = "Download EmailBot",
   full = false,
 }: {
   label?: string;

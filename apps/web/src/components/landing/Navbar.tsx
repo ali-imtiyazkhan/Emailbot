@@ -26,7 +26,7 @@ export default function Navbar() {
       className="relative z-50"
     >
       <div className="max-w-6xl mx-auto px-6 h-20 flex items-center justify-between">
-        <Link href="/" aria-label="Aura home">
+        <Link href="/" aria-label="EmailBot home">
           <LogoMark />
         </Link>
 

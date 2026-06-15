@@ -34,7 +34,7 @@ export default function FinalCTA() {
             like a tool — not an obligation.
           </p>
           <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-3">
-            <AppleButton label="Download Aura" />
+            <AppleButton label="Download EmailBot" />
             <button
               type="button"
               className="group inline-flex items-center justify-center gap-2 rounded-full border border-white/15 text-white text-sm font-medium px-5 py-3 hover:bg-white/5 transition-colors"

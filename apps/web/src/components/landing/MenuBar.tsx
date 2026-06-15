@@ -23,7 +23,7 @@ export default function MenuBar() {
       <div className="max-w-6xl mx-auto px-6 h-full flex items-center justify-between text-xs">
         <div className="flex items-center gap-4 text-white/70">
           <AppleLogo className="w-3.5 h-3.5" />
-          <span className="font-bold text-white">Aura</span>
+          <span className="font-bold text-white">EmailBot</span>
           {MENU_ITEMS.map((item, i) => (
             <span key={item} className={menuItemVisibility(i)}>
               {item}

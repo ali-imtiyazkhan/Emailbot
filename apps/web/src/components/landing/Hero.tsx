@@ -38,7 +38,7 @@ export default function Hero() {
         transition={{ duration: 0.8, delay: 0.5, ease: EASE }}
         className="mt-8 text-white/60 max-w-md text-base leading-[1.5]"
       >
-        Aura is the premier inbox platform for the current era. It leverages
+        EmailBot is the premier inbox platform for the current era. It leverages
         powerful AI to organize, prioritize, and refine your messages into total
         clarity.
       </motion.p>

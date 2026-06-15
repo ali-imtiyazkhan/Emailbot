@@ -7,7 +7,7 @@ const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 const TESTIMONIALS = [
   {
     quote:
-      "Aura gave our leadership team four hours of their week back. It reads like email from the future.",
+      "EmailBot gave our leadership team four hours of their week back. It reads like email from the future.",
     name: "Parker Wilf",
     role: "Group Product Manager",
     company: "MERCURY",

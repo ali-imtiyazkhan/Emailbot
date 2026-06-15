@@ -79,13 +79,13 @@ const MESSAGES: {
   },
   {
     name: "Vercel",
-    subject: "Deployment ready for aura-web",
-    preview: "Preview is live at aura-web-g3f.vercel.app",
+    subject: "Deployment ready for emailbot-web",
+    preview: "Preview is live at emailbot-web-g3f.vercel.app",
     time: "Mon",
   },
   {
     name: "GitHub",
-    subject: "[aura/core] PR #482 approved",
+    subject: "[emailbot/core] PR #482 approved",
     preview: "david-lim approved your pull request.",
     time: "Mon",
   },
@@ -126,7 +126,7 @@ export default function InboxMockup() {
             ))}
           </div>
           <span className="absolute left-1/2 -translate-x-1/2 text-xs text-white/50">
-            Aura — Inbox
+            EmailBot — Inbox
           </span>
         </div>
 
@@ -139,7 +139,7 @@ export default function InboxMockup() {
               className="w-full inline-flex items-center justify-center gap-1.5 rounded-lg bg-white text-black text-xs font-semibold px-3 py-2 transition-colors hover:bg-white/90"
             >
               <Sparkles className="w-3.5 h-3.5" />
-              Compose with Aura
+              Compose with EmailBot
             </button>
 
             <nav className="mt-4 space-y-0.5">
@@ -280,7 +280,7 @@ export default function InboxMockup() {
                     style={{ color: "#A4F4FD" }}
                   />
                   <span className="text-[11px] font-semibold text-white">
-                    Summary by Aura
+                    Summary by EmailBot
                   </span>
                 </div>
                 <p className="mt-1.5 text-xs text-white/70 leading-[1.6]">

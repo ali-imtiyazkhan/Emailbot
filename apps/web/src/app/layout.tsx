@@ -9,8 +9,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Aura — Your email. Revitalized.",
-  description: "Aura is the premier inbox platform for the current era. It leverages powerful AI to organize, prioritize, and refine your messages into total clarity.",
+  title: "EmailBot — Your email. Revitalized.",
+  description: "EmailBot is the premier inbox platform for the current era. It leverages powerful AI to organize, prioritize, and refine your messages into total clarity.",
 };
 
 export default function RootLayout({

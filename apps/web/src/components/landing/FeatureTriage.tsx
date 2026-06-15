@@ -56,7 +56,7 @@ export default function FeatureTriage() {
             in a single pass.
           </h2>
           <p className="mt-6 text-white/60 text-base leading-[1.6] max-w-md">
-            Aura reads every message, understands intent, and routes the noise
+            EmailBot reads every message, understands intent, and routes the noise
             away from the signal. Focus on what moves your day forward — the
             rest handles itself.
           </p>
