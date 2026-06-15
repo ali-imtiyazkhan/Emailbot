@@ -116,6 +116,22 @@ export const sendEmailReply = async (userId: number, originalMessageId: string, 
     expiry_date: account.tokenExpiry ? account.tokenExpiry.getTime() : undefined,
   });
 
+  const tokenRefreshHandler = async (tokens: { access_token?: string | null; refresh_token?: string | null; expiry_date?: number | null }) => {
+    if (tokens.access_token) {
+      await db.emailAccount.update({
+        where: { id: account.id },
+        data: {
+          accessToken: tokens.access_token,
+          tokenExpiry: tokens.expiry_date ? new Date(tokens.expiry_date) : null,
+          ...(tokens.refresh_token ? { refreshToken: tokens.refresh_token } : {}),
+        }
+      });
+      logger.info(`Refreshed Gmail access token for user ${userId} during reply`);
+    }
+  };
+
+  oauthClient.once('tokens', tokenRefreshHandler);
+
   const gmail = google.gmail({ version: 'v1', auth: oauthClient });
 
   try {
@@ -127,8 +143,7 @@ export const sendEmailReply = async (userId: number, originalMessageId: string, 
     const references = headers?.find(h => h.name?.toLowerCase() === 'references')?.value || '';
 
     const replySubject = subject.toLowerCase().startsWith('re:') ? subject : `Re: ${subject}`;
-    
-    
+
     const emailLines = [
       `To: ${from}`,
       `Subject: ${replySubject}`,
@@ -159,7 +174,14 @@ export const sendEmailReply = async (userId: number, originalMessageId: string, 
     logger.info(`Successfully sent Gmail reply for user ${userId} to message ${originalMessageId}`);
     return true;
   } catch (error: any) {
-    logger.error(`Error sending Gmail reply for user ${userId}:`, error.message);
+    logger.error(`Error sending Gmail reply for user ${userId}:`, error.message, error.response?.data);
+    if (error.code === 401 || error.response?.status === 401) {
+      await db.emailAccount.update({
+        where: { id: account.id },
+        data: { isActive: false }
+      });
+      logger.warn(`Deactivated Gmail account for user ${userId} due to 401 during reply`);
+    }
     return false;
   }
 };

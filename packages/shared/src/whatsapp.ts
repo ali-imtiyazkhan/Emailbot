@@ -27,9 +27,20 @@ export const sendTextMessage = async (to: string, text: string): Promise<string 
         },
       }
     );
-    return response.data.messages?.[0]?.id;
+    const msgId = response.data.messages?.[0]?.id;
+    logger.info(`WhatsApp text message sent to ${to}: ${msgId}`);
+    return msgId;
   } catch (error: any) {
-    logger.error('Error sending WhatsApp message:', error.response?.data || error.message);
+    const errDetail = error.response?.data?.error || error.message;
+    logger.error(`Error sending WhatsApp message to ${to}:`, JSON.stringify(errDetail));
+
+    if (error.response?.data?.error?.code === 190) {
+      logger.error('🚨 WhatsApp Access Token EXPIRED or INVALID. Please refresh it in the Meta Developer Dashboard.');
+    }
+    if (error.response?.data?.error?.code === 131051) {
+      logger.error(`🚨 Cannot send non-template message to ${to} outside 24-hour window. Use a template message instead.`);
+    }
+
     return undefined;
   }
 };
@@ -67,15 +78,20 @@ export const sendTemplateMessage = async (to: string, templateName: string, comp
         },
       }
     );
-    return response.data.messages?.[0]?.id;
+    const msgId = response.data.messages?.[0]?.id;
+    logger.info(`WhatsApp template message sent to ${to}: ${msgId}`);
+    return msgId;
   } catch (error: any) {
-    logger.error('Error sending WhatsApp template message:', error.response?.data || error.message);
-    
-    // Help the user with common token errors
+    const errDetail = error.response?.data?.error || error.message;
+    logger.error(`Error sending WhatsApp template message to ${to}:`, JSON.stringify(errDetail));
+
     if (error.response?.data?.error?.code === 190) {
       logger.error('🚨 WhatsApp Access Token EXPIRED or INVALID. Please refresh it in the Meta Developer Dashboard.');
     }
-    
+    if (error.response?.data?.error?.code === 131005) {
+      logger.error(`🚨 Template "new_email_notification" may not be approved or does not exist. Check Meta Business Manager.`);
+    }
+
     return undefined;
   }
 };
