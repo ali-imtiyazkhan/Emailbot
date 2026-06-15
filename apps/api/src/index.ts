@@ -13,7 +13,7 @@ import { prisma as db } from '@repo/db';
 import logger from '@repo/shared/logger';
 
 const app = express();
-const PORT = process.env.API_PORT || 3001;
+const PORT = process.env.PORT || process.env.API_PORT || 3001;
 
 // Security & Middleware
 app.use(helmet());
