@@ -245,7 +245,7 @@ router.get('/analytics', async (req, res) => {
         avgPriority: Math.round((d.total / d.count) * 10) / 10,
       })),
       totalEmails: emails.length,
-      totalNotified: emails.filter(e => e.notified).length,
+      totalNotified: emails.filter((e: { notified: boolean }) => e.notified).length,
     });
   } catch (error) {
     logger.error('Error fetching analytics:', error);

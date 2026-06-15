@@ -12,15 +12,15 @@ export const handleEmailJob = async (jobData: EmailJobData): Promise<void> => {
   const analysis = await summarizeEmail(email.subject, email.body);
 
   const rules = await db.filterRule.findMany({ where: { userId, isActive: true } });
-  const priorityRule = rules.find(r => r.ruleType === 'priority_min');
+  const priorityRule = rules.find((r: { ruleType: string }) => r.ruleType === 'priority_min');
   const minPriority = priorityRule ? parseInt(priorityRule.value) : 5;
 
-  const senderRules = rules.filter(r => r.ruleType === 'sender');
-  const senderMatch = senderRules.some(r => 
+  const senderRules = rules.filter((r: { ruleType: string }) => r.ruleType === 'sender');
+  const senderMatch = senderRules.some((r: { value: string }) => 
     email.sender.toLowerCase().includes(r.value.toLowerCase())
   );
-  const keywordRules = rules.filter(r => r.ruleType === 'keyword');
-  const keywordMatch = keywordRules.some(r => 
+  const keywordRules = rules.filter((r: { ruleType: string }) => r.ruleType === 'keyword');
+  const keywordMatch = keywordRules.some((r: { value: string }) => 
     (email.subject || '').toLowerCase().includes(r.value.toLowerCase())
   );
 

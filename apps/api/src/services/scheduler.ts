@@ -34,7 +34,7 @@ export const initScheduler = () => {
         include: { user: true },
       });
 
-      const matchedSettings = digestSettings.filter(setting => {
+      const matchedSettings = digestSettings.filter((setting: { timezone: string; sendTime: string; userId: number; user: { whatsapp: string | null }; enabled: boolean; minEmails: number; id: number }) => {
         try {
           const userTime = new Date().toLocaleTimeString('en-GB', {
             hour: '2-digit', minute: '2-digit', hour12: false,
@@ -63,7 +63,7 @@ export const initScheduler = () => {
         if (undigestedEmails.length < setting.minEmails) continue;
 
         // Build digest message
-        const lines = undigestedEmails.slice(0, 10).map((e, i) => {
+        const lines = undigestedEmails.slice(0, 10).map((e: { priorityScore: number | null; subject: string | null; summary: string | null }, i: number) => {
           const priority = e.priorityScore ? `⚡${e.priorityScore}` : '';
           return `${i + 1}. ${priority} *${e.subject || 'No Subject'}*\n   ${e.summary || 'No summary'}`;
         });
@@ -75,7 +75,7 @@ export const initScheduler = () => {
         // Mark as included in digest
         await db.processedEmail.updateMany({
           where: {
-            id: { in: undigestedEmails.map(e => e.id) },
+            id: { in: undigestedEmails.map((e: { id: number }) => e.id) },
           },
           data: { digestIncluded: true },
         });
