@@ -4,12 +4,13 @@
   "private": true,
   "type": "module",
   "exports": {
-    "./logger": "./src/logger.ts",
-    "./env": "./src/env.ts",
-    "./ai": "./src/ai.ts",
-    "./whatsapp": "./src/whatsapp.ts"
+    "./logger": "./dist/logger.js",
+    "./env": "./dist/env.js",
+    "./ai": "./dist/ai.js",
+    "./whatsapp": "./dist/whatsapp.js"
   },
   "scripts": {
+    "build": "tsc",
     "lint": "eslint src"
   },
   "dependencies": {
