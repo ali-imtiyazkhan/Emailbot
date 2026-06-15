@@ -1,7 +1,7 @@
 import cron from 'node-cron';
 import { processEmails } from './emailProcessor.js';
 import { sendTextMessage } from '@repo/shared/whatsapp';
-import { prisma as db, type DigestSetting, type User } from '@repo/db';
+import { prisma as db } from '@repo/db';
 import logger from '@repo/shared/logger';
 
 let isProcessing = false;
@@ -35,7 +35,7 @@ export const initScheduler = () => {
       });
 
       // Filter to only settings where the current time matches the user's configured timezone
-      const matchedSettings = digestSettings.filter((setting: DigestSetting & { user: User }) => {
+      const matchedSettings = digestSettings.filter((setting: { timezone: string; sendTime: string; userId: number; user: { whatsapp: string | null }; enabled: boolean; minEmails: number; id: number }) => {
         try {
           const userTime = new Date().toLocaleTimeString('en-GB', {
             hour: '2-digit', minute: '2-digit', hour12: false,
