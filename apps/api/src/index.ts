@@ -17,8 +17,20 @@ const PORT = process.env.API_PORT || 3001;
 
 // Security & Middleware
 app.use(helmet());
+const allowedOrigins = [
+  'http://localhost:3000',
+  'https://emailbot-web.vercel.app',
+  ...(process.env.FRONTEND_URL ? [process.env.FRONTEND_URL] : []),
+];
+
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
 }));
 app.use(morgan('dev'));
@@ -67,7 +79,7 @@ const server = app.listen(PORT, () => {
 // Graceful Shutdown
 const gracefulShutdown = async (signal: string) => {
   logger.info(`${signal} received — shutting down gracefully...`);
-  
+
   server.close(() => {
     logger.info('HTTP server closed');
   });
