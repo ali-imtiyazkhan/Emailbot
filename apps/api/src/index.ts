@@ -69,9 +69,9 @@ app.get('/health', async (req, res) => {
 });
 
 app.use('/auth', authLimiter, authRoutes);
+app.use('/api', apiLimiter, dashboardRoutes);
 app.use('/whatsapp', webhookLimiter, verifyWebhookSignature, webhookRoutes);
 app.use('/', webhookLimiter, verifyWebhookSignature, whatsappWebhookRouter);
-app.use('/api', apiLimiter, dashboardRoutes);
 
 
 // Global Error Handler
