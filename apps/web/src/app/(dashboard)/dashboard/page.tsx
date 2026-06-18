@@ -11,6 +11,7 @@ import {
   Stats,
   ProcessedEmail,
 } from "@/lib/api";
+import { getToken, fetchToken } from "@/lib/auth";
 import { Mail, SlidersHorizontal, Zap, ArrowRight, CheckCircle2 } from "lucide-react";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { AppPage, AppMetrics, AppSection, AppEmpty } from "@/components/app/AppPage";
@@ -55,6 +56,9 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (!getToken()) {
+      fetchToken();
+    }
     loadData();
   }, []);
 

@@ -2,8 +2,11 @@ import { Router } from 'express';
 import { z } from 'zod';
 import { prisma as db } from '@repo/db';
 import logger from '@repo/shared/logger';
+import { requireAuth } from '../middleware/auth.js';
 
 const router = Router();
+
+router.use(requireAuth);
 
 // ── Validation Schemas ─────────────────────────────────
 
@@ -23,7 +26,7 @@ const updateDigestSchema = z.object({
 
 router.get('/profile', async (req, res) => {
   try {
-    const userId = 1; // Assuming hardcoded for now
+    const userId = req.user!.userId
     const user = await db.user.findUnique({
       where: { id: userId },
       select: { id: true, email: true, name: true, whatsapp: true }
@@ -39,7 +42,7 @@ router.get('/profile', async (req, res) => {
 
 router.get('/stats', async (req, res) => {
   try {
-    const userId = 1;
+    const userId = req.user!.userId
     const count = await db.processedEmail.count({ where: { userId } });
     res.json({ totalProcessed: count });
   } catch (error) {
@@ -52,7 +55,7 @@ router.get('/stats', async (req, res) => {
 
 router.get('/filters', async (req, res) => {
   try {
-    const userId = 1;
+    const userId = req.user!.userId
     const filters = await db.filterRule.findMany({ where: { userId } });
     res.json(filters);
   } catch (error) {
@@ -63,7 +66,7 @@ router.get('/filters', async (req, res) => {
 
 router.post('/filters', async (req, res) => {
   try {
-    const userId = 1;
+    const userId = req.user!.userId
     const parsed = createFilterSchema.parse(req.body);
     await db.filterRule.create({ 
       data: { userId, ruleType: parsed.type, value: parsed.value } 
@@ -81,9 +84,15 @@ router.post('/filters', async (req, res) => {
 
 router.delete('/filters/:id', async (req, res) => {
   try {
+    const userId = req.user!.userId
     const id = parseInt(req.params.id);
     if (isNaN(id)) {
       res.status(400).json({ error: 'Invalid filter ID' });
+      return;
+    }
+    const filter = await db.filterRule.findFirst({ where: { id, userId } });
+    if (!filter) {
+      res.status(404).json({ error: 'Filter not found' });
       return;
     }
     await db.filterRule.delete({ where: { id } });
@@ -98,7 +107,7 @@ router.delete('/filters/:id', async (req, res) => {
 
 router.get('/emails', async (req, res) => {
   try {
-    const userId = 1;
+    const userId = req.user!.userId
     const page = Math.max(1, parseInt(req.query.page as string) || 1);
     const limit = Math.min(50, Math.max(1, parseInt(req.query.limit as string) || 20));
     const skip = (page - 1) * limit;
@@ -125,7 +134,7 @@ router.get('/emails', async (req, res) => {
 
 router.get('/accounts', async (req, res) => {
   try {
-    const userId = 1;
+    const userId = req.user!.userId
     const accounts = await db.emailAccount.findMany({
       where: { userId },
       select: {
@@ -148,7 +157,7 @@ router.get('/accounts', async (req, res) => {
 
 router.get('/digest-settings', async (req, res) => {
   try {
-    const userId = 1;
+    const userId = req.user!.userId
     let settings = await db.digestSetting.findUnique({ where: { userId } });
     if (!settings) {
       settings = await db.digestSetting.create({
@@ -164,7 +173,7 @@ router.get('/digest-settings', async (req, res) => {
 
 router.put('/digest-settings', async (req, res) => {
   try {
-    const userId = 1;
+    const userId = req.user!.userId
     const parsed = updateDigestSchema.parse(req.body);
     const settings = await db.digestSetting.upsert({
       where: { userId },
@@ -186,7 +195,7 @@ router.put('/digest-settings', async (req, res) => {
 
 router.get('/analytics', async (req, res) => {
   try {
-    const userId = 1;
+    const userId = req.user!.userId
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
@@ -257,7 +266,7 @@ router.get('/analytics', async (req, res) => {
 
 router.post('/emails/:id/reply', async (req, res) => {
   try {
-    const userId = 1;
+    const userId = req.user!.userId
     const emailId = parseInt(req.params.id);
     const { text } = req.body;
 

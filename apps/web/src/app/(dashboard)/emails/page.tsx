@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useMemo } from "react";
 import { fetchEmails, replyToEmail, ProcessedEmail } from "@/lib/api";
+import { getToken, fetchToken } from "@/lib/auth";
 import {
   Search,
   Mail,
@@ -45,6 +46,9 @@ export default function EmailsPage() {
   } | null>(null);
 
   useEffect(() => {
+    if (!getToken()) {
+      fetchToken();
+    }
     fetchEmails()
       .then(setEmails)
       .catch((err) => console.error("Failed to load emails:", err))

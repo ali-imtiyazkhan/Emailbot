@@ -5,6 +5,7 @@ import { prisma as db } from '@repo/db';
 import logger from '@repo/shared/logger';
 import { createGoogleOAuth2Client, GMAIL_SCOPES } from '../config/google.js';
 import { OUTLOOK_AUTH_URL, OUTLOOK_TOKEN_URL, OUTLOOK_SCOPES } from '../config/outlook.js';
+import { verifyToken, generateToken } from '../middleware/auth.js';
 
 const router = Router();
 
@@ -12,15 +13,36 @@ const router = Router();
 const escapeHtml = (str: string): string =>
   str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
+// ─── Token Endpoint ───────────────────────────────────────
+// Returns a JWT for the first user (dev convenience). In production, replace with real auth.
+router.get('/token', async (req, res) => {
+  try {
+    const user = await db.user.findFirst({ orderBy: { id: 'asc' } });
+    if (!user) {
+      res.status(404).json({ error: 'No user found. Run seed first.' });
+      return;
+    }
+    const token = generateToken({ userId: user.id, email: user.email });
+    res.json({ token, user: { id: user.id, email: user.email, name: user.name } });
+  } catch (error) {
+    logger.error('Error generating token:', error);
+    res.status(500).json({ error: 'Failed to generate token' });
+  }
+});
+
 // ─── Gmail OAuth2 
 
 // Step 1: Redirect user to Google consent screen
 router.get('/gmail/connect', (req, res) => {
+  const token = req.query.token as string | undefined;
+  const statePayload = token ? JSON.stringify({ token }) : '';
+
   const googleOAuth2Client = createGoogleOAuth2Client();
   const authUrl = googleOAuth2Client.generateAuthUrl({
     access_type: 'offline',
-    prompt: 'consent', // Force consent to ensure refresh_token is provided
+    prompt: 'consent',
     scope: GMAIL_SCOPES,
+    state: statePayload,
   });
   res.redirect(authUrl);
 });
@@ -49,7 +71,17 @@ router.get('/gmail/callback', async (req, res) => {
       return;
     }
 
-    const userId = 1; // TODO: In a real app, use the session user's ID
+    const stateParam = req.query.state as string | undefined;
+    let userId = 1;
+    if (stateParam) {
+      try {
+        const state = JSON.parse(stateParam);
+        if (state.token) {
+          const payload = verifyToken(state.token);
+          userId = payload.userId;
+        }
+      } catch { /* fall back to userId = 1 */ }
+    }
 
     // PERSISTENCE: Store or update the Gmail account
     const existing = await db.emailAccount.findFirst({
@@ -123,6 +155,9 @@ router.get('/gmail/callback', async (req, res) => {
 
 // Step 1: Redirect user to Microsoft consent screen
 router.get('/outlook/connect', (req, res) => {
+  const token = req.query.token as string | undefined;
+  const statePayload = token ? JSON.stringify({ token }) : '';
+
   const params = new URLSearchParams({
     client_id: process.env.OUTLOOK_CLIENT_ID || '',
     response_type: 'code',
@@ -130,6 +165,7 @@ router.get('/outlook/connect', (req, res) => {
     response_mode: 'query',
     scope: OUTLOOK_SCOPES,
     prompt: 'consent',
+    state: statePayload,
   });
   res.redirect(`${OUTLOOK_AUTH_URL}?${params.toString()}`);
 });
@@ -165,7 +201,17 @@ router.get('/outlook/callback', async (req, res) => {
     });
     const outlookEmail = profileResponse.data.mail || profileResponse.data.userPrincipalName;
 
-    const userId = 1; // TODO: Use actual session user
+    const stateParam = req.query.state as string | undefined;
+    let userId = 1;
+    if (stateParam) {
+      try {
+        const state = JSON.parse(stateParam);
+        if (state.token) {
+          const payload = verifyToken(state.token);
+          userId = payload.userId;
+        }
+      } catch { /* fall back to userId = 1 */ }
+    }
 
     // PERSISTENCE: Store or update the Outlook account
     const existing = await db.emailAccount.findFirst({
