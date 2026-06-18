@@ -1,7 +1,6 @@
-import { google } from 'googleapis';
+import axios from 'axios';
 import db from '../config/db.js';
 import logger from '../utils/logger.js';
-import { createGoogleOAuth2Client } from '../config/google.js';
 
 export interface FetchedEmail {
   id: string;
@@ -10,70 +9,95 @@ export interface FetchedEmail {
   body: string;
 }
 
-export const fetchLatestEmails = async (userId: number): Promise<FetchedEmail[]> => {
-  const account = await db.emailAccount.findFirst({ 
-    where: { userId, provider: 'gmail', isActive: true } 
+const GMAIL_TOKEN_URL = 'https://oauth2.googleapis.com/token';
+const GMAIL_API_BASE = 'https://gmail.googleapis.com/gmail/v1/users/me';
+
+async function ensureValidToken(account: {
+  id: number;
+  accessToken: string | null;
+  refreshToken: string | null;
+  tokenExpiry: Date | null;
+}): Promise<string> {
+  const now = Date.now();
+  const isExpired = !account.accessToken || (account.tokenExpiry && account.tokenExpiry.getTime() <= now + 60000);
+
+  if (!isExpired) {
+    return account.accessToken!;
+  }
+
+  if (!account.refreshToken) {
+    throw new Error('No refresh token available');
+  }
+
+  const res = await axios.post(
+    GMAIL_TOKEN_URL,
+    {
+      client_id: process.env.GMAIL_CLIENT_ID,
+      client_secret: process.env.GMAIL_CLIENT_SECRET,
+      refresh_token: account.refreshToken,
+      grant_type: 'refresh_token',
+    },
+    {
+      headers: { 'Content-Type': 'application/json' },
+      timeout: 15000,
+    }
+  );
+
+  const { access_token, expires_in } = res.data;
+  const tokenExpiry = expires_in ? new Date(now + expires_in * 1000) : null;
+
+  await db.emailAccount.update({
+    where: { id: account.id },
+    data: {
+      accessToken: access_token,
+      tokenExpiry,
+      isActive: true,
+    },
   });
-  
+
+  logger.info(`Refreshed Gmail access token for account ${account.id}`);
+  return access_token;
+}
+
+export const fetchLatestEmails = async (userId: number): Promise<FetchedEmail[]> => {
+  const account = await db.emailAccount.findFirst({
+    where: { userId, provider: 'gmail', isActive: true }
+  });
+
   if (!account || !account.accessToken) {
     logger.warn(`No active Gmail account found for user ${userId}`);
     return [];
   }
 
-  const oauthClient = createGoogleOAuth2Client();
-
-  oauthClient.setCredentials({
-    access_token: account.accessToken,
-    refresh_token: account.refreshToken || undefined,
-    expiry_date: account.tokenExpiry ? account.tokenExpiry.getTime() : undefined,
-  });
-
-  const tokenRefreshHandler = async (tokens: { access_token?: string | null; refresh_token?: string | null; expiry_date?: number | null }) => {
-    if (tokens.access_token) {
-      await db.emailAccount.update({
-        where: { id: account.id },
-        data: {
-          accessToken: tokens.access_token,
-          tokenExpiry: tokens.expiry_date ? new Date(tokens.expiry_date) : null,
-          ...(tokens.refresh_token ? { refreshToken: tokens.refresh_token } : {}),
-        }
-      });
-      logger.info(`Refreshed Gmail access token for user ${userId}`);
-    }
-  };
-
-  oauthClient.once('tokens', tokenRefreshHandler);
-
-  const gmail = google.gmail({ version: 'v1', auth: oauthClient });
-
   try {
-    const res = await gmail.users.messages.list({ 
-      userId: 'me', 
-      q: 'is:unread', 
-      maxResults: 15 
+    const accessToken = await ensureValidToken(account);
+
+    const listRes = await axios.get(`${GMAIL_API_BASE}/messages`, {
+      params: { q: 'is:unread', maxResults: 15 },
+      headers: { Authorization: `Bearer ${accessToken}` },
+      timeout: 15000,
     });
-    
-    const messages = res.data.messages || [];
+
+    const messages = listRes.data.messages || [];
     const emails: FetchedEmail[] = [];
 
     for (const msg of messages) {
       if (!msg.id) continue;
 
-      const detail = await gmail.users.messages.get({ 
-        userId: 'me', 
-        id: msg.id 
+      const detailRes = await axios.get(`${GMAIL_API_BASE}/messages/${msg.id}`, {
+        headers: { Authorization: `Bearer ${accessToken}` },
+        timeout: 15000,
       });
-      
-      const payload = detail.data.payload;
-      const headers = payload?.headers;
-      
-      const subject = headers?.find(h => h.name?.toLowerCase() === 'subject')?.value || 'No Subject';
-      const from = headers?.find(h => h.name?.toLowerCase() === 'from')?.value || 'Unknown';
-      
-      let body = detail.data.snippet || '';
-      
+
+      const payload = detailRes.data.payload;
+      const headers = payload?.headers || [];
+
+      const subject = headers.find((h: any) => h.name?.toLowerCase() === 'subject')?.value || 'No Subject';
+      const from = headers.find((h: any) => h.name?.toLowerCase() === 'from')?.value || 'Unknown';
+
+      let body = detailRes.data.snippet || '';
       if (payload?.parts) {
-        const textPart = payload.parts.find(p => p.mimeType === 'text/plain');
+        const textPart = payload.parts.find((p: any) => p.mimeType === 'text/plain');
         if (textPart?.body?.data) {
           body = Buffer.from(textPart.body.data, 'base64').toString();
         }
@@ -86,10 +110,10 @@ export const fetchLatestEmails = async (userId: number): Promise<FetchedEmail[]>
 
     return emails;
   } catch (error: unknown) {
-    const err = error as { code?: number; message?: string };
+    const err = error as { code?: number; message?: string; response?: { status?: number } };
     logger.error(`Error fetching Gmail for user ${userId}:`, err.message);
-    
-    if (err.code === 401) {
+
+    if (err.code === 401 || (err as any).response?.status === 401) {
       await db.emailAccount.update({
         where: { id: account.id },
         data: { isActive: false }
@@ -99,6 +123,7 @@ export const fetchLatestEmails = async (userId: number): Promise<FetchedEmail[]>
     return [];
   }
 };
+
 export const sendEmailReply = async (userId: number, originalMessageId: string, replyText: string): Promise<boolean> => {
   const account = await db.emailAccount.findFirst({
     where: { userId, provider: 'gmail', isActive: true }
@@ -109,38 +134,20 @@ export const sendEmailReply = async (userId: number, originalMessageId: string, 
     return false;
   }
 
-  const oauthClient = createGoogleOAuth2Client();
-  oauthClient.setCredentials({
-    access_token: account.accessToken,
-    refresh_token: account.refreshToken || undefined,
-    expiry_date: account.tokenExpiry ? account.tokenExpiry.getTime() : undefined,
-  });
-
-  const tokenRefreshHandler = async (tokens: { access_token?: string | null; refresh_token?: string | null; expiry_date?: number | null }) => {
-    if (tokens.access_token) {
-      await db.emailAccount.update({
-        where: { id: account.id },
-        data: {
-          accessToken: tokens.access_token,
-          tokenExpiry: tokens.expiry_date ? new Date(tokens.expiry_date) : null,
-          ...(tokens.refresh_token ? { refreshToken: tokens.refresh_token } : {}),
-        }
-      });
-      logger.info(`Refreshed Gmail access token for user ${userId} during reply`);
-    }
-  };
-
-  oauthClient.once('tokens', tokenRefreshHandler);
-
-  const gmail = google.gmail({ version: 'v1', auth: oauthClient });
-
   try {
-    const original = await gmail.users.messages.get({ userId: 'me', id: originalMessageId });
-    const headers = original.data.payload?.headers;
-    const subject = headers?.find(h => h.name?.toLowerCase() === 'subject')?.value || '';
-    const from = headers?.find(h => h.name?.toLowerCase() === 'from')?.value || '';
-    const messageIdHeader = headers?.find(h => h.name?.toLowerCase() === 'message-id')?.value || '';
-    const references = headers?.find(h => h.name?.toLowerCase() === 'references')?.value || '';
+    const accessToken = await ensureValidToken(account);
+
+    // Fetch the original message to get threading headers
+    const originalRes = await axios.get(`${GMAIL_API_BASE}/messages/${originalMessageId}`, {
+      headers: { Authorization: `Bearer ${accessToken}` },
+      timeout: 15000,
+    });
+
+    const headers = originalRes.data.payload?.headers || [];
+    const subject = headers.find((h: any) => h.name?.toLowerCase() === 'subject')?.value || '';
+    const from = headers.find((h: any) => h.name?.toLowerCase() === 'from')?.value || '';
+    const messageIdHeader = headers.find((h: any) => h.name?.toLowerCase() === 'message-id')?.value || '';
+    const references = headers.find((h: any) => h.name?.toLowerCase() === 'references')?.value || '';
 
     const replySubject = subject.toLowerCase().startsWith('re:') ? subject : `Re: ${subject}`;
 
@@ -163,13 +170,17 @@ export const sendEmailReply = async (userId: number, originalMessageId: string, 
       .replace(/\//g, '_')
       .replace(/=+$/, '');
 
-    await gmail.users.messages.send({
-      userId: 'me',
-      requestBody: {
-        raw,
-        threadId: original.data.threadId
+    await axios.post(
+      `${GMAIL_API_BASE}/messages/send`,
+      { raw, threadId: originalRes.data.threadId },
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+        },
+        timeout: 15000,
       }
-    });
+    );
 
     logger.info(`Successfully sent Gmail reply for user ${userId} to message ${originalMessageId}`);
     return true;

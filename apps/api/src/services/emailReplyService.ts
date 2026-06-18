@@ -1,4 +1,4 @@
-import { google } from 'googleapis';
+import axios from 'axios';
 import logger from '@repo/shared/logger';
 
 interface ReplyOptions {
@@ -7,6 +7,26 @@ interface ReplyOptions {
   originalSubject: string;
   replyBody: string;
   originalMessageId: string;
+}
+
+const GMAIL_TOKEN_URL = 'https://oauth2.googleapis.com/token';
+const GMAIL_API_BASE = 'https://gmail.googleapis.com/gmail/v1/users/me';
+
+async function refreshGmailToken(account: any): Promise<string> {
+  const res = await axios.post(
+    GMAIL_TOKEN_URL,
+    {
+      client_id: process.env.GMAIL_CLIENT_ID,
+      client_secret: process.env.GMAIL_CLIENT_SECRET,
+      refresh_token: account.refreshToken,
+      grant_type: 'refresh_token',
+    },
+    {
+      headers: { 'Content-Type': 'application/json' },
+      timeout: 15000,
+    }
+  );
+  return res.data.access_token;
 }
 
 export const sendEmailReply = async (options: ReplyOptions): Promise<void> => {
@@ -21,7 +41,6 @@ export const sendEmailReply = async (options: ReplyOptions): Promise<void> => {
   }
 };
 
-
 async function sendGmailReply(
   account: any,
   to: string,
@@ -29,24 +48,13 @@ async function sendGmailReply(
   body: string,
   threadMessageId: string
 ): Promise<void> {
-  const oauth2Client = new google.auth.OAuth2(
-    process.env.GMAIL_CLIENT_ID,
-    process.env.GMAIL_CLIENT_SECRET
-  );
+  const accessToken = await refreshGmailToken(account);
 
-  oauth2Client.setCredentials({
-    access_token: account.accessToken,
-    refresh_token: account.refreshToken,
-  });
-
-  const gmail = google.gmail({ version: 'v1', auth: oauth2Client });
-
-  // Build RFC 2822 email with threading headers
   const replySubject = subject.startsWith('Re:') ? subject : `Re: ${subject}`;
   const rawMessage = [
     `To: ${to}`,
     `Subject: ${replySubject}`,
-    `In-Reply-To: ${threadMessageId}`,   // this threads it correctly
+    `In-Reply-To: ${threadMessageId}`,
     `References: ${threadMessageId}`,
     `Content-Type: text/plain; charset=utf-8`,
     '',
@@ -59,13 +67,17 @@ async function sendGmailReply(
     .replace(/\//g, '_')
     .replace(/=+$/, '');
 
-  await gmail.users.messages.send({
-    userId: 'me',
-    requestBody: {
-      raw: encodedMessage,
-      threadId: threadMessageId, // keeps it in the same Gmail thread
-    },
-  });
+  await axios.post(
+    `${GMAIL_API_BASE}/messages/send`,
+    { raw: encodedMessage, threadId: threadMessageId },
+    {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+      },
+      timeout: 15000,
+    }
+  );
 
   logger.info(`Gmail reply sent to ${to}`);
 }
@@ -77,7 +89,6 @@ async function sendOutlookReply(
   body: string,
   originalMessageId: string
 ): Promise<void> {
-  // Refresh token if needed
   const tokenResponse = await fetch('https://login.microsoftonline.com/common/oauth2/v2.0/token', {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },

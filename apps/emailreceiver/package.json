@@ -12,6 +12,7 @@
   "dependencies": {
     "@repo/db": "*",
     "@repo/shared": "*",
+    "axios": "^1.7.9",
     "bullmq": "^5.71.1",
     "node-cron": "^3.0.3"
   },
