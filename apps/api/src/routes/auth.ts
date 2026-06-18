@@ -1,6 +1,5 @@
 import { Router } from 'express';
 import crypto from 'crypto';
-import { google } from 'googleapis';
 import axios from 'axios';
 import { prisma as db } from '@repo/db';
 import logger from '@repo/shared/logger';
@@ -173,10 +172,12 @@ router.post('/gmail/connect', async (req, res) => {
       tokens.expiry_date ? new Date(tokens.expiry_date).toISOString() : 'none');
     googleOAuth2Client.setCredentials(tokens);
 
-    // Get the user's email address from Google
-    const oauth2 = google.oauth2({ version: 'v2', auth: googleOAuth2Client });
-    const userInfo = await oauth2.userinfo.get();
-    const gmailAddress = userInfo.data.email;
+    // Get the user's email address from Google (using axios to bypass gaxios Premature close issues)
+    const userInfoResponse = await axios.get('https://www.googleapis.com/oauth2/v2/userinfo', {
+      headers: { Authorization: `Bearer ${tokens.access_token}` },
+      timeout: 15000,
+    });
+    const gmailAddress = userInfoResponse.data.email;
 
     if (!gmailAddress) {
       res.status(400).json({ error: 'Could not retrieve email address from Google.' });
@@ -218,7 +219,7 @@ router.post('/gmail/connect', async (req, res) => {
         where: { id: userId },
         data: {
           email: gmailAddress,
-          name: userInfo.data.name || currentUser.name,
+          name: userInfoResponse.data.name || currentUser.name,
         }
       });
       logger.info(`Updated user ${userId} profile to match Google account: ${gmailAddress}`);
