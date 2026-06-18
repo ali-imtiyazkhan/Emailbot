@@ -43,15 +43,23 @@ export async function fetchToken(secret?: string): Promise<string | null> {
       url += `?secret=${encodeURIComponent(activeSecret)}`;
     }
 
+    console.log('[auth] Fetching token from:', url);
     const res = await fetch(url);
-    if (!res.ok) return null;
+    console.log('[auth] Token response status:', res.status);
+    if (!res.ok) {
+      const body = await res.text().catch(() => '');
+      console.log('[auth] Token response body:', body);
+      return null;
+    }
     const data = await res.json();
+    console.log('[auth] Token received:', data.token ? data.token.substring(0, 20) + '...' : 'none');
     setToken(data.token);
     if (activeSecret) {
       setAuthSecret(activeSecret);
     }
     return data.token;
-  } catch {
+  } catch (err) {
+    console.log('[auth] fetchToken error:', err);
     return null;
   }
 }
