@@ -11,6 +11,8 @@ import dashboardRoutes from './routes/dashboard.js';
 import { redisConnection } from './config/redis.js';
 import { prisma as db } from '@repo/db';
 import logger from '@repo/shared/logger';
+import { authLimiter, apiLimiter, webhookLimiter } from './middleware/rateLimiter.js';
+import { verifyWebhookSignature } from './middleware/webhookAuth.js';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -34,7 +36,13 @@ app.use(cors({
   credentials: true,
 }));
 app.use(morgan('dev'));
-app.use(express.json());
+
+// Parse JSON and capture raw body for webhook signature verification
+app.use(express.json({
+  verify: (req: any, _res, buf) => {
+    req.rawBody = buf;
+  },
+}));
 
 // Routes 
 app.get('/health', async (req, res) => {
@@ -60,10 +68,11 @@ app.get('/health', async (req, res) => {
   }
 });
 
-app.use('/auth', authRoutes);
-app.use('/whatsapp', webhookRoutes);
-app.use('/', whatsappWebhookRouter);
-app.use('/api', dashboardRoutes);
+app.use('/auth', authLimiter, authRoutes);
+app.use('/whatsapp', webhookLimiter, verifyWebhookSignature, webhookRoutes);
+app.use('/', webhookLimiter, verifyWebhookSignature, whatsappWebhookRouter);
+app.use('/api', apiLimiter, dashboardRoutes);
+
 
 // Global Error Handler
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {

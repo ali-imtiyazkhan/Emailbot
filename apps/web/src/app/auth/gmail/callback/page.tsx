@@ -15,6 +15,7 @@ function GmailCallbackContent() {
   useEffect(() => {
     const code = searchParams.get("code");
     const error = searchParams.get("error");
+    const state = searchParams.get("state");
 
     if (error) {
       setStatus("error");
@@ -30,7 +31,7 @@ function GmailCallbackContent() {
 
     const exchangeCode = async () => {
       try {
-        const result = await connectEmailAccount("gmail", code);
+        const result = await connectEmailAccount("gmail", code, state || undefined);
         if (result.success) {
           setStatus("success");
           if (result.email) setEmail(result.email);

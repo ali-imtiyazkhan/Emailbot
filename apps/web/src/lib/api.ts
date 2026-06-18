@@ -181,12 +181,12 @@ export async function fetchConnectUrl(provider: 'gmail' | 'outlook'): Promise<{ 
   return response.json();
 }
 
-export async function connectEmailAccount(provider: 'gmail' | 'outlook', code: string): Promise<{ success: boolean; email?: string }> {
+export async function connectEmailAccount(provider: 'gmail' | 'outlook', code: string, state?: string): Promise<{ success: boolean; email?: string }> {
   const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
   const response = await apiFetch(`${baseUrl}/auth/${provider}/connect`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ code }),
+    body: JSON.stringify({ code, state }),
   });
   if (!response.ok) {
     const err = await response.json().catch(() => ({}));
