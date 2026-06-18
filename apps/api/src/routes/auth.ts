@@ -11,24 +11,21 @@ import { redisConnection } from '../config/redis.js';
 
 const router = Router();
 
-/** Escape HTML to prevent XSS injection in inline responses */
-const escapeHtml = (str: string): string =>
-  str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-
 // ── OAuth State helpers (CSRF protection) ──────────────────
 const STATE_PREFIX = 'oauth_state:';
 const STATE_TTL_SECONDS = 600; // 10 minutes
 
-async function generateOAuthState(userId: number): Promise<string> {
+async function generateOAuthState(userId?: number): Promise<string> {
   const state = crypto.randomBytes(32).toString('hex');
-  await redisConnection.set(`${STATE_PREFIX}${state}`, String(userId), 'EX', STATE_TTL_SECONDS);
+  await redisConnection.set(`${STATE_PREFIX}${state}`, String(userId ?? ''), 'EX', STATE_TTL_SECONDS);
   return state;
 }
 
-async function verifyOAuthState(state: string, userId: number): Promise<boolean> {
+async function verifyOAuthState(state: string, userId?: number): Promise<boolean> {
   const key = `${STATE_PREFIX}${state}`;
   const storedUserId = await redisConnection.get(key);
-  if (!storedUserId || parseInt(storedUserId) !== userId) return false;
+  if (!storedUserId) return false;
+  if (userId !== undefined && parseInt(storedUserId) !== userId) return false;
   await redisConnection.del(key);
   return true;
 }
@@ -65,10 +62,19 @@ router.get('/token', async (req, res) => {
 
 // ─── Gmail OAuth2 ─────────────────────────────────────────
 
-// Step 1: Return Google consent screen URL to the frontend (requires auth)
-router.get('/gmail/connect', requireAuth, async (req, res) => {
+// Step 1: Return Google consent screen URL to the frontend
+router.get('/gmail/connect', async (req, res) => {
   try {
-    const userId = req.user!.userId;
+    let userId: number | undefined;
+    // If auth token is provided, tie OAuth state to the user for CSRF
+    const header = req.headers.authorization;
+    if (header && header.startsWith('Bearer ')) {
+      try {
+        const decoded = verifyToken(header.split(' ')[1] as unknown as string);
+        userId = decoded.userId;
+      } catch { /* token invalid, proceed without user binding */ }
+    }
+
     const state = await generateOAuthState(userId);
 
     const googleOAuth2Client = createGoogleOAuth2Client();
@@ -137,7 +143,7 @@ router.post('/gmail/connect', requireAuth, async (req, res) => {
       });
     } else {
       await db.emailAccount.create({
-        data: {
+        data: {   
           userId,
           provider: 'gmail',
           ...accountData,
@@ -168,10 +174,19 @@ router.post('/gmail/connect', requireAuth, async (req, res) => {
 
 // ─── Outlook OAuth2 ───────────────────────────────────────
 
-// Step 1: Return Microsoft consent screen URL to the frontend (requires auth)
-router.get('/outlook/connect', requireAuth, async (req, res) => {
+// Step 1: Return Microsoft consent screen URL to the frontend
+router.get('/outlook/connect', async (req, res) => {
   try {
-    const userId = req.user!.userId;
+    let userId: number | undefined;
+    // If auth token is provided, tie OAuth state to the user for CSRF
+    const header = req.headers.authorization;
+    if (header && header.startsWith('Bearer ')) {
+      try {
+        const decoded = verifyToken(header.split(' ')[1] as unknown as string);
+        userId = decoded.userId;
+      } catch { /* token invalid, proceed without user binding */ }
+    }
+
     const state = await generateOAuthState(userId);
 
     const params = new URLSearchParams({

@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { fetchProfile, User } from "@/lib/api";
+import { getToken, fetchToken } from "@/lib/auth";
 import { LayoutDashboard, Mail, SlidersHorizontal, Settings, BarChart3 } from "lucide-react";
 import { motion } from "framer-motion";
 
@@ -31,9 +32,18 @@ export default function Sidebar() {
   const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
-    fetchProfile()
-      .then(setUser)
-      .catch((err) => console.error("Failed to load user profile:", err));
+    const init = async () => {
+      if (!getToken()) {
+        await fetchToken();
+      }
+      try {
+        const u = await fetchProfile();
+        setUser(u);
+      } catch (err) {
+        console.error("Failed to load user profile:", err);
+      }
+    };
+    init();
   }, []);
 
   const initial = user?.name?.[0] || user?.email?.[0] || "A";

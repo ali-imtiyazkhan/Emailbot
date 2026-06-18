@@ -54,10 +54,13 @@ export default function SettingsPage() {
   const [saved, setSaved] = useState(false);
 
   useEffect(() => {
-    if (!getToken()) {
-      fetchToken();
-    }
-    loadSettings();
+    const init = async () => {
+      if (!getToken()) {
+        await fetchToken();
+      }
+      await loadSettings();
+    };
+    init();
 
     const handleOAuthSuccess = (event: MessageEvent) => {
       if (event.origin !== window.location.origin) return;
@@ -112,6 +115,9 @@ export default function SettingsPage() {
 
   const handleConnect = async (provider: "gmail" | "outlook") => {
     try {
+      if (!getToken()) {
+        await fetchToken();
+      }
       const { url } = await fetchConnectUrl(provider);
       window.open(url, "_blank");
     } catch (err) {
