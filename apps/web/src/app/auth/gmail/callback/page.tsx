@@ -42,6 +42,7 @@ function GmailCallbackContent() {
             await fetchToken();
           }
         }
+        console.log('[gmail-callback] Sending auth code to backend:', code ? code.substring(0, 20) + '...' : 'none');
         const result = await connectEmailAccount("gmail", code, state || undefined);
         if (result.success) {
           setStatus("success");

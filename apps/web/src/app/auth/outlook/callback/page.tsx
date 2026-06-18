@@ -42,6 +42,7 @@ function OutlookCallbackContent() {
             await fetchToken();
           }
         }
+        console.log('[outlook-callback] Sending auth code to backend:', code ? code.substring(0, 20) + '...' : 'none');
         const result = await connectEmailAccount("outlook", code, state || undefined);
         if (result.success) {
           setStatus("success");

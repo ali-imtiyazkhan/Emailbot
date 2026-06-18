@@ -130,6 +130,10 @@ router.post('/gmail/connect', async (req, res) => {
     // Exchange code for tokens
     const googleOAuth2Client = createGoogleOAuth2Client();
     const { tokens } = await googleOAuth2Client.getToken(code);
+    logger.info('Google token exchange — access_token=%s refresh_token=%s expires=%s',
+      tokens.access_token?.substring(0, 20) + '...' || 'none',
+      tokens.refresh_token?.substring(0, 20) + '...' || 'none',
+      tokens.expiry_date ? new Date(tokens.expiry_date).toISOString() : 'none');
     googleOAuth2Client.setCredentials(tokens);
 
     // Get the user's email address from Google
@@ -273,6 +277,10 @@ router.post('/outlook/connect', async (req, res) => {
     );
 
     const { access_token, refresh_token, expires_in } = tokenResponse.data;
+    logger.info('Outlook token exchange — access_token=%s refresh_token=%s expires_in=%ds',
+      access_token?.substring(0, 20) + '...' || 'none',
+      refresh_token?.substring(0, 20) + '...' || 'none',
+      expires_in ?? 'none');
 
     // Get the user's identity from Microsoft Graph API
     const profileResponse = await axios.get('https://graph.microsoft.com/v1.0/me', {
