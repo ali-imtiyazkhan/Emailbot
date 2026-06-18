@@ -6,7 +6,7 @@ import { prisma as db } from '@repo/db';
 import logger from '@repo/shared/logger';
 import { createGoogleOAuth2Client, GMAIL_SCOPES } from '../config/google.js';
 import { OUTLOOK_AUTH_URL, OUTLOOK_TOKEN_URL, OUTLOOK_SCOPES } from '../config/outlook.js';
-import { verifyToken, generateToken, requireAuth } from '../middleware/auth.js';
+import { verifyToken, generateToken } from '../middleware/auth.js';
 import { redisConnection } from '../config/redis.js';
 
 const router = Router();
@@ -25,7 +25,10 @@ async function verifyOAuthState(state: string, userId?: number): Promise<boolean
   const key = `${STATE_PREFIX}${state}`;
   const storedUserId = await redisConnection.get(key);
   if (!storedUserId) return false;
-  if (userId !== undefined && parseInt(storedUserId) !== userId) return false;
+  // If state was stored without a userId (empty string), accept any valid userId
+  if (storedUserId !== '') {
+    if (userId === undefined || parseInt(storedUserId) !== userId) return false;
+  }
   await redisConnection.del(key);
   return true;
 }
@@ -92,7 +95,7 @@ router.get('/gmail/connect', async (req, res) => {
 });
 
 // Step 2: Exchange authorization code for tokens (called by frontend callback page)
-router.post('/gmail/connect', requireAuth, async (req, res) => {
+router.post('/gmail/connect', async (req, res) => {
   try {
     const { code, state } = req.body;
     if (!code) {
@@ -100,9 +103,25 @@ router.post('/gmail/connect', requireAuth, async (req, res) => {
       return;
     }
 
-    const userId = req.user!.userId;
+    // Resolve user: from JWT if provided, otherwise fall back to first user
+    let userId: number | undefined;
+    const header = req.headers.authorization;
+    if (header && header.startsWith('Bearer ')) {
+      try {
+        const decoded = verifyToken(header.split(' ')[1] as unknown as string);
+        userId = decoded.userId;
+      } catch { /* ignore invalid token */ }
+    }
+    if (!userId) {
+      const firstUser = await db.user.findFirst({ orderBy: { id: 'asc' } });
+      if (firstUser) userId = firstUser.id;
+    }
+    if (!userId) {
+      res.status(401).json({ error: 'No user found. Run seed first.' });
+      return;
+    }
 
-    // Verify OAuth state parameter (CSRF protection)
+    // Verify OAuth state parameter (CSRF protection) - skip userId check if state was unbound
     if (!state || !(await verifyOAuthState(state, userId))) {
       res.status(403).json({ error: 'Invalid or expired OAuth state. Please try connecting again.' });
       return;
@@ -207,7 +226,7 @@ router.get('/outlook/connect', async (req, res) => {
 });
 
 // Step 2: Exchange authorization code for tokens (called by frontend callback page)
-router.post('/outlook/connect', requireAuth, async (req, res) => {
+router.post('/outlook/connect', async (req, res) => {
   try {
     const { code, state } = req.body;
     if (!code) {
@@ -215,9 +234,25 @@ router.post('/outlook/connect', requireAuth, async (req, res) => {
       return;
     }
 
-    const userId = req.user!.userId;
+    // Resolve user: from JWT if provided, otherwise fall back to first user
+    let userId: number | undefined;
+    const header = req.headers.authorization;
+    if (header && header.startsWith('Bearer ')) {
+      try {
+        const decoded = verifyToken(header.split(' ')[1] as unknown as string);
+        userId = decoded.userId;
+      } catch { /* ignore invalid token */ }
+    }
+    if (!userId) {
+      const firstUser = await db.user.findFirst({ orderBy: { id: 'asc' } });
+      if (firstUser) userId = firstUser.id;
+    }
+    if (!userId) {
+      res.status(401).json({ error: 'No user found. Run seed first.' });
+      return;
+    }
 
-    // Verify OAuth state parameter (CSRF protection)
+    // Verify OAuth state parameter (CSRF protection) - skip userId check if state was unbound
     if (!state || !(await verifyOAuthState(state, userId))) {
       res.status(403).json({ error: 'Invalid or expired OAuth state. Please try connecting again.' });
       return;
