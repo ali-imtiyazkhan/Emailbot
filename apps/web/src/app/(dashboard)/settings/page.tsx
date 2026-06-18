@@ -6,6 +6,7 @@ import {
   fetchDigestSettings,
   updateDigestSettings,
   fetchProfile,
+  updateProfile,
   fetchConnectUrl,
   EmailAccount,
   DigestSetting,
@@ -52,6 +53,9 @@ export default function SettingsPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [whatsappInput, setWhatsappInput] = useState('');
+  const [whatsappSaving, setWhatsappSaving] = useState(false);
+  const [whatsappSaved, setWhatsappSaved] = useState(false);
 
   useEffect(() => {
     const init = async () => {
@@ -85,6 +89,7 @@ export default function SettingsPage() {
       setAccounts(acc);
       setDigest(dig);
       setProfile(prof);
+      setWhatsappInput(prof?.whatsapp ?? '');
     } catch (err) {
       console.error("Failed to load settings:", err);
     } finally {
@@ -255,30 +260,54 @@ export default function SettingsPage() {
           <MessageSquare size={14} style={{ display: "inline", marginRight: 8, verticalAlign: -2, opacity: 0.5 }} />
           WhatsApp
         </p>
-        <div className="app-row" style={{ cursor: "default", paddingTop: 0 }}>
+        <div className="app-form-row">
           <MessageSquare size={18} style={{ color: "var(--silver)", flexShrink: 0 }} />
           <div style={{ flex: 1 }}>
-            {profile?.whatsapp ? (
-              <>
-                <p style={{ fontSize: 16, fontFamily: "var(--font-mono)", color: "var(--text-1)", marginBottom: 8 }}>
-                  {profile.whatsapp}
-                </p>
-                <p style={{ fontSize: 14, color: "var(--text-2)", lineHeight: 1.65 }}>
-                  Urgent mail is summarized here. Reply in-thread to send email back.
-                </p>
-              </>
-            ) : (
-              <>
-                <p style={{ fontSize: 15, fontWeight: 500, color: "var(--text-1)", marginBottom: 8 }}>Not configured</p>
-                <p style={{ fontSize: 14, color: "var(--text-2)", lineHeight: 1.65 }}>
-                  Add your WhatsApp number in the database to enable push alerts.
-                </p>
-              </>
-            )}
+            <input
+              type="tel"
+              placeholder="+1234567890"
+              value={whatsappInput}
+              onChange={(e) => setWhatsappInput(e.target.value)}
+              style={{
+                width: "100%",
+                padding: "10px 12px",
+                fontSize: 15,
+                fontFamily: "var(--font-mono)",
+                background: "var(--bg-2)",
+                border: "1px solid var(--border)",
+                borderRadius: 8,
+                color: "var(--text-1)",
+                outline: "none",
+                boxSizing: "border-box",
+              }}
+            />
+            <p style={{ fontSize: 13, color: "var(--text-2)", marginTop: 6, lineHeight: 1.5 }}>
+              Include country code (e.g. +1 for US). Urgent mail summaries and reply prompts will be sent here.
+            </p>
           </div>
-          <span className={profile?.whatsapp ? "app-tag app-tag--live" : "app-tag"}>
-            {profile?.whatsapp ? "Connected" : "Inactive"}
-          </span>
+          <button
+            className="app-btn app-btn--primary"
+            style={{ whiteSpace: "nowrap", alignSelf: "flex-start" }}
+            disabled={whatsappSaving}
+            onClick={async () => {
+              setWhatsappSaving(true);
+              setWhatsappSaved(false);
+              try {
+                const val = whatsappInput.trim() || null;
+                const updated = await updateProfile({ whatsapp: val });
+                setProfile(updated);
+                setWhatsappInput(updated.whatsapp ?? '');
+                setWhatsappSaved(true);
+                setTimeout(() => setWhatsappSaved(false), 2000);
+              } catch (err: any) {
+                alert(err.message || 'Failed to save');
+              } finally {
+                setWhatsappSaving(false);
+              }
+            }}
+          >
+            {whatsappSaving ? "Saving..." : whatsappSaved ? <CheckCircle2 size={16} /> : "Save"}
+          </button>
         </div>
       </div>
 

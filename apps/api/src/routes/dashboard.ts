@@ -38,6 +38,32 @@ router.get('/profile', async (req, res) => {
   }
 });
 
+const updateProfileSchema = z.object({
+  whatsapp: z.string().regex(/^\+?[1-9]\d{6,14}$/, 'Must be a valid phone number with country code (e.g. +1234567890)').nullable(),
+});
+
+router.put('/profile', async (req, res) => {
+  try {
+    const userId = req.user!.userId
+    const parsed = updateProfileSchema.parse(req.body);
+    const user = await db.user.update({
+      where: { id: userId },
+      data: { whatsapp: parsed.whatsapp },
+      select: { id: true, email: true, name: true, whatsapp: true }
+    });
+    logger.info(`User ${userId} updated profile: whatsapp=${parsed.whatsapp}`);
+    res.json(user);
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      const zodError = error as z.ZodError;
+      res.status(400).json({ error: zodError.errors[0]?.message || 'Invalid input' });
+      return;
+    }
+    logger.error('Error updating profile:', error);
+    res.status(500).json({ error: 'Failed to update profile' });
+  }
+});
+
 // ── Stats ──────────────────────────────────────────────
 
 router.get('/stats', async (req, res) => {

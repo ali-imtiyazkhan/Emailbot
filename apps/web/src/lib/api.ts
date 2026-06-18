@@ -132,6 +132,19 @@ export async function fetchProfile(): Promise<User> {
   return response.json();
 }
 
+export async function updateProfile(data: { whatsapp: string | null }): Promise<User> {
+  const response = await apiFetch(`${API_BASE_URL}/profile`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  });
+  if (!response.ok) {
+    const err = await response.json().catch(() => ({}));
+    throw new Error(err.error || 'Failed to update profile');
+  }
+  return response.json();
+}
+
 // ── Analytics ────────────────────────────────────────────
 
 export interface AnalyticsData {
