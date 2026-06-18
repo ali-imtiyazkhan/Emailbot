@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import crypto from 'crypto';
 import { google } from 'googleapis';
 import axios from 'axios';
 import { prisma as db } from '@repo/db';
@@ -6,6 +7,7 @@ import logger from '@repo/shared/logger';
 import { createGoogleOAuth2Client, GMAIL_SCOPES } from '../config/google.js';
 import { OUTLOOK_AUTH_URL, OUTLOOK_TOKEN_URL, OUTLOOK_SCOPES } from '../config/outlook.js';
 import { verifyToken, generateToken, requireAuth } from '../middleware/auth.js';
+import { redisConnection } from '../config/redis.js';
 
 const router = Router();
 
@@ -13,9 +15,40 @@ const router = Router();
 const escapeHtml = (str: string): string =>
   str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
+// ── OAuth State helpers (CSRF protection) ──────────────────
+const STATE_PREFIX = 'oauth_state:';
+const STATE_TTL_SECONDS = 600; // 10 minutes
+
+async function generateOAuthState(userId: number): Promise<string> {
+  const state = crypto.randomBytes(32).toString('hex');
+  await redisConnection.set(`${STATE_PREFIX}${state}`, String(userId), 'EX', STATE_TTL_SECONDS);
+  return state;
+}
+
+async function verifyOAuthState(state: string, userId: number): Promise<boolean> {
+  const key = `${STATE_PREFIX}${state}`;
+  const storedUserId = await redisConnection.get(key);
+  if (!storedUserId || parseInt(storedUserId) !== userId) return false;
+  await redisConnection.del(key);
+  return true;
+}
+
 // ─── Token Endpoint ───────────────────────────────────────
-// Returns a JWT for the first user (dev convenience). In production, replace with real auth.
+// Returns a JWT for the first user (convenience for demo/single-user deployment).
+// Gated by AUTH_TOKEN_SECRET in production to prevent unauthorized access.
 router.get('/token', async (req, res) => {
+  const tokenSecret = process.env.AUTH_TOKEN_SECRET;
+
+  if (tokenSecret) {
+    const providedSecret = req.query.secret || req.headers['x-auth-secret'];
+    if (providedSecret !== tokenSecret) {
+      res.status(401).json({ error: 'Unauthorized. Invalid auth secret.' });
+      return;
+    }
+  } else if (process.env.NODE_ENV === 'production') {
+    logger.warn('WARNING: Running /auth/token in production without AUTH_TOKEN_SECRET set. Anyone can access your emailbot dashboard!');
+  }
+
   try {
     const user = await db.user.findFirst({ orderBy: { id: 'asc' } });
     if (!user) {
@@ -32,14 +65,18 @@ router.get('/token', async (req, res) => {
 
 // ─── Gmail OAuth2 ─────────────────────────────────────────
 
-// Step 1: Return Google consent screen URL to the frontend
-router.get('/gmail/connect', (req, res) => {
+// Step 1: Return Google consent screen URL to the frontend (requires auth)
+router.get('/gmail/connect', requireAuth, async (req, res) => {
   try {
+    const userId = req.user!.userId;
+    const state = await generateOAuthState(userId);
+
     const googleOAuth2Client = createGoogleOAuth2Client();
     const authUrl = googleOAuth2Client.generateAuthUrl({
       access_type: 'offline',
       prompt: 'consent',
       scope: GMAIL_SCOPES,
+      state,
     });
     res.json({ url: authUrl });
   } catch (error: any) {
@@ -51,13 +88,19 @@ router.get('/gmail/connect', (req, res) => {
 // Step 2: Exchange authorization code for tokens (called by frontend callback page)
 router.post('/gmail/connect', requireAuth, async (req, res) => {
   try {
-    const { code } = req.body;
+    const { code, state } = req.body;
     if (!code) {
       res.status(400).json({ error: 'Missing authorization code.' });
       return;
     }
 
     const userId = req.user!.userId;
+
+    // Verify OAuth state parameter (CSRF protection)
+    if (!state || !(await verifyOAuthState(state, userId))) {
+      res.status(403).json({ error: 'Invalid or expired OAuth state. Please try connecting again.' });
+      return;
+    }
 
     // Exchange code for tokens
     const googleOAuth2Client = createGoogleOAuth2Client();
@@ -125,9 +168,12 @@ router.post('/gmail/connect', requireAuth, async (req, res) => {
 
 // ─── Outlook OAuth2 ───────────────────────────────────────
 
-// Step 1: Return Microsoft consent screen URL to the frontend
-router.get('/outlook/connect', (req, res) => {
+// Step 1: Return Microsoft consent screen URL to the frontend (requires auth)
+router.get('/outlook/connect', requireAuth, async (req, res) => {
   try {
+    const userId = req.user!.userId;
+    const state = await generateOAuthState(userId);
+
     const params = new URLSearchParams({
       client_id: process.env.OUTLOOK_CLIENT_ID || '',
       response_type: 'code',
@@ -135,6 +181,7 @@ router.get('/outlook/connect', (req, res) => {
       response_mode: 'query',
       scope: OUTLOOK_SCOPES,
       prompt: 'consent',
+      state,
     });
     const authUrl = `${OUTLOOK_AUTH_URL}?${params.toString()}`;
     res.json({ url: authUrl });
@@ -147,13 +194,19 @@ router.get('/outlook/connect', (req, res) => {
 // Step 2: Exchange authorization code for tokens (called by frontend callback page)
 router.post('/outlook/connect', requireAuth, async (req, res) => {
   try {
-    const { code } = req.body;
+    const { code, state } = req.body;
     if (!code) {
       res.status(400).json({ error: 'Missing authorization code.' });
       return;
     }
 
     const userId = req.user!.userId;
+
+    // Verify OAuth state parameter (CSRF protection)
+    if (!state || !(await verifyOAuthState(state, userId))) {
+      res.status(403).json({ error: 'Invalid or expired OAuth state. Please try connecting again.' });
+      return;
+    }
 
     // Exchange code for tokens via Microsoft Token Endpoint
     const tokenResponse = await axios.post(
@@ -214,3 +267,4 @@ router.post('/outlook/connect', requireAuth, async (req, res) => {
 });
 
 export default router;
+

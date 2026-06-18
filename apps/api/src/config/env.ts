@@ -5,7 +5,7 @@ import path from 'path';
 dotenv.config({ path: path.resolve(process.cwd(), '../../.env') });
 
 // Validate critical environment variables at startup
-const required = ['DATABASE_URL'] as const;
+const required = ['DATABASE_URL', 'JWT_SECRET'] as const;
 const missing = required.filter((key) => !process.env[key]);
 
 if (missing.length > 0) {
