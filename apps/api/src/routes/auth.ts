@@ -5,7 +5,7 @@ import { prisma as db } from '@repo/db';
 import logger from '@repo/shared/logger';
 import { createGoogleOAuth2Client, GMAIL_SCOPES } from '../config/google.js';
 import { OUTLOOK_AUTH_URL, OUTLOOK_TOKEN_URL, OUTLOOK_SCOPES } from '../config/outlook.js';
-import { verifyToken, generateToken } from '../middleware/auth.js';
+import { verifyToken, generateToken, requireAuth } from '../middleware/auth.js';
 
 const router = Router();
 
@@ -30,31 +30,34 @@ router.get('/token', async (req, res) => {
   }
 });
 
-// ─── Gmail OAuth2 
+// ─── Gmail OAuth2 ─────────────────────────────────────────
 
-// Step 1: Redirect user to Google consent screen
+// Step 1: Return Google consent screen URL to the frontend
 router.get('/gmail/connect', (req, res) => {
-  const token = req.query.token as string | undefined;
-  const statePayload = token ? JSON.stringify({ token }) : '';
-
-  const googleOAuth2Client = createGoogleOAuth2Client();
-  const authUrl = googleOAuth2Client.generateAuthUrl({
-    access_type: 'offline',
-    prompt: 'consent',
-    scope: GMAIL_SCOPES,
-    state: statePayload,
-  });
-  res.redirect(authUrl);
+  try {
+    const googleOAuth2Client = createGoogleOAuth2Client();
+    const authUrl = googleOAuth2Client.generateAuthUrl({
+      access_type: 'offline',
+      prompt: 'consent',
+      scope: GMAIL_SCOPES,
+    });
+    res.json({ url: authUrl });
+  } catch (error: any) {
+    logger.error('Gmail connect URL generation error:', error);
+    res.status(500).json({ error: 'Failed to generate Gmail connection URL' });
+  }
 });
 
-// Step 2: Exchange authorization code for tokens
-router.get('/gmail/callback', async (req, res) => {
+// Step 2: Exchange authorization code for tokens (called by frontend callback page)
+router.post('/gmail/connect', requireAuth, async (req, res) => {
   try {
-    const code = req.query.code as string;
+    const { code } = req.body;
     if (!code) {
-      res.status(400).send('Missing authorization code.');
+      res.status(400).json({ error: 'Missing authorization code.' });
       return;
     }
+
+    const userId = req.user!.userId;
 
     // Exchange code for tokens
     const googleOAuth2Client = createGoogleOAuth2Client();
@@ -67,20 +70,8 @@ router.get('/gmail/callback', async (req, res) => {
     const gmailAddress = userInfo.data.email;
 
     if (!gmailAddress) {
-      res.status(400).send('Could not retrieve email address from Google.');
+      res.status(400).json({ error: 'Could not retrieve email address from Google.' });
       return;
-    }
-
-    const stateParam = req.query.state as string | undefined;
-    let userId = 1;
-    if (stateParam) {
-      try {
-        const state = JSON.parse(stateParam);
-        if (state.token) {
-          const payload = verifyToken(state.token);
-          userId = payload.userId;
-        }
-      } catch { /* fall back to userId = 1 */ }
     }
 
     // PERSISTENCE: Store or update the Gmail account
@@ -125,59 +116,44 @@ router.get('/gmail/callback', async (req, res) => {
     }
 
     logger.info(`Gmail connected for user ${userId}: ${gmailAddress}`);
-    res.send(`
-      <html>
-        <body style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; background: #0f172a; color: #f8fafc;">
-          <div style="text-align: center; padding: 2rem; border-radius: 1rem; background: #1e293b; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);">
-            <h1 style="color: #4ade80; margin-bottom: 1rem;">✓ Gmail Connected</h1>
-            <p style="color: #94a3b8; font-size: 1.1rem;">Your account <strong>${escapeHtml(gmailAddress)}</strong> is now linked.</p>
-            <p style="color: #64748b; font-size: 0.9rem; margin-top: 2rem;">You can safely close this window.</p>
-          </div>
-        </body>
-      </html>
-    `);
+    res.json({ success: true, email: gmailAddress });
   } catch (error: any) {
     logger.error('Gmail callback error:', error);
-    res.status(500).send(`
-      <html>
-        <body style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; background: #0f172a; color: #f8fafc;">
-          <div style="text-align: center; padding: 2rem; border-radius: 1rem; background: #1e293b; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);">
-            <h1 style="color: #f87171; margin-bottom: 1rem;">✗ Connection Failed</h1>
-            <p style="color: #94a3b8;">${escapeHtml(error.message || 'Verification timed out or failed.')}</p>
-          </div>
-        </body>
-      </html>
-    `);
+    res.status(500).json({ error: error.message || 'Failed to connect Gmail account' });
   }
 });
 
-// ─── Outlook OAuth2
+// ─── Outlook OAuth2 ───────────────────────────────────────
 
-// Step 1: Redirect user to Microsoft consent screen
+// Step 1: Return Microsoft consent screen URL to the frontend
 router.get('/outlook/connect', (req, res) => {
-  const token = req.query.token as string | undefined;
-  const statePayload = token ? JSON.stringify({ token }) : '';
-
-  const params = new URLSearchParams({
-    client_id: process.env.OUTLOOK_CLIENT_ID || '',
-    response_type: 'code',
-    redirect_uri: process.env.OUTLOOK_REDIRECT_URI || '',
-    response_mode: 'query',
-    scope: OUTLOOK_SCOPES,
-    prompt: 'consent',
-    state: statePayload,
-  });
-  res.redirect(`${OUTLOOK_AUTH_URL}?${params.toString()}`);
+  try {
+    const params = new URLSearchParams({
+      client_id: process.env.OUTLOOK_CLIENT_ID || '',
+      response_type: 'code',
+      redirect_uri: process.env.OUTLOOK_REDIRECT_URI || '',
+      response_mode: 'query',
+      scope: OUTLOOK_SCOPES,
+      prompt: 'consent',
+    });
+    const authUrl = `${OUTLOOK_AUTH_URL}?${params.toString()}`;
+    res.json({ url: authUrl });
+  } catch (error: any) {
+    logger.error('Outlook connect URL generation error:', error);
+    res.status(500).json({ error: 'Failed to generate Outlook connection URL' });
+  }
 });
 
-// Step 2: Exchange authorization code for tokens
-router.get('/outlook/callback', async (req, res) => {
+// Step 2: Exchange authorization code for tokens (called by frontend callback page)
+router.post('/outlook/connect', requireAuth, async (req, res) => {
   try {
-    const code = req.query.code as string;
+    const { code } = req.body;
     if (!code) {
-      res.status(400).send('Missing authorization code.');
+      res.status(400).json({ error: 'Missing authorization code.' });
       return;
     }
+
+    const userId = req.user!.userId;
 
     // Exchange code for tokens via Microsoft Token Endpoint
     const tokenResponse = await axios.post(
@@ -200,18 +176,6 @@ router.get('/outlook/callback', async (req, res) => {
       headers: { Authorization: `Bearer ${access_token}` },
     });
     const outlookEmail = profileResponse.data.mail || profileResponse.data.userPrincipalName;
-
-    const stateParam = req.query.state as string | undefined;
-    let userId = 1;
-    if (stateParam) {
-      try {
-        const state = JSON.parse(stateParam);
-        if (state.token) {
-          const payload = verifyToken(state.token);
-          userId = payload.userId;
-        }
-      } catch { /* fall back to userId = 1 */ }
-    }
 
     // PERSISTENCE: Store or update the Outlook account
     const existing = await db.emailAccount.findFirst({
@@ -242,29 +206,10 @@ router.get('/outlook/callback', async (req, res) => {
     }
 
     logger.info(`Outlook connected for user ${userId}: ${outlookEmail}`);
-    res.send(`
-      <html>
-        <body style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; background: #0f172a; color: #f8fafc;">
-          <div style="text-align: center; padding: 2rem; border-radius: 1rem; background: #1e293b; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);">
-            <h1 style="color: #60a5fa; margin-bottom: 1rem;">✓ Outlook Connected</h1>
-            <p style="color: #94a3b8; font-size: 1.1rem;">Your account <strong>${escapeHtml(outlookEmail)}</strong> is now linked.</p>
-            <p style="color: #64748b; font-size: 0.9rem; margin-top: 2rem;">You can safely close this window.</p>
-          </div>
-        </body>
-      </html>
-    `);
+    res.json({ success: true, email: outlookEmail });
   } catch (error: any) {
     logger.error('Outlook callback error:', error.response?.data || error);
-    res.status(500).send(`
-      <html>
-        <body style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; background: #0f172a; color: #f8fafc;">
-          <div style="text-align: center; padding: 2rem; border-radius: 1rem; background: #1e293b; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);">
-            <h1 style="color: #f87171; margin-bottom: 1rem;">✗ Connection Failed</h1>
-            <p style="color: #94a3b8;">Authentication with Microsoft failed.</p>
-          </div>
-        </body>
-      </html>
-    `);
+    res.status(500).json({ error: error.message || 'Failed to connect Outlook account' });
   }
 });
 
