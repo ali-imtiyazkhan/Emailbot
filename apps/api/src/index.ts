@@ -10,6 +10,7 @@ import webhookRoutes from './routes/webhook.js';
 import whatsappWebhookRouter from './routes/whatsappWebhook.js';
 import dashboardRoutes from './routes/dashboard.js';
 import { redisConnection } from './config/redis.js';
+import { initWorker } from './services/queueService.js';
 import { prisma as db } from '@repo/db';
 import { authLimiter, apiLimiter, webhookLimiter } from './middleware/rateLimiter.js';
 import { verifyWebhookSignature } from './middleware/webhookAuth.js';
@@ -110,6 +111,9 @@ app.use((err: any, req: express.Request, res: express.Response, next: express.Ne
   res.status(500).json({ error: 'Internal server error' });
 });
 
+// Initialize BullMQ email worker
+const worker = initWorker();
+
 // Start Server
 const server = app.listen(PORT, () => {
   logger.info(`EmailBot API running on port ${PORT}`);
@@ -122,6 +126,11 @@ const gracefulShutdown = async (signal: string) => {
   server.close(() => {
     logger.info('HTTP server closed');
   });
+
+  try {
+    await worker.close();
+    logger.info('BullMQ worker closed');
+  } catch { /* Worker may already be closed */ }
 
   try {
     await redisConnection.quit();
