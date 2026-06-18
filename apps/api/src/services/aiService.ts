@@ -1,8 +1,6 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import logger from '../utils/logger.js';
 
-// Env is loaded centrally via config/env.ts (first import in index.ts)
-
 const configuration = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY || "");
 const model = configuration.getGenerativeModel({ model: "gemini-1.5-flash" });
 

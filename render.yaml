@@ -18,6 +18,47 @@ services:
         sync: false
       - key: PORT
         value: 10000
+      # ── Required: JWT secret for authentication tokens ──
+      - key: JWT_SECRET
+        sync: false
+      # ── Optional: Production auth gate for /auth/token ──
+      - key: AUTH_TOKEN_SECRET
+        sync: false
+      # ── Gmail / Google OAuth ──
+      - key: GMAIL_CLIENT_ID
+        sync: false
+      - key: GMAIL_CLIENT_SECRET
+        sync: false
+      - key: GMAIL_REDIRECT_URI
+        sync: false
+      # ── Outlook / Microsoft OAuth ──
+      - key: OUTLOOK_CLIENT_ID
+        sync: false
+      - key: OUTLOOK_CLIENT_SECRET
+        sync: false
+      - key: OUTLOOK_TENANT_ID
+        sync: false
+      - key: OUTLOOK_REDIRECT_URI
+        sync: false
+      # ── WhatsApp Cloud API ──
+      - key: WHATSAPP_VERIFY_TOKEN
+        sync: false
+      - key: WHATSAPP_PHONE_NUMBER_ID
+        sync: false
+      - key: WHATSAPP_ACCESS_TOKEN
+        sync: false
+      - key: WHATSAPP_RECIPIENT_PHONE
+        sync: false
+      - key: WHATSAPP_BUSINESS_ACCOUNT_ID
+        sync: false
+      - key: WHATSAPP_APP_SECRET
+        sync: false
+      # ── AI / Gemini ──
+      - key: GOOGLE_API_KEY
+        sync: false
+      # ── Frontend URL (for CORS and redirects) ──
+      - key: FRONTEND_URL
+        sync: false
 
 # Managed PostgreSQL
 databases:

@@ -17,19 +17,36 @@ const STATE_TTL_SECONDS = 600; // 10 minutes
 
 async function generateOAuthState(userId?: number): Promise<string> {
   const state = crypto.randomBytes(32).toString('hex');
-  await redisConnection.set(`${STATE_PREFIX}${state}`, String(userId ?? ''), 'EX', STATE_TTL_SECONDS);
+  try {
+    await redisConnection.set(`${STATE_PREFIX}${state}`, String(userId ?? ''), 'EX', STATE_TTL_SECONDS);
+  } catch (err: any) {
+    logger.error('Failed to store OAuth state in Redis: %s', err.message);
+    throw new Error('OAuth state storage failed — Redis may be unavailable');
+  }
   return state;
 }
 
 async function verifyOAuthState(state: string, userId?: number): Promise<boolean> {
   const key = `${STATE_PREFIX}${state}`;
-  const storedUserId = await redisConnection.get(key);
-  if (!storedUserId) return false;
+  let storedUserId: string | null;
+  try {
+    storedUserId = await redisConnection.get(key);
+  } catch (err: any) {
+    logger.error('Failed to read OAuth state from Redis: %s', err.message);
+    return false;
+  }
+  if (!storedUserId) {
+    logger.warn('OAuth state not found in Redis (key=%s) — possible expiry or missing storage', key);
+    return false;
+  }
   // If state was stored without a userId (empty string), accept any valid userId
   if (storedUserId !== '') {
-    if (userId === undefined || parseInt(storedUserId) !== userId) return false;
+    if (userId === undefined || parseInt(storedUserId) !== userId) {
+      logger.warn('OAuth state userId mismatch: stored=%s, expected=%s', storedUserId, userId);
+      return false;
+    }
   }
-  await redisConnection.del(key);
+  await redisConnection.del(key).catch(() => {});
   return true;
 }
 
@@ -59,9 +76,11 @@ router.get('/token', async (req, res) => {
     }
     const token = generateToken({ userId: user.id, email: user.email });
     res.json({ token, user: { id: user.id, email: user.email, name: user.name } });
-  } catch (error) {
-    logger.error('Error generating token:', error);
-    res.status(500).json({ error: 'Failed to generate token' });
+  } catch (error: any) {
+    logger.error('Error generating token:', error.message);
+    res.status(500).json({ error: error.message === 'JWT_SECRET is not configured. Set JWT_SECRET environment variable.'
+      ? 'Server misconfiguration: JWT_SECRET is not set.'
+      : 'Failed to generate token' });
   }
 });
 

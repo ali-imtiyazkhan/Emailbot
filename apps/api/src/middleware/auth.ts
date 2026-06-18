@@ -2,7 +2,11 @@ import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import logger from '../utils/logger.js';
 
-const JWT_SECRET = process.env.JWT_SECRET!;
+const JWT_SECRET = process.env.JWT_SECRET;
+if (!JWT_SECRET) {
+  logger.error('CRITICAL: JWT_SECRET environment variable is not set. Authentication will not work.');
+  logger.error('Add JWT_SECRET to your Render environment variables or .env file.');
+}
 
 export interface AuthPayload {
   userId: number;
@@ -22,11 +26,17 @@ declare global {
  * Generate a JWT token for a given user.
  */
 export const generateToken = (payload: AuthPayload): string => {
+  if (!JWT_SECRET) {
+    throw new Error('JWT_SECRET is not configured. Set JWT_SECRET environment variable.');
+  }
   return jwt.sign(payload, JWT_SECRET, { expiresIn: '7d' });
 };
 
 
 export const verifyToken = (token: string): AuthPayload => {
+  if (!JWT_SECRET) {
+    throw new Error('JWT_SECRET is not configured. Set JWT_SECRET environment variable.');
+  }
   return jwt.verify(token, JWT_SECRET) as AuthPayload;
 };
 

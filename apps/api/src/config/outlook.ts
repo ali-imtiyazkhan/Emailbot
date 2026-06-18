@@ -1,7 +1,5 @@
 import axios from 'axios';
 
-// Env is loaded centrally via config/env.ts (first import in index.ts)
-
 export const OUTLOOK_AUTH_URL = `https://login.microsoftonline.com/${process.env.OUTLOOK_TENANT_ID}/oauth2/v2.0/authorize`;
 export const OUTLOOK_TOKEN_URL = `https://login.microsoftonline.com/${process.env.OUTLOOK_TENANT_ID}/oauth2/v2.0/token`;
 

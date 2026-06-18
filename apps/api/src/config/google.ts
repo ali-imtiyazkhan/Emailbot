@@ -1,7 +1,5 @@
 import { google } from 'googleapis';
 
-// Env is loaded centrally via config/env.ts (first import in index.ts)
-
 export const GMAIL_SCOPES = [
   'https://www.googleapis.com/auth/gmail.readonly',
   'https://www.googleapis.com/auth/gmail.send',

@@ -1,7 +1,6 @@
 import axios from 'axios';
 import logger from '../utils/logger.js';
 
-// Env is loaded centrally via config/env.ts (first import in index.ts)
 const WHATSAPP_API_VERSION = 'v22.0';
 const WHATSAPP_API_URL = `https://graph.facebook.com/${WHATSAPP_API_VERSION}/${process.env.WHATSAPP_PHONE_NUMBER_ID}/messages`;
 
