@@ -150,9 +150,23 @@ router.post('/gmail/connect', async (req, res) => {
       return;
     }
 
-    // Exchange code for tokens
+    // Exchange code for tokens using direct HTTP call (bypasses gaxios/HTTP2 issues on Render)
     const googleOAuth2Client = createGoogleOAuth2Client();
-    const { tokens } = await googleOAuth2Client.getToken(code);
+    const tokenResponse = await axios.post(
+      'https://oauth2.googleapis.com/token',
+      {
+        code,
+        client_id: process.env.GMAIL_CLIENT_ID,
+        client_secret: process.env.GMAIL_CLIENT_SECRET,
+        redirect_uri: process.env.GMAIL_REDIRECT_URI,
+        grant_type: 'authorization_code',
+      },
+      {
+        headers: { 'Content-Type': 'application/json' },
+        timeout: 15000,
+      }
+    );
+    const tokens = tokenResponse.data;
     logger.info('Google token exchange — access_token=%s refresh_token=%s expires=%s',
       tokens.access_token?.substring(0, 20) + '...' || 'none',
       tokens.refresh_token?.substring(0, 20) + '...' || 'none',
