@@ -10,6 +10,7 @@ import {
   DigestSetting,
   User,
 } from "@/lib/api";
+import { getToken, fetchToken } from "@/lib/auth";
 import {
   Globe,
   Clock,
@@ -52,6 +53,9 @@ export default function SettingsPage() {
   const [saved, setSaved] = useState(false);
 
   useEffect(() => {
+    if (!getToken()) {
+      fetchToken();
+    }
     loadSettings();
   }, []);
 
@@ -155,7 +159,7 @@ export default function SettingsPage() {
               <button
                 type="button"
                 className="btn btn-secondary"
-                onClick={() => window.open(`${API_URL}/auth/gmail/connect`, "_blank")}
+                onClick={() => window.open(`${API_URL}/auth/gmail/connect?token=${getToken() || ''}`, "_blank")}
               >
                 <Plus size={12} /> Gmail
               </button>
@@ -164,7 +168,7 @@ export default function SettingsPage() {
               <button
                 type="button"
                 className="btn btn-secondary"
-                onClick={() => window.open(`${API_URL}/auth/outlook/connect`, "_blank")}
+                onClick={() => window.open(`${API_URL}/auth/outlook/connect?token=${getToken() || ''}`, "_blank")}
               >
                 <Plus size={12} /> Outlook
               </button>
@@ -181,14 +185,14 @@ export default function SettingsPage() {
               <button
                 type="button"
                 className="btn btn-primary"
-                onClick={() => window.open(`${API_URL}/auth/gmail/connect`, "_blank")}
+                onClick={() => window.open(`${API_URL}/auth/gmail/connect?token=${getToken() || ''}`, "_blank")}
               >
                 <Mail size={14} /> Gmail
               </button>
               <button
                 type="button"
                 className="btn btn-secondary"
-                onClick={() => window.open(`${API_URL}/auth/outlook/connect`, "_blank")}
+                onClick={() => window.open(`${API_URL}/auth/outlook/connect?token=${getToken() || ''}`, "_blank")}
               >
                 <Mail size={14} /> Outlook
               </button>

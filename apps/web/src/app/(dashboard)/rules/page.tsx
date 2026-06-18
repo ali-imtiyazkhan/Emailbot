@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { fetchFilters, createFilter, deleteFilter, FilterRule } from "@/lib/api";
+import { getToken, fetchToken } from "@/lib/auth";
 import { Plus, Trash2, User, Hash, Zap, Settings2, X } from "lucide-react";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { AppPage, AppSection, AppEmpty } from "@/components/app/AppPage";
@@ -40,6 +41,9 @@ export default function RulesPage() {
   const [deleteConfirm, setDeleteConfirm] = useState<number | null>(null);
 
   useEffect(() => {
+    if (!getToken()) {
+      fetchToken();
+    }
     loadRules();
   }, []);
 

@@ -1,4 +1,6 @@
-export const API_BASE_URL = (process.env.NEXT_PUBLIC_API_URL || 'https://emailbot-zulo.onrender.com') + '/api';
+import { authHeaders } from './auth';
+
+export const API_BASE_URL = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001') + '/api';
 
 //  Types
 export interface Stats {
@@ -60,20 +62,28 @@ export interface DigestSetting {
 
 // ── Fetchers ───────────────────────────────────────────
 
+async function apiFetch(url: string, options?: RequestInit): Promise<Response> {
+  const response = await fetch(url, {
+    ...options,
+    headers: { ...authHeaders(), ...options?.headers },
+  });
+  return response;
+}
+
 export async function fetchStats(): Promise<Stats> {
-  const response = await fetch(`${API_BASE_URL}/stats`);
+  const response = await apiFetch(`${API_BASE_URL}/stats`);
   if (!response.ok) throw new Error('Failed to fetch stats');
   return response.json();
 }
 
 export async function fetchFilters(): Promise<FilterRule[]> {
-  const response = await fetch(`${API_BASE_URL}/filters`);
+  const response = await apiFetch(`${API_BASE_URL}/filters`);
   if (!response.ok) throw new Error('Failed to fetch filters');
   return response.json();
 }
 
 export async function createFilter(type: string, value: string): Promise<void> {
-  const response = await fetch(`${API_BASE_URL}/filters`, {
+  const response = await apiFetch(`${API_BASE_URL}/filters`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ type, value }),
@@ -82,34 +92,33 @@ export async function createFilter(type: string, value: string): Promise<void> {
 }
 
 export async function deleteFilter(id: number): Promise<void> {
-  const response = await fetch(`${API_BASE_URL}/filters/${id}`, {
+  const response = await apiFetch(`${API_BASE_URL}/filters/${id}`, {
     method: 'DELETE',
   });
   if (!response.ok) throw new Error('Failed to delete filter');
 }
 
 export async function fetchEmails(): Promise<ProcessedEmail[]> {
-  const response = await fetch(`${API_BASE_URL}/emails?limit=50`);
+  const response = await apiFetch(`${API_BASE_URL}/emails?limit=50`);
   if (!response.ok) throw new Error('Failed to fetch emails');
   const result = await response.json();
-  // API now returns { data, total, page, limit, totalPages }
   return result.data ?? result;
 }
 
 export async function fetchAccounts(): Promise<EmailAccount[]> {
-  const response = await fetch(`${API_BASE_URL}/accounts`);
+  const response = await apiFetch(`${API_BASE_URL}/accounts`);
   if (!response.ok) throw new Error('Failed to fetch accounts');
   return response.json();
 }
 
 export async function fetchDigestSettings(): Promise<DigestSetting> {
-  const response = await fetch(`${API_BASE_URL}/digest-settings`);
+  const response = await apiFetch(`${API_BASE_URL}/digest-settings`);
   if (!response.ok) throw new Error('Failed to fetch digest settings');
   return response.json();
 }
 
 export async function updateDigestSettings(settings: Partial<DigestSetting>): Promise<DigestSetting> {
-  const response = await fetch(`${API_BASE_URL}/digest-settings`, {
+  const response = await apiFetch(`${API_BASE_URL}/digest-settings`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(settings),
@@ -118,7 +127,7 @@ export async function updateDigestSettings(settings: Partial<DigestSetting>): Pr
 }
 
 export async function fetchProfile(): Promise<User> {
-  const response = await fetch(`${API_BASE_URL}/profile`);
+  const response = await apiFetch(`${API_BASE_URL}/profile`);
   if (!response.ok) throw new Error('Failed to fetch profile');
   return response.json();
 }
@@ -136,7 +145,7 @@ export interface AnalyticsData {
 }
 
 export async function fetchAnalytics(): Promise<AnalyticsData> {
-  const response = await fetch(`${API_BASE_URL}/analytics`);
+  const response = await apiFetch(`${API_BASE_URL}/analytics`);
   if (!response.ok) throw new Error('Failed to fetch analytics');
   return response.json();
 }
@@ -151,7 +160,7 @@ export interface ReplyResult {
 }
 
 export async function replyToEmail(emailId: number, text: string): Promise<ReplyResult> {
-  const response = await fetch(`${API_BASE_URL}/emails/${emailId}/reply`, {
+  const response = await apiFetch(`${API_BASE_URL}/emails/${emailId}/reply`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ text }),
