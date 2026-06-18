@@ -6,6 +6,7 @@ import {
   fetchDigestSettings,
   updateDigestSettings,
   fetchProfile,
+  fetchConnectUrl,
   EmailAccount,
   DigestSetting,
   User,
@@ -57,6 +58,18 @@ export default function SettingsPage() {
       fetchToken();
     }
     loadSettings();
+
+    const handleOAuthSuccess = (event: MessageEvent) => {
+      if (event.origin !== window.location.origin) return;
+      if (event.data?.type === "oauth-success") {
+        loadSettings();
+      }
+    };
+
+    window.addEventListener("message", handleOAuthSuccess);
+    return () => {
+      window.removeEventListener("message", handleOAuthSuccess);
+    };
   }, []);
 
   const loadSettings = async () => {
@@ -94,6 +107,16 @@ export default function SettingsPage() {
       alert("Failed to save settings");
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleConnect = async (provider: "gmail" | "outlook") => {
+    try {
+      const { url } = await fetchConnectUrl(provider);
+      window.open(url, "_blank");
+    } catch (err) {
+      console.error(`Failed to initiate ${provider} connection:`, err);
+      alert(`Failed to initiate ${provider} connection`);
     }
   };
 
@@ -159,7 +182,7 @@ export default function SettingsPage() {
               <button
                 type="button"
                 className="btn btn-secondary"
-                onClick={() => window.open(`${API_URL}/auth/gmail/connect?token=${getToken() || ''}`, "_blank")}
+                onClick={() => handleConnect("gmail")}
               >
                 <Plus size={12} /> Gmail
               </button>
@@ -168,7 +191,7 @@ export default function SettingsPage() {
               <button
                 type="button"
                 className="btn btn-secondary"
-                onClick={() => window.open(`${API_URL}/auth/outlook/connect?token=${getToken() || ''}`, "_blank")}
+                onClick={() => handleConnect("outlook")}
               >
                 <Plus size={12} /> Outlook
               </button>
@@ -185,14 +208,14 @@ export default function SettingsPage() {
               <button
                 type="button"
                 className="btn btn-primary"
-                onClick={() => window.open(`${API_URL}/auth/gmail/connect?token=${getToken() || ''}`, "_blank")}
+                onClick={() => handleConnect("gmail")}
               >
                 <Mail size={14} /> Gmail
               </button>
               <button
                 type="button"
                 className="btn btn-secondary"
-                onClick={() => window.open(`${API_URL}/auth/outlook/connect?token=${getToken() || ''}`, "_blank")}
+                onClick={() => handleConnect("outlook")}
               >
                 <Mail size={14} /> Outlook
               </button>

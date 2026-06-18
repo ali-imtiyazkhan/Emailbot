@@ -171,3 +171,26 @@ export async function replyToEmail(emailId: number, text: string): Promise<Reply
   }
   return response.json();
 }
+
+// ── Email OAuth Connection ───────────────────────────────
+
+export async function fetchConnectUrl(provider: 'gmail' | 'outlook'): Promise<{ url: string }> {
+  const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+  const response = await apiFetch(`${baseUrl}/auth/${provider}/connect`);
+  if (!response.ok) throw new Error(`Failed to fetch ${provider} connect URL`);
+  return response.json();
+}
+
+export async function connectEmailAccount(provider: 'gmail' | 'outlook', code: string): Promise<{ success: boolean; email?: string }> {
+  const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+  const response = await apiFetch(`${baseUrl}/auth/${provider}/connect`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ code }),
+  });
+  if (!response.ok) {
+    const err = await response.json().catch(() => ({}));
+    throw new Error(err.error || `Failed to connect ${provider} account`);
+  }
+  return response.json();
+}
