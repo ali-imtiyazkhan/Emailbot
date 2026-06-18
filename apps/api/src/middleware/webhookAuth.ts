@@ -9,6 +9,12 @@ import logger from '../utils/logger.js';
  * Requires `req.rawBody` to be populated (see index.ts express.json verify option).
  */
 export const verifyWebhookSignature = (req: Request, res: Response, next: NextFunction): void => {
+  // Skip verification for GET requests (webhook verification handshake)
+  if (req.method === 'GET') {
+    next();
+    return;
+  }
+
   const appSecret = process.env.WHATSAPP_APP_SECRET;
 
   // Skip verification if app secret is not configured (with warning)
