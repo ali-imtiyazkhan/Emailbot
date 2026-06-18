@@ -46,13 +46,20 @@ export default function EmailsPage() {
   } | null>(null);
 
   useEffect(() => {
-    if (!getToken()) {
-      fetchToken();
-    }
-    fetchEmails()
-      .then(setEmails)
-      .catch((err) => console.error("Failed to load emails:", err))
-      .finally(() => setLoading(false));
+    const init = async () => {
+      if (!getToken()) {
+        await fetchToken();
+      }
+      try {
+        const data = await fetchEmails();
+        setEmails(data);
+      } catch (err) {
+        console.error("Failed to load emails:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    init();
   }, []);
 
   const filtered = useMemo(() => {

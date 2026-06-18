@@ -56,10 +56,13 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!getToken()) {
-      fetchToken();
-    }
-    loadData();
+    const init = async () => {
+      if (!getToken()) {
+        await fetchToken();
+      }
+      await loadData();
+    };
+    init();
     const healthInterval = setInterval(pollHealth, 15000);
     return () => clearInterval(healthInterval);
   }, []);

@@ -3,6 +3,7 @@
 import React, { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { connectEmailAccount } from "@/lib/api";
+import { getToken, fetchToken, setToken } from "@/lib/auth";
 import { motion, AnimatePresence } from "framer-motion";
 import { Mail, Check, X, Loader2 } from "lucide-react";
 
@@ -31,6 +32,16 @@ function OutlookCallbackContent() {
 
     const exchangeCode = async () => {
       try {
+        // Ensure we have a JWT token for the authenticated POST request
+        if (!getToken()) {
+          if (window.opener?.localStorage) {
+            const parentToken = window.opener.localStorage.getItem('emailbot_token');
+            if (parentToken) setToken(parentToken);
+          }
+          if (!getToken()) {
+            await fetchToken();
+          }
+        }
         const result = await connectEmailAccount("outlook", code, state || undefined);
         if (result.success) {
           setStatus("success");
