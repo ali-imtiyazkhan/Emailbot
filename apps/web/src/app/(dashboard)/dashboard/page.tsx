@@ -60,7 +60,18 @@ export default function DashboardPage() {
       fetchToken();
     }
     loadData();
+    const healthInterval = setInterval(pollHealth, 15000);
+    return () => clearInterval(healthInterval);
   }, []);
+
+  const pollHealth = async () => {
+    try {
+      const res = await fetch(`${API_BASE}/health`);
+      setHealth(await res.json());
+    } catch {
+      setHealth(null);
+    }
+  };
 
   const loadData = async () => {
     try {
@@ -78,13 +89,7 @@ export default function DashboardPage() {
       console.error("Failed to load dashboard data:", err);
     }
 
-    try {
-      const res = await fetch(`${API_BASE}/health`);
-      setHealth(await res.json());
-    } catch {
-      /* offline */
-    }
-
+    await pollHealth();
     setLoading(false);
   };
 
