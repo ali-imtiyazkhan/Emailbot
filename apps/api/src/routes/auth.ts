@@ -50,10 +50,12 @@ router.get('/token', async (req, res) => {
   }
 
   try {
-    const user = await db.user.findFirst({ orderBy: { id: 'asc' } });
+    let user = await db.user.findFirst({ orderBy: { id: 'asc' } });
     if (!user) {
-      res.status(404).json({ error: 'No user found. Run seed first.' });
-      return;
+      user = await db.user.create({
+        data: { email: 'admin@emailbot.io', name: 'Admin' },
+      });
+      logger.info('Auto-created default user (id=%d) — no user existed in DB', user.id);
     }
     const token = generateToken({ userId: user.id, email: user.email });
     res.json({ token, user: { id: user.id, email: user.email, name: user.name } });
@@ -113,12 +115,14 @@ router.post('/gmail/connect', async (req, res) => {
       } catch { /* ignore invalid token */ }
     }
     if (!userId) {
-      const firstUser = await db.user.findFirst({ orderBy: { id: 'asc' } });
-      if (firstUser) userId = firstUser.id;
-    }
-    if (!userId) {
-      res.status(401).json({ error: 'No user found. Run seed first.' });
-      return;
+      let firstUser = await db.user.findFirst({ orderBy: { id: 'asc' } });
+      if (!firstUser) {
+        firstUser = await db.user.create({
+          data: { email: 'admin@emailbot.io', name: 'Admin' },
+        });
+        logger.info('Auto-created default user (id=%d) during Gmail connect', firstUser.id);
+      }
+      userId = firstUser.id;
     }
 
     // Verify OAuth state parameter (CSRF protection) - skip userId check if state was unbound
@@ -248,12 +252,14 @@ router.post('/outlook/connect', async (req, res) => {
       } catch { /* ignore invalid token */ }
     }
     if (!userId) {
-      const firstUser = await db.user.findFirst({ orderBy: { id: 'asc' } });
-      if (firstUser) userId = firstUser.id;
-    }
-    if (!userId) {
-      res.status(401).json({ error: 'No user found. Run seed first.' });
-      return;
+      let firstUser = await db.user.findFirst({ orderBy: { id: 'asc' } });
+      if (!firstUser) {
+        firstUser = await db.user.create({
+          data: { email: 'admin@emailbot.io', name: 'Admin' },
+        });
+        logger.info('Auto-created default user (id=%d) during Outlook connect', firstUser.id);
+      }
+      userId = firstUser.id;
     }
 
     // Verify OAuth state parameter (CSRF protection) - skip userId check if state was unbound
