@@ -132,7 +132,7 @@ export async function fetchProfile(): Promise<User> {
   return response.json();
 }
 
-export async function updateProfile(data: { whatsapp: string | null }): Promise<User> {
+export async function updateProfile(data: { name?: string; email?: string; whatsapp?: string | null }): Promise<User> {
   const response = await apiFetch(`${API_BASE_URL}/profile`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },

@@ -56,6 +56,9 @@ export default function SettingsPage() {
   const [whatsappInput, setWhatsappInput] = useState('');
   const [whatsappSaving, setWhatsappSaving] = useState(false);
   const [whatsappSaved, setWhatsappSaved] = useState(false);
+  const [editingEmail, setEditingEmail] = useState(false);
+  const [emailInput, setEmailInput] = useState('');
+  const [emailSaving, setEmailSaving] = useState(false);
 
   useEffect(() => {
     const init = async () => {
@@ -175,7 +178,62 @@ export default function SettingsPage() {
             <p style={{ fontSize: 17, fontWeight: 600, color: "var(--text-1)", marginBottom: 6 }}>
               {profile?.name || "User"}
             </p>
-            <p style={{ fontSize: 14, color: "var(--text-2)" }}>{profile?.email}</p>
+            {editingEmail ? (
+              <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+                <input
+                  type="email"
+                  value={emailInput}
+                  onChange={(e) => setEmailInput(e.target.value)}
+                  className="app-input app-input--plain"
+                  style={{ minWidth: 200, fontSize: 14 }}
+                  autoFocus
+                />
+                <button
+                  type="button"
+                  className="app-btn app-btn--primary"
+                  style={{ whiteSpace: "nowrap" }}
+                  disabled={emailSaving}
+                  onClick={async () => {
+                    setEmailSaving(true);
+                    try {
+                      const updated = await updateProfile({ email: emailInput.trim() });
+                      setProfile(updated);
+                      setEmailInput(updated.email);
+                      setEditingEmail(false);
+                    } catch (err: any) {
+                      alert(err.message || 'Failed to update email');
+                    } finally {
+                      setEmailSaving(false);
+                    }
+                  }}
+                >
+                  {emailSaving ? "Saving..." : "Save"}
+                </button>
+                <button
+                  type="button"
+                  className="app-btn"
+                  style={{ whiteSpace: "nowrap" }}
+                  onClick={() => setEditingEmail(false)}
+                >
+                  Cancel
+                </button>
+              </div>
+            ) : (
+              <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                <p style={{ fontSize: 14, color: "var(--text-2)" }}>{profile?.email}</p>
+                <button
+                  type="button"
+                  className="btn btn-ghost"
+                  style={{ fontSize: 12, padding: "2px 8px", minHeight: "auto", lineHeight: "20px" }}
+                  onClick={() => {
+                    setEmailInput(profile?.email || '');
+                    setEditingEmail(true);
+                  }}
+                >
+                  Change
+                </button>
+              </div>
+            )}
           </div>
           <span className="app-tag">ID {profile?.id}</span>
         </div>

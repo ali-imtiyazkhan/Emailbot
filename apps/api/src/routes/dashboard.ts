@@ -39,6 +39,8 @@ router.get('/profile', async (req, res) => {
 });
 
 const updateProfileSchema = z.object({
+  name: z.string().max(255).optional(),
+  email: z.string().email('Must be a valid email').optional(),
   whatsapp: z.string().regex(/^\+?[1-9]\d{6,14}$/, 'Must be a valid phone number with country code (e.g. +1234567890)').nullable(),
 });
 
@@ -46,12 +48,18 @@ router.put('/profile', async (req, res) => {
   try {
     const userId = req.user!.userId
     const parsed = updateProfileSchema.parse(req.body);
+
+    const data: Record<string, unknown> = {};
+    if (parsed.name !== undefined) data.name = parsed.name;
+    if (parsed.email !== undefined) data.email = parsed.email;
+    if (parsed.whatsapp !== undefined) data.whatsapp = parsed.whatsapp;
+
     const user = await db.user.update({
       where: { id: userId },
-      data: { whatsapp: parsed.whatsapp },
+      data,
       select: { id: true, email: true, name: true, whatsapp: true }
     });
-    logger.info(`User ${userId} updated profile: whatsapp=${parsed.whatsapp}`);
+    logger.info(`User ${userId} updated profile: ${JSON.stringify(data)}`);
     res.json(user);
   } catch (error) {
     if (error instanceof z.ZodError) {
