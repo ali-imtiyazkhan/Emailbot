@@ -38,32 +38,48 @@ export const summarizeEmail = async (subject: string, body: string): Promise<Ema
     { "summary": "...", "priority": 5, "category": "..." }
   `;
 
-  try {
-    const model = getAIModel();
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    let text = response.text();
-
-    text = text.replace(/```json\n?|```/g, '').trim();
-
+  const maxRetries = 3;
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
-      const parsed = JSON.parse(text) as EmailSummary;
-      parsed.priority = Math.max(1, Math.min(10, Math.round(parsed.priority)));
-      return parsed;
-    } catch (parseError) {
-      logger.error('Failed to parse Gemini JSON response:', { text, error: parseError });
+      const model = getAIModel();
+      const result = await model.generateContent(prompt);
+      const response = await result.response;
+      let text = response.text();
+
+      text = text.replace(/```json\n?|```/g, '').trim();
+
+      try {
+        const parsed = JSON.parse(text) as EmailSummary;
+        parsed.priority = Math.max(1, Math.min(10, Math.round(parsed.priority)));
+        return parsed;
+      } catch (parseError) {
+        logger.error('Failed to parse Gemini JSON response:', { text, error: parseError });
+        return {
+          summary: body.substring(0, 150) + (body.length > 150 ? '...' : ''),
+          priority: 7,
+          category: 'unanalyzed'
+        };
+      }
+    } catch (err: any) {
+      const isRetryable = err.message?.includes('503') || err.message?.includes('429') || err.message?.includes('RESOURCE_EXHAUSTED') || err.message?.includes('UNAVAILABLE');
+      if (attempt < maxRetries && isRetryable) {
+        const delay = Math.min(1000 * Math.pow(2, attempt) + Math.random() * 1000, 15000);
+        logger.warn(`Gemini API attempt ${attempt}/${maxRetries} failed, retrying in ${Math.round(delay)}ms:`, err.message);
+        await new Promise((resolve) => setTimeout(resolve, delay));
+        continue;
+      }
+      logger.error('Error calling Google Gemini service:', { error: err.message || err, attempt });
       return {
-        summary: body.substring(0, 150) + (body.length > 150 ? '...' : ''),
-        priority: 7,
-        category: 'unanalyzed'
+        summary: `[AI Error] ${body.substring(0, 150)}...`,
+        priority: 10,
+        category: 'error'
       };
     }
-  } catch (err: any) {
-    logger.error('Error calling Google Gemini service:', { error: err.message || err });
-    return {
-      summary: `[AI Error] ${body.substring(0, 150)}...`,
-      priority: 10,
-      category: 'error'
-    };
   }
+
+  return {
+    summary: `[AI Error] ${body.substring(0, 150)}...`,
+    priority: 10,
+    category: 'error'
+  };
 };

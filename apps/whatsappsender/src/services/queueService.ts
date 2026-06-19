@@ -20,7 +20,7 @@ export const initWorker = () => {
       await handleEmailJob(job.data);
     },
     {
-      connection: { url: REDIS_URL },
+      connection: { url: REDIS_URL, maxRetriesPerRequest: null },
       concurrency: 5,
     }
   );

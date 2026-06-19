@@ -5,6 +5,7 @@ import db from '../config/db.js';
 import logger from '../utils/logger.js';
 
 let isProcessing = false;
+const PROCESSING_TIMEOUT_MS = 10 * 60 * 1000; // 10 minutes
 
 export const initScheduler = () => {
   // Check emails every 1 minute — with overlap protection
@@ -17,7 +18,15 @@ export const initScheduler = () => {
     isProcessing = true;
     try {
       logger.info('Running scheduled email check...');
-      await processEmails();
+      await Promise.race([
+        processEmails(),
+        new Promise<void>((_, reject) =>
+          setTimeout(
+            () => reject(new Error(`Email processing timed out after ${PROCESSING_TIMEOUT_MS}ms`)),
+            PROCESSING_TIMEOUT_MS
+          )
+        ),
+      ]);
     } catch (error) {
       logger.error('Scheduled email check failed:', error);
     } finally {

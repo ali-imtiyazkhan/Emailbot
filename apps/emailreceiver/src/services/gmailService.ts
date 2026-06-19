@@ -44,13 +44,14 @@ async function ensureValidToken(account: {
     }
   );
 
-  const { access_token, expires_in } = res.data;
+  const { access_token, expires_in, refresh_token } = res.data;
   const tokenExpiry = expires_in ? new Date(now + expires_in * 1000) : null;
 
   await db.emailAccount.update({
     where: { id: account.id },
     data: {
       accessToken: access_token,
+      refreshToken: refresh_token || account.refreshToken,
       tokenExpiry,
       isActive: true,
     },
@@ -93,7 +94,7 @@ export const fetchLatestEmails = async (userId: number): Promise<FetchedEmail[]>
       const subject = headers.find((h: any) => h.name === 'Subject')?.value || 'No Subject';
       const sender = headers.find((h: any) => h.name === 'From')?.value || 'Unknown';
 
-      let body = '';
+      let body = detailRes.data.snippet || '';
       if (payload?.parts) {
         const textPart = payload.parts.find((p: any) => p.mimeType === 'text/plain');
         if (textPart && textPart.body?.data) {

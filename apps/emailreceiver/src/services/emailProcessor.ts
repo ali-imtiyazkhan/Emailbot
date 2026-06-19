@@ -13,7 +13,11 @@ export interface EmailJobData {
 
 const REDIS_URL = process.env.REDIS_URL || 'redis://localhost:6379';
 export const emailQueue = new Queue<EmailJobData>('email-processing', {
-  connection: { url: REDIS_URL },
+  connection: { url: REDIS_URL, maxRetriesPerRequest: null },
+  defaultJobOptions: {
+    attempts: 3,
+    backoff: { type: 'exponential', delay: 5000 },
+  },
 });
 
 export const processEmails = async (): Promise<void> => {

@@ -34,7 +34,17 @@ export const fetchOutlookEmails = async (userId: number): Promise<FetchedOutlook
     );
 
     const accessToken = tokenRes.data.access_token;
-    
+
+    // Save refreshed tokens to DB
+    await db.emailAccount.update({
+      where: { id: account.id },
+      data: {
+        accessToken,
+        refreshToken: tokenRes.data.refresh_token || account.refreshToken,
+        tokenExpiry: tokenRes.data.expires_in ? new Date(Date.now() + tokenRes.data.expires_in * 1000) : null,
+      },
+    });
+
     const res = await axios.get('https://graph.microsoft.com/v1.0/me/messages?$filter=isRead eq false&$top=10', {
       headers: { Authorization: `Bearer ${accessToken}` }
     });
@@ -55,6 +65,15 @@ export const fetchOutlookEmails = async (userId: number): Promise<FetchedOutlook
     return emails;
   } catch (error) {
     logger.error(`Error fetching Outlook for user ${userId}:`, error);
+
+    if (axios.isAxiosError(error) && error.response?.status === 401) {
+      await db.emailAccount.update({
+        where: { id: account.id },
+        data: { isActive: false },
+      });
+      logger.warn(`Deactivated Outlook account ${account.id} due to 401`);
+    }
+
     return [];
   }
 };

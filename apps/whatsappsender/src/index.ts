@@ -3,7 +3,7 @@ import logger from '@repo/shared/logger'
 import { initWorker } from './services/queueService.js'
 
 // Validate required environment variables
-validateEnv(['REDIS_URL', 'GOOGLE_API_KEY', 'WHATSAPP_ACCESS_TOKEN', 'WHATSAPP_PHONE_NUMBER_ID']);
+validateEnv(['DATABASE_URL', 'REDIS_URL', 'GOOGLE_API_KEY', 'WHATSAPP_ACCESS_TOKEN', 'WHATSAPP_PHONE_NUMBER_ID']);
 
 logger.info('🚀 WhatsApp Sender worker starting...');
 
