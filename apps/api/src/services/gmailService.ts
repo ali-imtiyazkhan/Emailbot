@@ -65,7 +65,7 @@ export const fetchLatestEmails = async (userId: number): Promise<FetchedEmail[]>
     where: { userId, provider: 'gmail', isActive: true }
   });
 
-  if (!account || !account.accessToken) {
+  if (!account || !account.refreshToken) {
     logger.warn(`No active Gmail account found for user ${userId}`);
     return [];
   }
@@ -111,10 +111,10 @@ export const fetchLatestEmails = async (userId: number): Promise<FetchedEmail[]>
 
     return emails;
   } catch (error: unknown) {
-    const err = error as { code?: number; message?: string; response?: { status?: number } };
+    const err = error as { message?: string; response?: { status?: number } };
     logger.error(`Error fetching Gmail for user ${userId}:`, err.message);
 
-    if (err.code === 401 || (err as any).response?.status === 401) {
+    if ((error as any).response?.status === 401) {
       await db.emailAccount.update({
         where: { id: account.id },
         data: { isActive: false }

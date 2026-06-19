@@ -2,10 +2,13 @@ import { Worker, Job } from 'bullmq';
 import { handleEmailJob } from './emailWorkerHandler.js';
 import logger from '@repo/shared/logger';
 
+interface FetchedEmail { id: string; subject: string; sender: string; body: string; receivedAt?: Date }
+interface FetchedOutlookEmail { id: string; subject: string; sender: string; body: string; receivedAt?: Date }
+
 export interface EmailJobData {
   userId: number;
   accountId: number;
-  email: any;
+  email: FetchedEmail | FetchedOutlookEmail;
   whatsapp: string | null;
 }
 

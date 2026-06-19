@@ -39,6 +39,7 @@ export const summarizeEmail = async (subject: string, body: string): Promise<Ema
   `;
 
   const maxRetries = 3;
+  let lastError: string | undefined;
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
       const model = getAIModel();
@@ -61,6 +62,7 @@ export const summarizeEmail = async (subject: string, body: string): Promise<Ema
         };
       }
     } catch (err: any) {
+      lastError = err.message || String(err);
       const isRetryable = err.message?.includes('503') || err.message?.includes('429') || err.message?.includes('RESOURCE_EXHAUSTED') || err.message?.includes('UNAVAILABLE');
       if (attempt < maxRetries && isRetryable) {
         const delay = Math.min(1000 * Math.pow(2, attempt) + Math.random() * 1000, 15000);
@@ -68,15 +70,11 @@ export const summarizeEmail = async (subject: string, body: string): Promise<Ema
         await new Promise((resolve) => setTimeout(resolve, delay));
         continue;
       }
-      logger.error('Error calling Google Gemini service:', { error: err.message || err, attempt });
-      return {
-        summary: `[AI Error] ${body.substring(0, 150)}...`,
-        priority: 10,
-        category: 'error'
-      };
+      break;
     }
   }
 
+  logger.error('Error calling Google Gemini service:', { error: lastError });
   return {
     summary: `[AI Error] ${body.substring(0, 150)}...`,
     priority: 10,
