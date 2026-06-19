@@ -41,7 +41,7 @@ router.get('/profile', async (req, res) => {
 const updateProfileSchema = z.object({
   name: z.string().max(255).optional(),
   email: z.string().email('Must be a valid email').optional(),
-  whatsapp: z.string().regex(/^\+?[1-9]\d{6,14}$/, 'Must be a valid phone number with country code (e.g. +1234567890)').nullable(),
+  whatsapp: z.string().regex(/^\+?[1-9]\d{6,14}$/, 'Must be a valid phone number with country code (e.g. +1234567890)').nullable().optional(),
 });
 
 router.put('/profile', async (req, res) => {
