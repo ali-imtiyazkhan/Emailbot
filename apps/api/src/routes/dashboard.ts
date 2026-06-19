@@ -187,6 +187,25 @@ router.get('/accounts', async (req, res) => {
   }
 });
 
+router.delete('/accounts/:id', async (req, res) => {
+  try {
+    const userId = req.user!.userId
+    const { id } = req.params;
+    const account = await db.emailAccount.findFirst({
+      where: { id: Number(id), userId }
+    });
+    if (!account) {
+      res.status(404).json({ error: 'Account not found' });
+      return;
+    }
+    await db.emailAccount.delete({ where: { id: Number(id) } });
+    res.json({ success: true });
+  } catch (error) {
+    logger.error('Error deleting account:', error);
+    res.status(500).json({ error: 'Failed to delete account' });
+  }
+});
+
 // ── Digest Settings ────────────────────────────────────
 
 router.get('/digest-settings', async (req, res) => {

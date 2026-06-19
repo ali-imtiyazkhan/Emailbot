@@ -105,6 +105,13 @@ export async function fetchEmails(): Promise<ProcessedEmail[]> {
   return result.data ?? result;
 }
 
+export async function disconnectAccount(id: number): Promise<void> {
+  const response = await apiFetch(`${API_BASE_URL}/accounts/${id}`, {
+    method: 'DELETE',
+  });
+  if (!response.ok) throw new Error('Failed to disconnect account');
+}
+
 export async function fetchAccounts(): Promise<EmailAccount[]> {
   const response = await apiFetch(`${API_BASE_URL}/accounts`);
   if (!response.ok) throw new Error('Failed to fetch accounts');

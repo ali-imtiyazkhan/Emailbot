@@ -8,6 +8,7 @@ import {
   fetchProfile,
   updateProfile,
   fetchConnectUrl,
+  disconnectAccount,
   EmailAccount,
   DigestSetting,
   User,
@@ -306,6 +307,22 @@ export default function SettingsPage() {
                 <span className={acc.isActive ? "app-tag app-tag--live" : "app-tag"}>
                   {acc.isActive ? "Active" : "Paused"}
                 </span>
+                <button
+                  type="button"
+                  className="btn btn-ghost"
+                  style={{ fontSize: 12, padding: "2px 8px", minHeight: "auto", lineHeight: "20px", color: "#e74c3c" }}
+                  onClick={async () => {
+                    if (!confirm(`Disconnect ${acc.email}?`)) return;
+                    try {
+                      await disconnectAccount(acc.id);
+                      await loadSettings();
+                    } catch (err: any) {
+                      alert(err.message || 'Failed to disconnect');
+                    }
+                  }}
+                >
+                  Disconnect
+                </button>
               </div>
             ))}
           </div>
