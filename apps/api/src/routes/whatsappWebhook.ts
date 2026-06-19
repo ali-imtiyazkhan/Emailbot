@@ -3,6 +3,7 @@ import { prisma as db } from '@repo/db';
 import logger from '@repo/shared/logger';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { sendEmailReply } from '../services/emailReplyService.js';
+import { sendTextMessage } from '@repo/shared/whatsapp';
 
 const router = Router();
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY!);
@@ -50,6 +51,7 @@ router.post('/webhook/whatsapp', async (req: Request, res: Response) => {
 
     const replyText = incomingMsg.text?.body;
     const contextMessageId = incomingMsg.context?.id; // ID of the message they replied to
+    const from = incomingMsg.from;
 
     if (!contextMessageId) {
       logger.info('WhatsApp message has no reply context — not a reply to a notification, ignoring.');
@@ -66,6 +68,9 @@ router.post('/webhook/whatsapp', async (req: Request, res: Response) => {
 
     if (!processedEmail) {
       logger.warn(`No email found for WhatsApp message ID: ${contextMessageId}`);
+      if (from) {
+        await sendTextMessage(from, `⚠️ Could not find the original email for this reply. It may have expired or been sent from a different account.`);
+      }
       return;
     }
 
@@ -75,15 +80,24 @@ router.post('/webhook/whatsapp', async (req: Request, res: Response) => {
     const polishedReply = await polishReplyWithAI(replyText, processedEmail.subject || '', processedEmail.sender || '');
 
     // Send the polished reply as an email
-    await sendEmailReply({
-      emailAccount: processedEmail.emailAccount,
-      originalSender: processedEmail.sender || '',
-      originalSubject: processedEmail.subject || '',
-      replyBody: polishedReply,
-      originalMessageId: processedEmail.messageId,
-    });
-
-    logger.info(` Reply sent successfully for email: ${processedEmail.messageId}`);
+    try {
+      await sendEmailReply({
+        emailAccount: processedEmail.emailAccount,
+        originalSender: processedEmail.sender || '',
+        originalSubject: processedEmail.subject || '',
+        replyBody: polishedReply,
+        originalMessageId: processedEmail.messageId,
+      });
+      logger.info(`Reply sent successfully for email: ${processedEmail.messageId}`);
+      if (from) {
+        await sendTextMessage(from, `✅ Your reply has been sent to *${processedEmail.sender}*`);
+      }
+    } catch (replyErr) {
+      logger.error(`Error sending email reply for message ${contextMessageId}:`, replyErr);
+      if (from) {
+        await sendTextMessage(from, `❌ Failed to send your email reply. The email account may need to be reconnected.`);
+      }
+    }
 
   } catch (error) {
     logger.error('Error processing WhatsApp webhook:', error);

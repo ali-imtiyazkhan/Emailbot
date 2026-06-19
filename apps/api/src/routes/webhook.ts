@@ -38,10 +38,17 @@ router.post('/webhook', async (req, res) => {
       const text = message.text?.body;
       const from = message.from;
       const context = message.context;
-      logger.info('Received WhatsApp message:', { text, from, replyContext: context?.id, msgId: message.id });
+      logger.info('Received WhatsApp message:', { text, from, replyContext: context?.id, msgId: message.id, type: message.type });
 
-      // Find the user by WhatsApp number
-      const user = await db.user.findFirst({ where: { whatsapp: from } });
+      // Find the user by WhatsApp number (try with and without + prefix)
+      let user = await db.user.findFirst({ where: { whatsapp: from } });
+      if (!user && from) {
+        const withPlus = from.startsWith('+') ? from : `+${from}`;
+        const withoutPlus = from.startsWith('+') ? from.slice(1) : from;
+        user = await db.user.findFirst({
+          where: { OR: [{ whatsapp: withPlus }, { whatsapp: withoutPlus }] }
+        });
+      }
       if (!user) {
         logger.warn(`No user found with WhatsApp number: ${from}`);
         return;
@@ -50,7 +57,7 @@ router.post('/webhook', async (req, res) => {
 
       // Handle REPLIES to email notifications
       if (context?.id && text) {
-        logger.info(`Looking up ProcessedEmail for user ${user.id} with whatsappMessageId: ${context.id}`);
+        logger.info(`Looking up ProcessedEmail for user ${user.id} with whatsappMessageId: "${context.id}"`);
         const originalEmail = await db.processedEmail.findFirst({
           where: { userId: user.id, whatsappMessageId: context.id },
           include: { emailAccount: true }
