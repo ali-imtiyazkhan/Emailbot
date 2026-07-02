@@ -3,7 +3,7 @@
 import React, { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { connectEmailAccount } from "@/lib/api";
-import { getToken, fetchToken, setToken } from "@/lib/auth";
+import { setToken } from "@/lib/auth";
 import { motion, AnimatePresence } from "framer-motion";
 import { Mail, Check, X, Loader2 } from "lucide-react";
 
@@ -32,25 +32,15 @@ function GmailCallbackContent() {
 
     const exchangeCode = async () => {
       try {
-        // Ensure we have a JWT token for the authenticated POST request
-        if (!getToken()) {
-          if (window.opener?.localStorage) {
-            const parentToken = window.opener.localStorage.getItem('emailbot_token');
-            if (parentToken) setToken(parentToken);
-          }
-          if (!getToken()) {
-            await fetchToken();
-          }
-        }
-        console.log('[gmail-callback] Sending auth code to backend:', code ? code.substring(0, 20) + '...' : 'none');
         const result = await connectEmailAccount("gmail", code, state || undefined);
         if (result.success) {
+          if (result.token) setToken(result.token);
           setStatus("success");
           if (result.email) setEmail(result.email);
 
-          // Notify parent window to reload account listings
+          // Notify parent window with the new token
           if (window.opener) {
-            window.opener.postMessage({ type: "oauth-success", provider: "gmail" }, window.location.origin);
+            window.opener.postMessage({ type: "oauth-success", provider: "gmail", token: result.token }, window.location.origin);
           }
 
           // Auto close window after 2.5 seconds

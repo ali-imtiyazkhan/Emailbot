@@ -13,7 +13,7 @@ import {
   DigestSetting,
   User,
 } from "@/lib/api";
-import { getToken, fetchToken } from "@/lib/auth";
+import { getToken, setToken } from "@/lib/auth";
 import {
   Globe,
   Clock,
@@ -62,17 +62,16 @@ export default function SettingsPage() {
   const [emailSaving, setEmailSaving] = useState(false);
 
   useEffect(() => {
-    const init = async () => {
-      if (!getToken()) {
-        await fetchToken();
-      }
-      await loadSettings();
-    };
-    init();
+    if (!getToken()) {
+      setLoading(false);
+      return;
+    }
+    loadSettings();
 
     const handleOAuthSuccess = (event: MessageEvent) => {
       if (event.origin !== window.location.origin) return;
       if (event.data?.type === "oauth-success") {
+        if (event.data?.token) setToken(event.data.token);
         loadSettings();
       }
     };
@@ -124,9 +123,6 @@ export default function SettingsPage() {
 
   const handleConnect = async (provider: "gmail" | "outlook") => {
     try {
-      if (!getToken()) {
-        await fetchToken();
-      }
       const { url } = await fetchConnectUrl(provider);
       window.open(url, "_blank");
     } catch (err) {

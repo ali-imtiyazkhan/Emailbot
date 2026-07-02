@@ -1,4 +1,4 @@
-import { authHeaders, fetchToken, clearToken } from './auth';
+import { authHeaders } from './auth';
 
 export const API_BASE_URL = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001') + '/api';
 
@@ -62,16 +62,17 @@ export interface DigestSetting {
 
 // ── Fetchers ───────────────────────────────────────────
 
-async function apiFetch(url: string, options?: RequestInit, retried = false): Promise<Response> {
+async function apiFetch(url: string, options?: RequestInit): Promise<Response> {
   const response = await fetch(url, {
     ...options,
     headers: { ...authHeaders(), ...options?.headers },
   });
 
-  if (response.status === 401 && !retried) {
-    clearToken();
-    await fetchToken();
-    return apiFetch(url, options, true);
+  if (response.status === 401) {
+    // Token missing or expired — redirect to dashboard for re-auth
+    if (typeof window !== 'undefined') {
+      window.location.href = '/dashboard';
+    }
   }
 
   return response;
@@ -208,7 +209,7 @@ export async function fetchConnectUrl(provider: 'gmail' | 'outlook'): Promise<{ 
   return response.json();
 }
 
-export async function connectEmailAccount(provider: 'gmail' | 'outlook', code: string, state?: string): Promise<{ success: boolean; email?: string }> {
+export async function connectEmailAccount(provider: 'gmail' | 'outlook', code: string, state?: string): Promise<{ success: boolean; email?: string; token?: string }> {
   const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
   const response = await apiFetch(`${baseUrl}/auth/${provider}/connect`, {
     method: 'POST',

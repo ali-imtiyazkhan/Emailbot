@@ -5,7 +5,7 @@ import { prisma as db } from '@repo/db';
 import logger from '@repo/shared/logger';
 import { createGoogleOAuth2Client, GMAIL_SCOPES } from '../config/google.js';
 import { OUTLOOK_AUTH_URL, OUTLOOK_TOKEN_URL, OUTLOOK_SCOPES } from '../config/outlook.js';
-import { verifyToken, generateToken } from '../middleware/auth.js';
+import { verifyToken, generateToken, AuthPayload } from '../middleware/auth.js';
 import { redisConnection } from '../config/redis.js';
 
 const router = Router();
@@ -123,27 +123,19 @@ router.post('/gmail/connect', async (req, res) => {
       return;
     }
 
-    // Resolve user: from JWT if provided, otherwise fall back to first user
+    // Resolve user: from JWT if provided
     let userId: number | undefined;
+    let userEmail: string | undefined;
     const header = req.headers.authorization;
     if (header && header.startsWith('Bearer ')) {
       try {
         const decoded = verifyToken(header.split(' ')[1] as unknown as string);
         userId = decoded.userId;
+        userEmail = decoded.email;
       } catch { /* ignore invalid token */ }
     }
-    if (!userId) {
-      let firstUser = await db.user.findFirst({ orderBy: { id: 'asc' } });
-      if (!firstUser) {
-        firstUser = await db.user.create({
-          data: { email: 'admin@emailbot.io', name: 'Admin' },
-        });
-        logger.info('Auto-created default user (id=%d) during Gmail connect', firstUser.id);
-      }
-      userId = firstUser.id;
-    }
 
-    // Verify OAuth state parameter (CSRF protection) - skip userId check if state was unbound
+    // Verify OAuth state parameter (CSRF protection)
     if (!state || !(await verifyOAuthState(state, userId))) {
       res.status(403).json({ error: 'Invalid or expired OAuth state. Please try connecting again.' });
       return;
@@ -184,6 +176,18 @@ router.post('/gmail/connect', async (req, res) => {
       return;
     }
 
+    // If no existing userId (no JWT), find or create user by their Google email
+    if (!userId) {
+      let existingUser = await db.user.findFirst({ where: { email: gmailAddress } });
+      if (!existingUser) {
+        existingUser = await db.user.create({
+          data: { email: gmailAddress, name: userInfoResponse.data.name || gmailAddress.split('@')[0] },
+        });
+        logger.info('Created new user (id=%d) for %s during Gmail connect', existingUser.id, gmailAddress);
+      }
+      userId = existingUser.id;
+    }
+
     // PERSISTENCE: Store or update the Gmail account
     const existing = await db.emailAccount.findFirst({
       where: { userId, provider: 'gmail' }
@@ -212,9 +216,9 @@ router.post('/gmail/connect', async (req, res) => {
       });
     }
 
-    // Sync User profile if it's the first connection or still using default seed
+    // Sync User profile
     const currentUser = await db.user.findUnique({ where: { id: userId } });
-    if (currentUser && (currentUser.email === 'admin@emailbot.io' || !currentUser.name)) {
+    if (currentUser && (currentUser.email !== gmailAddress || !currentUser.name)) {
       await db.user.update({
         where: { id: userId },
         data: {
@@ -225,8 +229,11 @@ router.post('/gmail/connect', async (req, res) => {
       logger.info(`Updated user ${userId} profile to match Google account: ${gmailAddress}`);
     }
 
+    // Generate and return JWT so the frontend can persist it
+    const jwtToken = generateToken({ userId, email: gmailAddress });
+
     logger.info(`Gmail connected for user ${userId}: ${gmailAddress}`);
-    res.json({ success: true, email: gmailAddress });
+    res.json({ success: true, email: gmailAddress, token: jwtToken });
   } catch (error: any) {
     logger.error('Gmail callback error:', error);
     res.status(500).json({ error: error.message || 'Failed to connect Gmail account' });
@@ -276,7 +283,7 @@ router.post('/outlook/connect', async (req, res) => {
       return;
     }
 
-    // Resolve user: from JWT if provided, otherwise fall back to first user
+    // Resolve user: from JWT if provided
     let userId: number | undefined;
     const header = req.headers.authorization;
     if (header && header.startsWith('Bearer ')) {
@@ -285,18 +292,8 @@ router.post('/outlook/connect', async (req, res) => {
         userId = decoded.userId;
       } catch { /* ignore invalid token */ }
     }
-    if (!userId) {
-      let firstUser = await db.user.findFirst({ orderBy: { id: 'asc' } });
-      if (!firstUser) {
-        firstUser = await db.user.create({
-          data: { email: 'admin@emailbot.io', name: 'Admin' },
-        });
-        logger.info('Auto-created default user (id=%d) during Outlook connect', firstUser.id);
-      }
-      userId = firstUser.id;
-    }
 
-    // Verify OAuth state parameter (CSRF protection) - skip userId check if state was unbound
+    // Verify OAuth state parameter (CSRF protection)
     if (!state || !(await verifyOAuthState(state, userId))) {
       res.status(403).json({ error: 'Invalid or expired OAuth state. Please try connecting again.' });
       return;
@@ -328,6 +325,18 @@ router.post('/outlook/connect', async (req, res) => {
     });
     const outlookEmail = profileResponse.data.mail || profileResponse.data.userPrincipalName;
 
+    // If no existing userId, find or create user by their Outlook email
+    if (!userId) {
+      let existingUser = await db.user.findFirst({ where: { email: outlookEmail } });
+      if (!existingUser) {
+        existingUser = await db.user.create({
+          data: { email: outlookEmail, name: profileResponse.data.displayName || outlookEmail.split('@')[0] },
+        });
+        logger.info('Created new user (id=%d) for %s during Outlook connect', existingUser.id, outlookEmail);
+      }
+      userId = existingUser.id;
+    }
+
     // PERSISTENCE: Store or update the Outlook account
     const existing = await db.emailAccount.findFirst({
       where: { userId, provider: 'outlook' }
@@ -356,8 +365,23 @@ router.post('/outlook/connect', async (req, res) => {
       });
     }
 
+    // Sync User profile
+    const currentUser = await db.user.findUnique({ where: { id: userId } });
+    if (currentUser && (currentUser.email !== outlookEmail || !currentUser.name)) {
+      await db.user.update({
+        where: { id: userId },
+        data: {
+          email: outlookEmail,
+          name: profileResponse.data.displayName || currentUser.name,
+        }
+      });
+    }
+
+    // Generate and return JWT so the frontend can persist it
+    const jwtToken = generateToken({ userId, email: outlookEmail });
+
     logger.info(`Outlook connected for user ${userId}: ${outlookEmail}`);
-    res.json({ success: true, email: outlookEmail });
+    res.json({ success: true, email: outlookEmail, token: jwtToken });
   } catch (error: any) {
     logger.error('Outlook callback error:', error.response?.data || error);
     res.status(500).json({ error: error.message || 'Failed to connect Outlook account' });

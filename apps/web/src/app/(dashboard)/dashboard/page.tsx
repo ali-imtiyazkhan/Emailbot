@@ -11,7 +11,7 @@ import {
   Stats,
   ProcessedEmail,
 } from "@/lib/api";
-import { getToken, fetchToken } from "@/lib/auth";
+import { getToken } from "@/lib/auth";
 import { Mail, SlidersHorizontal, Zap, ArrowRight, CheckCircle2 } from "lucide-react";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { AppPage, AppMetrics, AppSection, AppEmpty } from "@/components/app/AppPage";
@@ -45,6 +45,7 @@ function priorityClass(score: number | null) {
 }
 
 export default function DashboardPage() {
+  const [hasToken] = useState(!!getToken());
   const [stats, setStats] = useState<Stats | null>(null);
   const [filters, setFilters] = useState<Awaited<ReturnType<typeof fetchFilters>>>([]);
   const [emails, setEmails] = useState<ProcessedEmail[]>([]);
@@ -56,16 +57,11 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const init = async () => {
-      if (!getToken()) {
-        await fetchToken();
-      }
-      await loadData();
-    };
-    init();
+    if (!hasToken) return;
+    loadData();
     const healthInterval = setInterval(pollHealth, 15000);
     return () => clearInterval(healthInterval);
-  }, []);
+  }, [hasToken]);
 
   const pollHealth = async () => {
     try {
@@ -102,6 +98,32 @@ export default function DashboardPage() {
 
   const metricValue = (n: number) =>
     loading ? <span className="app-skeleton" style={{ display: "inline-block", width: 48, height: 32 }} /> : <AnimatedCounter value={n} />;
+
+  if (!hasToken) {
+    return (
+      <AppPage>
+        <div className="connect-prompt">
+          <div className="connect-prompt-card">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" style={{ color: "var(--text-3)", marginBottom: 16 }}>
+              <rect x="2" y="4" width="20" height="16" rx="2" />
+              <path d="M22 7l-10 7L2 7" />
+            </svg>
+            <h2 style={{ fontSize: 20, fontWeight: 600, marginBottom: 8, color: "var(--text-1)" }}>Connect your email to get started</h2>
+            <p style={{ fontSize: 14, color: "var(--text-3)", maxWidth: 400, margin: "0 auto 24px", lineHeight: 1.6 }}>
+              EmailBot monitors your inbox, scores messages by importance, and sends WhatsApp alerts for critical emails.
+            </p>
+            <Link href="/settings" className="btn btn-primary btn-lg">
+              Connect email
+            </Link>
+          </div>
+        </div>
+        <style>{`
+          .connect-prompt { display: flex; align-items: center; justify-content: center; min-height: 60vh; }
+          .connect-prompt-card { text-align: center; padding: 48px; }
+        `}</style>
+      </AppPage>
+    );
+  }
 
   return (
     <AppPage>
