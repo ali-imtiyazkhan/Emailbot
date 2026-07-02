@@ -1,4 +1,4 @@
-import { authHeaders } from './auth';
+import { authHeaders, fetchToken, clearToken } from './auth';
 
 export const API_BASE_URL = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001') + '/api';
 
@@ -62,11 +62,18 @@ export interface DigestSetting {
 
 // ── Fetchers ───────────────────────────────────────────
 
-async function apiFetch(url: string, options?: RequestInit): Promise<Response> {
+async function apiFetch(url: string, options?: RequestInit, retried = false): Promise<Response> {
   const response = await fetch(url, {
     ...options,
     headers: { ...authHeaders(), ...options?.headers },
   });
+
+  if (response.status === 401 && !retried) {
+    clearToken();
+    await fetchToken();
+    return apiFetch(url, options, true);
+  }
+
   return response;
 }
 
