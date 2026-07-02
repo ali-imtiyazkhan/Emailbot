@@ -117,8 +117,8 @@ See `.env.example` for all 20+ variables covering:
 | Token refresh not persisted in emailReplyService | ✅ Fixed | `refreshGmailToken()` and `sendOutlookReply()` now save refreshed tokens to DB |
 | OAuth state empty string always rejected | ✅ Fixed | `verifyOAuthState()` used `!storedUserId` which treated `''` (unbound state) as falsy. Changed to `storedUserId === null` |
 | Logger `%s` not interpolated in console | ✅ Fixed | Added `winston.format.splat()` to console transport |
-| Dashboard auto-logged anyone as first user | ⚠️ Known | Single-user design — anyone visiting gets the first DB user's token. Dashboard shows "Connect your email" empty state when no accounts exist |
-| Frontend 401 never recovered | ✅ Fixed | `apiFetch()` now clears stale token, fetches new one, and retries once on 401 |
+| Dashboard auto-logged anyone as first user | ✅ Fixed | OAuth connect now creates a new DB user per provider email when no JWT exists; returned JWT is stored in localStorage. Each OAuth flow from a fresh browser creates a separate identity. No auto-login — dashboard shows "Connect your email" prompt when no token. See "Auth / Security" below. |
+| Frontend 401 never recovered | ⚠️ Changed | `apiFetch()` 401 handler now redirects to `/dashboard` instead of calling `fetchToken()` (which would re-login as first user). Token expiry means user needs to reconnect. |
 | NaN priority from AI (`Math.round(NaN)`) | ❌ Open | `packages/shared/src/ai.ts:54` — `Math.round()` on non-numeric AI output produces `NaN`, making `NaN >= threshold` always `false` |
 | Showcase CSS hardcoded values | ✅ Fixed | `email_ai_feature_showcase.html` now uses CSS variables and site design tokens |
 
@@ -134,6 +134,10 @@ See `.env.example` for all 20+ variables covering:
 - `GET /auth/token` returns a JWT for the **first DB user** with no authentication. Anyone visiting gets the first user's token. Dashboard shows "Connect your email" empty state when no accounts exist.
 - JWT tokens expire in **7 days**. Frontend auto-refreshes on 401 with one retry.
 - OAuth state is stored in Redis with `oauth_state:<state>` key, 600s TTL, deleted after verification.
+- **No auto-login**: dashboard does NOT call `fetchToken()` on mount. If no token in localStorage, the user sees a "Connect your email" prompt linking to `/settings`.
+- **OAuth creates new user**: `POST /gmail/connect` and `POST /outlook/connect` create a new DB user (keyed by provider email) when no JWT is provided. The response includes `{ success, email, token }`. The callback page stores the JWT via `setToken()`.
+- **Connect flow**: Settings page works without a token. Clicking "Connect Gmail/Outlook" opens an OAuth popup; the callback exchanges the code, creates the user (if new), returns a JWT, stores it in the popup, and posts the token back to the parent window via `postMessage`. The parent then reloads data with the new token.
+- **401 handling**: `apiFetch()` no longer calls `fetchToken()` on 401 (which would re-login as first user). Instead it redirects to `/dashboard`. Users whose token expires need to reconnect via OAuth.
 
 ### Design System (Frontend)
 - CSS variables: `--bg: #050505`, `--surface: #0f0f0f`, `--border: #1c1c1c`, `--border-light: #2a2a2a`, `--text-1/2/3`, `--r-xs/sm/md/lg/xl` (2px–8px)
