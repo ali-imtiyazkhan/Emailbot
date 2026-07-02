@@ -117,7 +117,7 @@ See `.env.example` for all 20+ variables covering:
 | Token refresh not persisted in emailReplyService | ✅ Fixed | `refreshGmailToken()` and `sendOutlookReply()` now save refreshed tokens to DB |
 | OAuth state empty string always rejected | ✅ Fixed | `verifyOAuthState()` used `!storedUserId` which treated `''` (unbound state) as falsy. Changed to `storedUserId === null` |
 | Logger `%s` not interpolated in console | ✅ Fixed | Added `winston.format.splat()` to console transport |
-| Dashboard auto-logged anyone as first user | ✅ Fixed | Dashboard no longer auto-calls `fetchToken()`. All dashboard pages gated behind `AuthGate` requiring `AUTH_TOKEN_SECRET` |
+| Dashboard auto-logged anyone as first user | ⚠️ Known | Single-user design — anyone visiting gets the first DB user's token. Dashboard shows "Connect your email" empty state when no accounts exist |
 | Frontend 401 never recovered | ✅ Fixed | `apiFetch()` now clears stale token, fetches new one, and retries once on 401 |
 | NaN priority from AI (`Math.round(NaN)`) | ❌ Open | `packages/shared/src/ai.ts:54` — `Math.round()` on non-numeric AI output produces `NaN`, making `NaN >= threshold` always `false` |
 | Showcase CSS hardcoded values | ✅ Fixed | `email_ai_feature_showcase.html` now uses CSS variables and site design tokens |
@@ -131,7 +131,7 @@ See `.env.example` for all 20+ variables covering:
 - AI models differ: worker uses `gemini-2.5-flash-lite` (`@repo/shared/ai.ts`), API reply polish uses `gemini-1.5-flash` (`apps/api/src/services/aiService.ts`).
 
 ### Auth / Security
-- `GET /auth/token` returns a JWT for the **first DB user** with no authentication unless `AUTH_TOKEN_SECRET` is set in env. The dashboard is gated behind this secret.
+- `GET /auth/token` returns a JWT for the **first DB user** with no authentication. Anyone visiting gets the first user's token. Dashboard shows "Connect your email" empty state when no accounts exist.
 - JWT tokens expire in **7 days**. Frontend auto-refreshes on 401 with one retry.
 - OAuth state is stored in Redis with `oauth_state:<state>` key, 600s TTL, deleted after verification.
 

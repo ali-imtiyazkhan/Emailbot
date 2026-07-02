@@ -11,7 +11,7 @@ import {
   Stats,
   ProcessedEmail,
 } from "@/lib/api";
-import { getToken } from "@/lib/auth";
+import { getToken, fetchToken } from "@/lib/auth";
 import { Mail, SlidersHorizontal, Zap, ArrowRight, CheckCircle2 } from "lucide-react";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { AppPage, AppMetrics, AppSection, AppEmpty } from "@/components/app/AppPage";
@@ -56,7 +56,13 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    loadData();
+    const init = async () => {
+      if (!getToken()) {
+        await fetchToken();
+      }
+      await loadData();
+    };
+    init();
     const healthInterval = setInterval(pollHealth, 15000);
     return () => clearInterval(healthInterval);
   }, []);
