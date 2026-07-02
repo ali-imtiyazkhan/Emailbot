@@ -1,5 +1,32 @@
 
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3/dist/tabler-icons.min.css" />
+
 <style>
+/* ── Design tokens (fallback for standalone viewing) ── */
+:root {
+  --bg: #050505;
+  --surface: #0f0f0f;
+  --surface-2: #171717;
+  --border: #1c1c1c;
+  --border-light: #2a2a2a;
+  --text-1: #f2f2f2;
+  --text-2: #888888;
+  --text-3: #484848;
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-serif: 'Instrument Serif', Georgia, serif;
+  --font-mono: 'SF Mono', 'Fira Code', monospace;
+  --r-xs: 2px;
+  --r-sm: 3px;
+  --r-md: 4px;
+  --r-lg: 6px;
+  --r-xl: 8px;
+}
+
+body {
+  background: var(--bg);
+  font-family: var(--font-sans);
+}
+
 /* ── Reset for showcase ── */
 .flow-showcase *{box-sizing:border-box;margin:0;padding:0}
 
@@ -8,8 +35,8 @@
   position:relative;
   width:100%;
   padding:48px 32px;
-  background:#0a0a0c;
-  border-radius:16px;
+  background:transparent;
+  border-radius:0;
   overflow:hidden;
   font-family:var(--font-sans, 'Inter', system-ui, sans-serif);
 }
@@ -20,7 +47,7 @@
   position:absolute;
   inset:0;
   background-image:
-    radial-gradient(circle, rgba(255,255,255,0.03) 1px, transparent 1px);
+    radial-gradient(circle, rgba(255,255,255,0.025) 1px, transparent 1px);
   background-size:28px 28px;
   mask-image:radial-gradient(ellipse 80% 80% at 50% 50%, black 20%, transparent 75%);
   pointer-events:none;
@@ -33,9 +60,19 @@
   top:50%;left:50%;
   transform:translate(-50%,-50%);
   width:420px;height:420px;
-  background:radial-gradient(circle, rgba(120,100,255,0.08) 0%, rgba(56,138,221,0.04) 40%, transparent 70%);
+  background:radial-gradient(circle, rgba(120,100,255,0.07) 0%, rgba(56,138,221,0.03) 40%, transparent 70%);
   pointer-events:none;
   z-index:0;
+}
+
+/* Chrome shimmer on top edge */
+.flow-showcase .flow-heading::before{
+  content:"";
+  position:absolute;
+  top:0;left:0;right:0;
+  height:1px;
+  z-index:10;
+  background:linear-gradient(90deg, transparent 5%, rgba(255,255,255,0.1) 35%, rgba(255,255,255,0.2) 50%, rgba(255,255,255,0.1) 65%, transparent 95%);
 }
 
 /* ── Main Flow Layout ── */
@@ -57,7 +94,7 @@
   flex-shrink:0;
 }
 .flow-col-left{width:200px}
-.flow-col-right{width:220px}
+.flow-col-right{width:240px}
 
 /* ── SVG connection layer ── */
 .flow-connections{
@@ -65,6 +102,8 @@
   inset:0;
   z-index:0;
   pointer-events:none;
+  width:100%;
+  height:100%;
 }
 
 /* ── Center Hub ── */
@@ -83,17 +122,17 @@
   position:relative;
   width:100px;height:100px;
   border-radius:50%;
-  background:linear-gradient(145deg, #1a1a2e, #16162a);
-  border:1px solid rgba(120,100,255,0.25);
+  background:linear-gradient(145deg, var(--surface), var(--bg));
+  border:1px solid var(--border-light);
   display:flex;
   align-items:center;
   justify-content:center;
   flex-direction:column;
   gap:2px;
   box-shadow:
-    0 0 40px rgba(120,100,255,0.12),
-    0 0 80px rgba(56,138,221,0.06),
-    inset 0 0 20px rgba(120,100,255,0.05);
+    0 0 40px rgba(120,100,255,0.1),
+    0 0 80px rgba(56,138,221,0.05),
+    inset 0 0 20px rgba(120,100,255,0.04);
 }
 
 /* Pulsing ring */
@@ -144,13 +183,13 @@
 .hub-desc-title{
   font-size:14px;
   font-weight:600;
-  color:#e8e8e6;
+  color:var(--text-1);
   letter-spacing:-0.01em;
   margin-bottom:4px;
 }
 .hub-desc-sub{
   font-size:11px;
-  color:#6a6a68;
+  color:var(--text-3);
   line-height:1.5;
 }
 
@@ -159,22 +198,23 @@
   display:flex;
   align-items:center;
   gap:10px;
-  background:#111114;
-  border:1px solid rgba(255,255,255,0.06);
-  border-radius:10px;
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--r-xl);
   padding:10px 14px;
   cursor:default;
   transition:all .2s ease;
   position:relative;
+  box-shadow:inset 0 1px 1px rgba(255,255,255,0.08);
 }
 .email-card:hover{
-  background:#1a1a1f;
-  border-color:rgba(255,255,255,0.12);
+  background:var(--surface-2);
+  border-color:var(--border-light);
   transform:translateX(4px);
 }
 .email-card-icon{
   width:32px;height:32px;
-  border-radius:8px;
+  border-radius:var(--r-lg);
   display:flex;
   align-items:center;
   justify-content:center;
@@ -187,12 +227,12 @@
 .email-card-label{
   font-size:12px;
   font-weight:600;
-  color:#e0e0de;
+  color:var(--text-1);
   line-height:1.3;
 }
 .email-card-sub{
   font-size:10px;
-  color:#5a5a58;
+  color:var(--text-3);
   margin-top:1px;
 }
 /* Dot connector on right side of card */
@@ -204,23 +244,24 @@
   transform:translateY(-50%);
   width:8px;height:8px;
   border-radius:50%;
-  background:#1e1e2e;
+  background:var(--surface-2);
   border:1.5px solid rgba(120,100,255,0.3);
 }
 
 /* ── WhatsApp/Output Cards (Right) ── */
 .wa-card{
-  background:#111114;
-  border:1px solid rgba(255,255,255,0.06);
-  border-radius:10px;
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--r-xl);
   padding:14px 16px;
   position:relative;
   transition:all .2s ease;
   cursor:default;
+  box-shadow:inset 0 1px 1px rgba(255,255,255,0.08);
 }
 .wa-card:hover{
-  background:#1a1a1f;
-  border-color:rgba(255,255,255,0.12);
+  background:var(--surface-2);
+  border-color:var(--border-light);
   transform:translateX(-4px);
 }
 /* Dot connector on left side */
@@ -232,8 +273,8 @@
   transform:translateY(-50%);
   width:8px;height:8px;
   border-radius:50%;
-  background:#1e1e2e;
-  border:1.5px solid rgba(37,211,102,0.4);
+  background:var(--surface-2);
+  border:1.5px solid rgba(74,222,128,0.4);
 }
 
 .wa-card-header{
@@ -244,7 +285,7 @@
 }
 .wa-card-icon{
   width:24px;height:24px;
-  border-radius:6px;
+  border-radius:var(--r-md);
   display:flex;
   align-items:center;
   justify-content:center;
@@ -254,7 +295,7 @@
 .wa-card-source{
   font-size:11px;
   font-weight:600;
-  color:#d0d0ce;
+  color:var(--text-1);
 }
 .wa-card-tag{
   margin-left:auto;
@@ -262,19 +303,20 @@
   font-weight:600;
   letter-spacing:0.04em;
   padding:2px 7px;
-  border-radius:4px;
+  border-radius:var(--r-xs);
   text-transform:uppercase;
+  white-space:nowrap;
 }
 .wa-card-body{
   font-size:12px;
   font-weight:600;
-  color:#e8e8e6;
+  color:var(--text-1);
   line-height:1.35;
   margin-bottom:4px;
 }
 .wa-card-preview{
   font-size:11px;
-  color:#5a5a58;
+  color:var(--text-3);
   line-height:1.4;
   overflow:hidden;
   text-overflow:ellipsis;
@@ -284,18 +326,18 @@
 /* ── Tag colors ── */
 .tag-urgent{background:rgba(239,68,68,0.15);color:#f87171;border:1px solid rgba(239,68,68,0.2)}
 .tag-promo{background:rgba(234,179,8,0.12);color:#fbbf24;border:1px solid rgba(234,179,8,0.2)}
-.tag-opportunity{background:rgba(34,197,94,0.12);color:#4ade80;border:1px solid rgba(34,197,94,0.2)}
+.tag-opportunity{background:rgba(74,222,128,0.12);color:#4ade80;border:1px solid rgba(74,222,128,0.2)}
 .tag-reply{background:rgba(56,138,221,0.12);color:#60a5fa;border:1px solid rgba(56,138,221,0.2)}
 
 /* ── Flow Direction Labels ── */
 .flow-label{
   text-align:center;
-  margin-bottom:12px;
+  margin-bottom:4px;
 }
 .flow-label-text{
   font-size:11px;
   font-weight:500;
-  color:rgba(120,100,255,0.5);
+  color:rgba(120,100,255,0.45);
   letter-spacing:0.06em;
   font-style:italic;
 }
@@ -305,39 +347,39 @@
   display:flex;
   align-items:center;
   justify-content:center;
-  gap:16px;
+  gap:12px;
   margin-top:36px;
   padding:16px 24px;
   background:rgba(255,255,255,0.02);
-  border:1px solid rgba(255,255,255,0.05);
-  border-radius:10px;
+  border:1px solid var(--border);
+  border-radius:var(--r-xl);
   position:relative;
   z-index:1;
 }
 .reply-flow-step{
-  display:flex;
+  display:inline-flex;
   align-items:center;
   gap:8px;
   font-size:12px;
-  color:#7a7a78;
+  color:var(--text-2);
 }
 .reply-flow-icon{
   width:30px;height:30px;
-  border-radius:8px;
-  display:flex;
+  border-radius:var(--r-lg);
+  display:inline-flex;
   align-items:center;
   justify-content:center;
   font-size:14px;
-  border:1px solid rgba(255,255,255,0.08);
+  border:1px solid var(--border);
 }
 .reply-flow-arrow{
-  color:#3a3a38;
+  color:var(--text-3);
   font-size:14px;
 }
 .reply-flow-label{
   font-size:11px;
   font-weight:500;
-  color:#888;
+  color:var(--text-2);
 }
 
 /* ── Score badges ── */
@@ -349,7 +391,7 @@
   font-weight:700;
   font-family:var(--font-mono, monospace);
   padding:2px 6px;
-  border-radius:4px;
+  border-radius:var(--r-xs);
   margin-top:6px;
 }
 .score-high{background:rgba(239,68,68,0.12);color:#f87171}
@@ -361,14 +403,14 @@
   to{stroke-dashoffset:-20}
 }
 .conn-line{
-  stroke:rgba(120,100,255,0.15);
+  stroke:rgba(120,100,255,0.13);
   stroke-width:1.5;
   fill:none;
   stroke-dasharray:6 4;
   animation:dash-flow 1.5s linear infinite;
 }
 .conn-line-out{
-  stroke:rgba(37,211,102,0.15);
+  stroke:rgba(74,222,128,0.13);
   stroke-width:1.5;
   fill:none;
   stroke-dasharray:6 4;
@@ -400,14 +442,15 @@
 .flow-heading-title{
   font-size:22px;
   font-weight:600;
-  color:#f0f0ef;
+  color:var(--text-1);
   letter-spacing:-0.02em;
   line-height:1.3;
 }
 .flow-heading-title em{
+  font-family:var(--font-serif);
   font-style:italic;
   font-weight:400;
-  color:#7a7a78;
+  color:var(--text-2);
 }
 </style>
 
