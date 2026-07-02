@@ -34,14 +34,14 @@ async function verifyOAuthState(state: string, userId?: number): Promise<boolean
     logger.error('Failed to read OAuth state from Redis: %s', err.message);
     return false;
   }
-  if (!storedUserId) {
-    logger.warn('OAuth state not found in Redis (key=%s) — possible expiry or missing storage', key);
+  if (storedUserId === null) {
+    logger.warn(`OAuth state not found in Redis (key=${key}) — possible expiry or missing storage`);
     return false;
   }
   // If state was stored without a userId (empty string), accept any valid userId
   if (storedUserId !== '') {
     if (userId === undefined || parseInt(storedUserId) !== userId) {
-      logger.warn('OAuth state userId mismatch: stored=%s, expected=%s', storedUserId, userId);
+      logger.warn(`OAuth state userId mismatch: stored=${storedUserId}, expected=${userId}`);
       return false;
     }
   }
