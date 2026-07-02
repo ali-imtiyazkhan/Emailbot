@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { fetchAnalytics, AnalyticsData } from "@/lib/api";
-import { getToken, fetchToken } from "@/lib/auth";
+import { getToken } from "@/lib/auth";
 import { BarChart3, TrendingUp, Users, Tag, ArrowUpRight, ArrowDownRight } from "lucide-react";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { AppPage, AppMetrics } from "@/components/app/AppPage";
@@ -43,9 +43,6 @@ export default function AnalyticsPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!getToken()) {
-      fetchToken();
-    }
     fetchAnalytics()
       .then(setData)
       .catch(console.error)

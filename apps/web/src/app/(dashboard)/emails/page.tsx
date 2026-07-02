@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useMemo } from "react";
 import { fetchEmails, replyToEmail, ProcessedEmail } from "@/lib/api";
-import { getToken, fetchToken } from "@/lib/auth";
+import { getToken } from "@/lib/auth";
 import {
   Search,
   Mail,
@@ -46,20 +46,10 @@ export default function EmailsPage() {
   } | null>(null);
 
   useEffect(() => {
-    const init = async () => {
-      if (!getToken()) {
-        await fetchToken();
-      }
-      try {
-        const data = await fetchEmails();
-        setEmails(data);
-      } catch (err) {
-        console.error("Failed to load emails:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    init();
+    fetchEmails()
+      .then(setEmails)
+      .catch((err) => console.error("Failed to load emails:", err))
+      .finally(() => setLoading(false));
   }, []);
 
   const filtered = useMemo(() => {
