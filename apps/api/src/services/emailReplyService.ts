@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { prisma as db } from '@repo/db';
 import logger from '@repo/shared/logger';
 
 interface ReplyOptions {
@@ -26,7 +27,20 @@ async function refreshGmailToken(account: any): Promise<string> {
       timeout: 15000,
     }
   );
-  return res.data.access_token;
+
+  const { access_token, expires_in } = res.data;
+  const tokenExpiry = expires_in ? new Date(Date.now() + expires_in * 1000) : null;
+
+  await db.emailAccount.update({
+    where: { id: account.id },
+    data: {
+      accessToken: access_token,
+      tokenExpiry,
+      isActive: true,
+    },
+  });
+
+  return access_token;
 }
 
 export const sendEmailReply = async (options: ReplyOptions): Promise<void> => {
@@ -105,6 +119,16 @@ async function sendOutlookReply(
   }
 
   const tokens = await tokenResponse.json();
+
+  await db.emailAccount.update({
+    where: { id: account.id },
+    data: {
+      accessToken: tokens.access_token,
+      refreshToken: tokens.refresh_token || account.refreshToken,
+      tokenExpiry: tokens.expires_in ? new Date(Date.now() + tokens.expires_in * 1000) : null,
+      isActive: true,
+    },
+  });
 
   const replyResponse = await fetch(`https://graph.microsoft.com/v1.0/me/messages/${originalMessageId}/reply`, {
     method: 'POST',

@@ -7,7 +7,6 @@ import logger from '@repo/shared/logger';
 
 import authRoutes from './routes/auth.js';
 import webhookRoutes from './routes/webhook.js';
-import whatsappWebhookRouter from './routes/whatsappWebhook.js';
 import dashboardRoutes from './routes/dashboard.js';
 import { redisConnection } from './config/redis.js';
 import { prisma as db } from '@repo/db';
@@ -101,7 +100,6 @@ app.get('/health', async (req, res) => {
 app.use('/auth', authLimiter, authRoutes);
 app.use('/api', apiLimiter, dashboardRoutes);
 app.use('/whatsapp', webhookLimiter, verifyWebhookSignature, webhookRoutes);
-app.use('/', webhookLimiter, verifyWebhookSignature, whatsappWebhookRouter);
 
 
 // Global Error Handler
