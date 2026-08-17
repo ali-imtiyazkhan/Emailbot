@@ -15,6 +15,7 @@ import {
   CheckCircle2,
   Loader2,
   ArrowUpDown,
+  Tag,
 } from "lucide-react";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { AppPage, AppMetrics, AppEmpty } from "@/components/app/AppPage";
@@ -34,6 +35,7 @@ export default function EmailsPage() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [filterPriority, setFilterPriority] = useState("all");
+  const [filterCategory, setFilterCategory] = useState("all");
   const [expandedId, setExpandedId] = useState<number | null>(null);
   const [sortMode, setSortMode] = useState<SortMode>("newest");
   const [replyText, setReplyText] = useState("");
@@ -50,11 +52,18 @@ export default function EmailsPage() {
       window.location.href = "/dashboard";
       return;
     }
-    fetchEmails()
+    fetchEmails({ category: filterCategory, priority: filterPriority, limit: 100 })
       .then(setEmails)
       .catch((err) => console.error("Failed to load emails:", err))
       .finally(() => setLoading(false));
-  }, []);
+  }, [filterCategory, filterPriority]);
+
+  const categories = useMemo(() => {
+    const cats = emails
+      .map((e) => e.category)
+      .filter((c): c is string => !!c && c !== 'unanalyzed' && c !== 'error' && c !== 'unknown');
+    return [...new Set(cats)].sort();
+  }, [emails]);
 
   const filtered = useMemo(() => {
     let result = emails.filter((email) => {
@@ -72,7 +81,10 @@ export default function EmailsPage() {
           (email.priorityScore ?? 0) < 8) ||
         (filterPriority === "low" && (email.priorityScore ?? 0) < 5);
 
-      return matchesSearch && matchesPriority;
+      const matchesCategory =
+        filterCategory === "all" || email.category === filterCategory;
+
+      return matchesSearch && matchesPriority && matchesCategory;
     });
 
     result.sort((a, b) => {
@@ -83,7 +95,7 @@ export default function EmailsPage() {
     });
 
     return result;
-  }, [emails, search, filterPriority, sortMode]);
+  }, [emails, search, filterPriority, filterCategory, sortMode]);
 
   const highCount = emails.filter((e) => (e.priorityScore ?? 0) >= 8).length;
   const notifiedCount = emails.filter((e) => e.notified).length;
@@ -132,6 +144,22 @@ export default function EmailsPage() {
             </button>
           ))}
         </div>
+        {categories.length > 0 && (
+          <div className="app-pills">
+            <select
+              value={filterCategory}
+              onChange={(e) => setFilterCategory(e.target.value)}
+              className="app-select"
+            >
+              <option value="all">All categories</option>
+              {categories.map((cat) => (
+                <option key={cat} value={cat}>
+                  {cat}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
         <button type="button" onClick={cycleSort} className="app-link" style={{ border: "none", background: "none", cursor: "pointer" }}>
           <ArrowUpDown size={12} /> {sortMode}
         </button>
@@ -203,6 +231,13 @@ export default function EmailsPage() {
                     <p style={{ fontSize: 13, color: "var(--text-2)" }} className="truncate">
                       {email.sender || "Unknown"}
                       <span className="app-tag"> · {email.emailAccount.provider}</span>
+                      {email.category && (
+                        <>
+                          <span className="app-tag"> · </span>
+                          <Tag size={10} style={{ display: "inline", verticalAlign: -1, marginRight: 4 }} />
+                          <span className="app-tag">{email.category}</span>
+                        </>
+                      )}
                       {email.notified && (
                         <span className="app-tag app-tag--live"> · notified</span>
                       )}

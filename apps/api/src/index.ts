@@ -40,10 +40,10 @@ for (const { key, label } of OPTIONAL_BUT_CRITICAL) {
 if (!process.env.AUTH_TOKEN_SECRET && process.env.NODE_ENV === 'production') {
   logger.warn('SECURITY: AUTH_TOKEN_SECRET is not set. Anyone can call /auth/token to get a JWT. Set this in production.');
 }
-// ──────────────────────────────────────────────────────────
+
 
 const app = express();
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.API_PORT || 3001;
 
 // Security & Middleware
 app.set('trust proxy', 1);

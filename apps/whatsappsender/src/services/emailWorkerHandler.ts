@@ -12,26 +12,32 @@ export const handleEmailJob = async (jobData: any): Promise<void> => {
     // AI Analysis
     const analysis = await summarizeEmail(email.subject, email.body);
 
-    // Check filter rules
+// Check filter rules
     const rules = await db.filterRule.findMany({ where: { userId, isActive: true } });
     const priorityRule = rules.find((r: any) => r.ruleType === 'priority_min');
     const minPriority = priorityRule ? parseInt(priorityRule.value) : 5;
 
     // Check sender rules — always notify if sender matches
     const senderRules = rules.filter((r: any) => r.ruleType === 'sender');
-    const senderMatch = senderRules.some((r: any) => 
+    const senderMatch = senderRules.some((r: any) =>
       email.sender.toLowerCase().includes(r.value.toLowerCase())
     );
 
     // Check keyword rules — always notify if keyword found in subject
     const keywordRules = rules.filter((r: any) => r.ruleType === 'keyword');
-    const keywordMatch = keywordRules.some((r: any) => 
+    const keywordMatch = keywordRules.some((r: any) =>
       (email.subject || '').toLowerCase().includes(r.value.toLowerCase())
+    );
+
+    // Check category rules — always notify if AI category matches
+    const categoryRules = rules.filter((r: any) => r.ruleType === 'category');
+    const categoryMatch = categoryRules.some((r: any) =>
+      analysis.category?.toLowerCase() === r.value.toLowerCase()
     );
 
     // Fail-open: If AI failed (category 'error'), we force notification
     const aiFailed = analysis.category === 'error';
-    const shouldNotify = aiFailed || senderMatch || keywordMatch || analysis.priority >= minPriority;
+    const shouldNotify = aiFailed || senderMatch || keywordMatch || categoryMatch || analysis.priority >= minPriority;
 
     if (aiFailed) {
       logger.warn(`AI Analysis failed for email ${email.id}. Falling back to default notification.`);
@@ -41,6 +47,9 @@ export const handleEmailJob = async (jobData: any): Promise<void> => {
     }
     if (keywordMatch) {
       logger.info(`Keyword rule matched for email ${email.id}`);
+    }
+    if (categoryMatch) {
+      logger.info(`Category rule matched for email ${email.id}`);
     }
 
     let whatsappMessageId: string | undefined;

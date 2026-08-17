@@ -31,6 +31,7 @@ export interface ProcessedEmail {
   subject: string | null;
   sender: string | null;
   summary: string | null;
+  category: string | null;
   priorityScore: number | null;
   notified: boolean;
   digestIncluded: boolean;
@@ -106,8 +107,12 @@ export async function deleteFilter(id: number): Promise<void> {
   if (!response.ok) throw new Error('Failed to delete filter');
 }
 
-export async function fetchEmails(): Promise<ProcessedEmail[]> {
-  const response = await apiFetch(`${API_BASE_URL}/emails?limit=50`);
+export async function fetchEmails(params?: { category?: string; priority?: string; limit?: number }): Promise<ProcessedEmail[]> {
+  const query = new URLSearchParams();
+  if (params?.category) query.set('category', params.category);
+  if (params?.priority) query.set('priority', params.priority);
+  if (params?.limit) query.set('limit', String(params.limit));
+  const response = await apiFetch(`${API_BASE_URL}/emails?${query.toString()}`);
   if (!response.ok) throw new Error('Failed to fetch emails');
   const result = await response.json();
   return result.data ?? result;

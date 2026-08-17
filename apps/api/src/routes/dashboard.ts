@@ -11,7 +11,7 @@ router.use(requireAuth);
 // ── Validation Schemas ─────────────────────────────────
 
 const createFilterSchema = z.object({
-  type: z.enum(['sender', 'keyword', 'priority_min']),
+  type: z.enum(['sender', 'keyword', 'priority_min', 'category']),
   value: z.string().min(1, 'Value is required').max(255),
 });
 
@@ -145,16 +145,26 @@ router.get('/emails', async (req, res) => {
     const page = Math.max(1, parseInt(req.query.page as string) || 1);
     const limit = Math.min(50, Math.max(1, parseInt(req.query.limit as string) || 20));
     const skip = (page - 1) * limit;
+    const category = req.query.category as string | undefined;
+    const priority = req.query.priority as string | undefined;
+
+    const where: Record<string, unknown> = { userId };
+    if (category && category !== 'all') where.category = category;
+    if (priority && priority !== 'all') {
+      if (priority === 'high') where.priorityScore = { gte: 8 };
+      else if (priority === 'medium') where.priorityScore = { gte: 5, lt: 8 };
+      else if (priority === 'low') where.priorityScore = { lt: 5 };
+    }
 
     const [emails, total] = await Promise.all([
       db.processedEmail.findMany({
-        where: { userId },
+        where,
         orderBy: { processedAt: 'desc' },
         skip,
         take: limit,
         include: { emailAccount: { select: { provider: true, email: true } } }
       }),
-      db.processedEmail.count({ where: { userId } }),
+      db.processedEmail.count({ where }),
     ]);
 
     res.json({ data: emails, total, page, limit, totalPages: Math.ceil(total / limit) });

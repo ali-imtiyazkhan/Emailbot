@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { fetchFilters, createFilter, deleteFilter, FilterRule } from "@/lib/api";
 import { getToken } from "@/lib/auth";
-import { Plus, Trash2, User, Hash, Zap, Settings2, X } from "lucide-react";
+import { Plus, Trash2, User, Hash, Zap, Settings2, X, Tag } from "lucide-react";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { AppPage, AppSection, AppEmpty } from "@/components/app/AppPage";
 import { motion, AnimatePresence } from "framer-motion";
@@ -29,6 +29,12 @@ const RULE_META: Record<
     label: "Min. priority",
     description: "Only notify when AI score is at or above this value (1–10).",
     hint: "8",
+  },
+  category: {
+    icon: Tag,
+    label: "Category",
+    description: "Match emails with a specific AI-detected category.",
+    hint: "Work, Personal, Security",
   },
 };
 
