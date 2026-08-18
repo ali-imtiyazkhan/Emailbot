@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { fetchFilters, createFilter, deleteFilter, FilterRule } from "@/lib/api";
+import Link from "next/link";
+import { fetchFilters, createFilter, deleteFilter, FilterRule, AuthError } from "@/lib/api";
 import { getToken } from "@/lib/auth";
 import { Plus, Trash2, User, Hash, Zap, Settings2, X, Tag } from "lucide-react";
 import { PageHeader } from "@/components/ui/PageHeader";
@@ -45,10 +46,12 @@ export default function RulesPage() {
   const [newRule, setNewRule] = useState({ type: "sender", value: "" });
   const [submitting, setSubmitting] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState<number | null>(null);
+  const [authError, setAuthError] = useState(false);
 
   useEffect(() => {
     if (!getToken()) {
-      window.location.href = "/dashboard";
+      setAuthError(true);
+      setLoading(false);
       return;
     }
     loadRules();
@@ -57,12 +60,54 @@ export default function RulesPage() {
   const loadRules = async () => {
     try {
       setFilters(await fetchFilters());
+      setAuthError(false);
     } catch (err) {
       console.error("Failed to load rules:", err);
+      if (err instanceof AuthError) {
+        setAuthError(true);
+      }
     } finally {
       setLoading(false);
     }
   };
+
+  if (loading) {
+    return (
+      <div className="app-page" style={{ justifyContent: "center", minHeight: "60vh" }}>
+        <div className="app-status">
+          <span className="app-status-dot app-status-dot--idle" />
+          Loading rules…
+        </div>
+      </div>
+    );
+  }
+
+  if (authError) {
+    return (
+      <AppPage>
+        <div className="connect-prompt">
+          <div className="connect-prompt-card">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" style={{ color: "var(--text-3)", marginBottom: 16 }}>
+              <circle cx="12" cy="12" r="10" />
+              <line x1="12" y1="8" x2="12" y2="12" />
+              <line x1="12" y1="16" x2="12.01" y2="16" />
+            </svg>
+            <h2 style={{ fontSize: 20, fontWeight: 600, marginBottom: 8, color: "var(--text-1)" }}>Session expired</h2>
+            <p style={{ fontSize: 14, color: "var(--text-3)", maxWidth: 400, margin: "0 auto 24px", lineHeight: 1.6 }}>
+              Your authentication token has expired. Please reconnect your email account to continue.
+            </p>
+            <Link href="/settings" className="btn btn-primary btn-lg" onClick={() => window.location.reload()}>
+              Reconnect
+            </Link>
+          </div>
+        </div>
+        <style>{`
+          .connect-prompt { display: flex; align-items: center; justify-content: center; min-height: 60vh; }
+          .connect-prompt-card { text-align: center; padding: 48px; }
+        `}</style>
+      </AppPage>
+    );
+  }
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();

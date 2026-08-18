@@ -10,6 +10,7 @@ import {
   fetchAccounts,
   Stats,
   ProcessedEmail,
+  AuthError,
 } from "@/lib/api";
 import { getToken } from "@/lib/auth";
 import { Mail, SlidersHorizontal, Zap, ArrowRight, CheckCircle2 } from "lucide-react";
@@ -55,6 +56,7 @@ export default function DashboardPage() {
     services: { database: string; redis: string };
   } | null>(null);
   const [loading, setLoading] = useState(true);
+  const [authError, setAuthError] = useState(false);
 
   useEffect(() => {
     if (!hasToken) return;
@@ -84,8 +86,12 @@ export default function DashboardPage() {
       setFilters(f);
       setEmails(e);
       setAccounts(acc);
+      setAuthError(false);
     } catch (err) {
       console.error("Failed to load dashboard data:", err);
+      if (err instanceof AuthError) {
+        setAuthError(true);
+      }
     }
 
     await pollHealth();
@@ -99,7 +105,7 @@ export default function DashboardPage() {
   const metricValue = (n: number) =>
     loading ? <span className="app-skeleton" style={{ display: "inline-block", width: 48, height: 32 }} /> : <AnimatedCounter value={n} />;
 
-  if (!hasToken) {
+  if (!hasToken || authError) {
     return (
       <AppPage>
         <div className="connect-prompt">

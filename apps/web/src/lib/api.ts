@@ -63,6 +63,13 @@ export interface DigestSetting {
 
 // ── Fetchers ───────────────────────────────────────────
 
+export class AuthError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'AuthError';
+  }
+}
+
 async function apiFetch(url: string, options?: RequestInit): Promise<Response> {
   const response = await fetch(url, {
     ...options,
@@ -70,10 +77,7 @@ async function apiFetch(url: string, options?: RequestInit): Promise<Response> {
   });
 
   if (response.status === 401) {
-    // Token missing or expired — redirect to dashboard for re-auth
-    if (typeof window !== 'undefined') {
-      window.location.href = '/dashboard';
-    }
+    throw new AuthError('Authentication required');
   }
 
   return response;

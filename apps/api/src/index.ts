@@ -13,7 +13,7 @@ import { prisma as db } from '@repo/db';
 import { authLimiter, apiLimiter, webhookLimiter } from './middleware/rateLimiter.js';
 import { verifyWebhookSignature } from './middleware/webhookAuth.js';
 
-// ── Startup Environment Validation ────────────────────────
+// ── Startup Environment Validation 
 const REQUIRED_ENV_VARS = ['JWT_SECRET', 'DATABASE_URL'] as const;
 const OPTIONAL_BUT_CRITICAL: { key: string; label: string }[] = [
   { key: 'GMAIL_CLIENT_ID', label: 'Gmail OAuth' },
