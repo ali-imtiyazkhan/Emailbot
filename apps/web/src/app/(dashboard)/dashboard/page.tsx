@@ -105,21 +105,29 @@ export default function DashboardPage() {
   const metricValue = (n: number) =>
     loading ? <span className="app-skeleton" style={{ display: "inline-block", width: 48, height: 32 }} /> : <AnimatedCounter value={n} />;
 
-  if (!hasToken || authError) {
+  if (!hasToken) {
+    if (typeof window !== 'undefined') {
+      window.location.href = '/settings';
+    }
+    return null;
+  }
+
+  if (authError) {
     return (
       <AppPage>
         <div className="connect-prompt">
           <div className="connect-prompt-card">
             <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" style={{ color: "var(--text-3)", marginBottom: 16 }}>
-              <rect x="2" y="4" width="20" height="16" rx="2" />
-              <path d="M22 7l-10 7L2 7" />
+              <circle cx="12" cy="12" r="10" />
+              <line x1="12" y1="8" x2="12" y2="12" />
+              <line x1="12" y1="16" x2="12.01" y2="16" />
             </svg>
-            <h2 style={{ fontSize: 20, fontWeight: 600, marginBottom: 8, color: "var(--text-1)" }}>Connect your email to get started</h2>
+            <h2 style={{ fontSize: 20, fontWeight: 600, marginBottom: 8, color: "var(--text-1)" }}>Session expired</h2>
             <p style={{ fontSize: 14, color: "var(--text-3)", maxWidth: 400, margin: "0 auto 24px", lineHeight: 1.6 }}>
-              EmailBot monitors your inbox, scores messages by importance, and sends WhatsApp alerts for critical emails.
+              Your authentication token has expired. Please reconnect your email account to continue.
             </p>
-            <Link href="/settings" className="btn btn-primary btn-lg">
-              Connect email
+            <Link href="/settings" className="btn btn-primary btn-lg" onClick={() => window.location.reload()}>
+              Reconnect
             </Link>
           </div>
         </div>

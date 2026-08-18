@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { fetchProfile, User } from "@/lib/api";
-import { getToken, fetchToken } from "@/lib/auth";
+import { getToken } from "@/lib/auth";
 import { LayoutDashboard, Mail, SlidersHorizontal, Settings, BarChart3 } from "lucide-react";
 import { motion } from "framer-motion";
 
@@ -33,9 +33,8 @@ export default function Sidebar() {
 
   useEffect(() => {
     const init = async () => {
-      if (!getToken()) {
-        await fetchToken();
-      }
+      const token = getToken();
+      if (!token) return;
       try {
         const u = await fetchProfile();
         setUser(u);

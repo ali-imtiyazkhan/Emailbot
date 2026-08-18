@@ -64,10 +64,6 @@ export default function SettingsPage() {
   const [emailSaving, setEmailSaving] = useState(false);
 
   useEffect(() => {
-    if (!getToken()) {
-      setLoading(false);
-      return;
-    }
     loadSettings();
 
     const handleOAuthSuccess = (event: MessageEvent) => {
@@ -150,37 +146,16 @@ export default function SettingsPage() {
     );
   }
 
-  if (authError) {
-    return (
-      <AppPage>
-        <div className="connect-prompt">
-          <div className="connect-prompt-card">
-            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" style={{ color: "var(--text-3)", marginBottom: 16 }}>
-              <circle cx="12" cy="12" r="10" />
-              <line x1="12" y1="8" x2="12" y2="12" />
-              <line x1="12" y1="16" x2="12.01" y2="16" />
-            </svg>
-            <h2 style={{ fontSize: 20, fontWeight: 600, marginBottom: 8, color: "var(--text-1)" }}>Session expired</h2>
-            <p style={{ fontSize: 14, color: "var(--text-3)", maxWidth: 400, margin: "0 auto 24px", lineHeight: 1.6 }}>
-              Your authentication token has expired. Please reconnect your email account to continue.
-            </p>
-            <Link href="/settings" className="btn btn-primary btn-lg" onClick={() => window.location.reload()}>
-              Reconnect
-            </Link>
-          </div>
-        </div>
-        <style>{`
-          .connect-prompt { display: flex; align-items: center; justify-content: center; min-height: 60vh; }
-          .connect-prompt-card { text-align: center; padding: 48px; }
-        `}</style>
-      </AppPage>
-    );
-  }
-
   const initial = profile?.name?.[0] || profile?.email?.[0] || "?";
 
   return (
     <AppPage>
+      {authError && (
+        <div style={{ marginBottom: 24, padding: 16, background: "rgba(231, 76, 60, 0.1)", border: "1px solid #e74c3c", borderRadius: 8, color: "#e74c3c" }}>
+          <strong>Session expired</strong> — your authentication token has expired. You can still connect email accounts below, but some settings may not load until you reconnect.
+        </div>
+      )}
+
       <PageHeader
         title="Settings"
         description="Accounts, WhatsApp delivery, and your morning digest."
