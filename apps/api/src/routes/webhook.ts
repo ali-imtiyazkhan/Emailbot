@@ -58,10 +58,25 @@ router.post('/webhook', async (req, res) => {
       // Handle REPLIES to email notifications
       if (context?.id && text) {
         logger.info(`Looking up ProcessedEmail for user ${user.id} with whatsappMessageId: "${context.id}"`);
-        const originalEmail = await db.processedEmail.findFirst({
+        let originalEmail = await db.processedEmail.findFirst({
           where: { userId: user.id, whatsappMessageId: context.id },
           include: { emailAccount: true }
         });
+
+        // Fallback: if no match found by exact whatsappMessageId, try finding the most
+        // recent notified email for this user (handles cases where context.id doesn't match
+        // due to template message threading quirks or older notifications)
+        if (!originalEmail) {
+          logger.warn(`No exact match for context.id "${context.id}". Attempting fallback: most recent notified email for user ${user.id}.`);
+          originalEmail = await db.processedEmail.findFirst({
+            where: { userId: user.id, notified: true },
+            orderBy: { processedAt: 'desc' },
+            include: { emailAccount: true }
+          });
+          if (originalEmail) {
+            logger.info(`Fallback matched to most recent email: "${originalEmail.subject}" (ID: ${originalEmail.messageId})`);
+          }
+        }
 
         if (originalEmail) {
           logger.info(`Found matching email: "${originalEmail.subject}" (ID: ${originalEmail.messageId}, provider: ${originalEmail.emailAccount.provider})`);
@@ -97,8 +112,15 @@ router.post('/webhook', async (req, res) => {
             } else {
               logger.error(`Unknown email provider: ${originalEmail.emailAccount.provider}`);
             }
-          } catch (replyErr) {
+          } catch (replyErr: any) {
             logger.error(`Error sending email reply for user ${user.id}:`, replyErr);
+
+            // Provide specific guidance for common OAuth errors
+            if (replyErr?.message?.includes('invalid_grant') || replyErr?.response?.status === 401) {
+              logger.error(`🚨 OAuth token expired/revoked for user ${user.id}. They need to reconnect their email account.`);
+              await sendTextMessage(from, `❌ Your email account credentials have expired. Please visit the dashboard settings to reconnect your ${originalEmail.emailAccount.provider} account.`);
+              return;
+            }
           }
 
           if (success) {
@@ -111,7 +133,17 @@ router.post('/webhook', async (req, res) => {
           }
           return;
         } else {
-          logger.warn(`No ProcessedEmail found for user ${user.id} with whatsappMessageId: ${context.id}. The notification may be from an older session or different account.`);
+          logger.warn(`No ProcessedEmail found for user ${user.id} with whatsappMessageId: ${context.id} and no recent notified emails either.`);
+
+          // Log available whatsappMessageIds for debugging
+          const recentEmails = await db.processedEmail.findMany({
+            where: { userId: user.id, notified: true },
+            orderBy: { processedAt: 'desc' },
+            take: 5,
+            select: { whatsappMessageId: true, subject: true, processedAt: true }
+          });
+          logger.warn(`Recent notified emails for user ${user.id}: ${JSON.stringify(recentEmails)}`);
+
           await sendTextMessage(from, `⚠️ Could not find the original email for this reply. It may have expired or been sent from a different account.`);
           return;
         }

@@ -1,5 +1,5 @@
 import { summarizeEmail } from '@repo/shared/ai'
-import { sendNotification } from '@repo/shared/whatsapp'
+import { sendNotification, sendTextMessage } from '@repo/shared/whatsapp'
 import { prisma as db } from '@repo/db'
 import logger from '@repo/shared/logger'
 
@@ -12,7 +12,7 @@ export const handleEmailJob = async (jobData: any): Promise<void> => {
     // AI Analysis
     const analysis = await summarizeEmail(email.subject, email.body);
 
-// Check filter rules
+    // Check filter rules
     const rules = await db.filterRule.findMany({ where: { userId, isActive: true } });
     const priorityRule = rules.find((r: any) => r.ruleType === 'priority_min');
     const minPriority = priorityRule ? parseInt(priorityRule.value) : 5;
@@ -54,8 +54,24 @@ export const handleEmailJob = async (jobData: any): Promise<void> => {
 
     let whatsappMessageId: string | undefined;
     if (shouldNotify && whatsapp) {
-      whatsappMessageId = await sendNotification(whatsapp, email.subject, analysis.summary, analysis.priority);
-      logger.info(`Notification sent to ${whatsapp} for email ${email.id} (WA CID: ${whatsappMessageId})`);
+      // Step 1: Send template notification (bypasses 24-hour customer care window)
+      const templateMsgId = await sendNotification(whatsapp, email.subject, analysis.summary, analysis.priority);
+      logger.info(`Template notification sent to ${whatsapp} for email ${email.id} (template WA ID: ${templateMsgId})`);
+
+      // Step 2: Send a follow-up text message that users can swipe-reply to.
+      // Template messages don't reliably support reply threading — the context.id
+      // in the webhook may not match the template's wamid. By sending a regular
+      // text message immediately after, we give the user a message they can reply
+      // to with a reliable, matchable context.id.
+      const replyPromptMsg = await sendTextMessage(
+        whatsapp,
+        `📧 *${email.subject || 'No Subject'}*\nFrom: ${email.sender || 'Unknown'}\n\n💬 _Reply to this message to respond to the email._`
+      );
+
+      // Store the text message ID — this is the one whose context.id will appear
+      // in the webhook when the user swipe-replies.
+      whatsappMessageId = replyPromptMsg || templateMsgId;
+      logger.info(`Reply-prompt sent to ${whatsapp} for email ${email.id} (reply WA ID: ${whatsappMessageId})`);
     } else {
       logger.info(`Notification skipped for email ${email.id} (Priority: ${analysis.priority}, Threshold: ${minPriority}, WhatsApp: ${!!whatsapp})`);
     }

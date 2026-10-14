@@ -121,6 +121,9 @@ See `.env.example` for all 20+ variables covering:
 | Frontend 401 never recovered | ⚠️ Changed | `apiFetch()` 401 handler now redirects to `/dashboard` instead of calling `fetchToken()` (which would re-login as first user). Token expiry means user needs to reconnect. |
 | NaN priority from AI (`Math.round(NaN)`) | ❌ Open | `packages/shared/src/ai.ts:54` — `Math.round()` on non-numeric AI output produces `NaN`, making `NaN >= threshold` always `false` |
 | Showcase CSS hardcoded values | ✅ Fixed | `email_ai_feature_showcase.html` now uses CSS variables and site design tokens |
+| WhatsApp reply threading broken | ✅ Fixed | Template messages don't support reliable reply `context.id`. Worker now sends a follow-up text message after the template and stores that message's ID as `whatsappMessageId`. See `emailWorkerHandler.ts`. |
+| Webhook reply lookup too strict | ✅ Fixed | Webhook now falls back to the most recent notified email when `context.id` doesn't match any stored `whatsappMessageId`. Also added OAuth error detection + debug logging. See `webhook.ts`. |
+
 
 ## Important Notes for LLMs
 
