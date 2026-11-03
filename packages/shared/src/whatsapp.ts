@@ -32,7 +32,7 @@ export const sendTextMessage = async (to: string, text: string): Promise<string 
     return msgId;
   } catch (error: any) {
     const errDetail = error.response?.data?.error || error.message;
-    logger.error(`Error sending WhatsApp message to ${to}:`, JSON.stringify(errDetail));
+    logger.error(`Error sending WhatsApp message to ${to}: ${JSON.stringify(errDetail)}`);
 
     if (error.response?.data?.error?.code === 190) {
       logger.error('🚨 WhatsApp Access Token EXPIRED or INVALID. Please refresh it in the Meta Developer Dashboard.');
@@ -83,7 +83,7 @@ export const sendTemplateMessage = async (to: string, templateName: string, comp
     return msgId;
   } catch (error: any) {
     const errDetail = error.response?.data?.error || error.message;
-    logger.error(`Error sending WhatsApp template message to ${to}:`, JSON.stringify(errDetail));
+    logger.error(`Error sending WhatsApp template message to ${to}: ${JSON.stringify(errDetail)}`);
 
     if (error.response?.data?.error?.code === 190) {
       logger.error('🚨 WhatsApp Access Token EXPIRED or INVALID. Please refresh it in the Meta Developer Dashboard.');

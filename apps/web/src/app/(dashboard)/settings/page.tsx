@@ -366,29 +366,33 @@ export default function SettingsPage() {
               Include country code (e.g. +1 for US). Urgent mail summaries and reply prompts will be sent here.
             </p>
           </div>
-          <button
-            className="app-btn app-btn--primary"
-            style={{ whiteSpace: "nowrap", alignSelf: "flex-start" }}
-            disabled={whatsappSaving}
-            onClick={async () => {
-              setWhatsappSaving(true);
-              setWhatsappSaved(false);
-              try {
-                const val = whatsappInput.trim() || null;
-                const updated = await updateProfile({ whatsapp: val });
-                setProfile(updated);
-                setWhatsappInput(updated.whatsapp ?? '');
-                setWhatsappSaved(true);
-                setTimeout(() => setWhatsappSaved(false), 2000);
-              } catch (err: any) {
-                alert(err.message || 'Failed to save');
-              } finally {
-                setWhatsappSaving(false);
-              }
-            }}
-          >
-            {whatsappSaving ? "Saving..." : whatsappSaved ? <CheckCircle2 size={16} /> : "Save"}
-          </button>
+          {(() => {
+            const hasChanged = whatsappInput.trim() !== (profile?.whatsapp ?? '');
+            return (
+              <button
+                className="app-btn app-btn--primary"
+                style={{ whiteSpace: "nowrap", alignSelf: "flex-start" }}
+                disabled={whatsappSaving || (!hasChanged && !whatsappSaved)}
+                onClick={async () => {
+                  setWhatsappSaving(true);
+                  setWhatsappSaved(false);
+                  try {
+                    const val = whatsappInput.trim() || null;
+                    const updated = await updateProfile({ whatsapp: val });
+                    setProfile(updated);
+                    setWhatsappInput(updated.whatsapp ?? '');
+                    setWhatsappSaved(true);
+                  } catch (err: any) {
+                    alert(err.message || 'Failed to save');
+                  } finally {
+                    setWhatsappSaving(false);
+                  }
+                }}
+              >
+                {whatsappSaving ? "Saving..." : whatsappSaved ? <><CheckCircle2 size={16} /> Saved</> : hasChanged ? "Save" : "Saved"}
+              </button>
+            );
+          })()}
         </div>
       </div>
 

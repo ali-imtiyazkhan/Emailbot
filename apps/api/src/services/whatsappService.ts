@@ -29,7 +29,7 @@ export const sendTextMessage = async (to: string, text: string): Promise<string 
     return response.data?.messages?.[0]?.id;
   } catch (error: unknown) {
     const err = error as { response?: { data?: unknown }; message?: string };
-    logger.error('Error sending WhatsApp message:', err.response?.data || err.message);
+    logger.error(`Error sending WhatsApp message: ${JSON.stringify(err.response?.data || err.message)}`);
     return undefined;
   }
 };
