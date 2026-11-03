@@ -100,11 +100,17 @@ export const sendNotification = async (to: string, subject: string, summary: str
   // Use the template to bypass the 24-hour customer care window restriction
   const sanitize = (text: string) => text.replace(/[\n\r\t]/g, ' ').replace(/\s{2,}/g, ' ').trim();
   const parameters = [
-    { type: 'text', text: sanitize(subject) },
-    { type: 'text', text: sanitize(summary) },
-    { type: 'text', text: String(priority) },
+    { type: 'text', text: sanitize(subject), parameter_name: 'subject' },
+    { type: 'text', text: sanitize(summary), parameter_name: 'summary' },
+    { type: 'text', text: String(priority), parameter_name: 'priority' },
   ];
 
   logger.info(`Sending template-based notification to ${to}...`);
-  return await sendTemplateMessage(to, 'new_email_notification', parameters);
+  const templateMsgId = await sendTemplateMessage(to, 'new_email_notification', parameters);
+  if (!templateMsgId) {
+    logger.warn(`Template message failed for ${to}, falling back to direct text message...`);
+    const fallbackText = `📧 *New Email*\n*Subject:* ${subject}\n\n*Summary:* ${summary}\n\n*Priority:* ${priority}/10`;
+    return await sendTextMessage(to, fallbackText);
+  }
+  return templateMsgId;
 };
