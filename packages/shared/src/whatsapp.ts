@@ -45,13 +45,27 @@ export const sendTextMessage = async (to: string, text: string): Promise<string 
   }
 };
 
-export const sendTemplateMessage = async (to: string, templateName: string, components: any[]): Promise<string | undefined> => {
+export const sendTemplateMessage = async (to: string, templateName: string, components: any[] = [], languageCode: string = 'en_US'): Promise<string | undefined> => {
   if (!process.env.WHATSAPP_ACCESS_TOKEN || !process.env.WHATSAPP_PHONE_NUMBER_ID) {
     logger.warn('WHATSAPP_ACCESS_TOKEN or WHATSAPP_PHONE_NUMBER_ID not set, skipping template message');
     return;
   }
 
   const url = `https://graph.facebook.com/${WHATSAPP_API_VERSION}/${process.env.WHATSAPP_PHONE_NUMBER_ID}/messages`;
+
+  const templatePayload: any = {
+    name: templateName,
+    language: { code: languageCode },
+  };
+
+  if (components && components.length > 0) {
+    templatePayload.components = [
+      {
+        type: 'body',
+        parameters: components,
+      },
+    ];
+  }
 
   try {
     const response = await axios.post(
@@ -60,16 +74,7 @@ export const sendTemplateMessage = async (to: string, templateName: string, comp
         messaging_product: 'whatsapp',
         to,
         type: 'template',
-        template: {
-          name: templateName,
-          language: { code: 'en' },
-          components: [
-            {
-              type: 'body',
-              parameters: components,
-            },
-          ],
-        },
+        template: templatePayload,
       },
       {
         headers: {
@@ -105,12 +110,17 @@ export const sendNotification = async (to: string, subject: string, summary: str
     { type: 'text', text: String(priority), parameter_name: 'priority' },
   ];
 
-  logger.info(`Sending template-based notification to ${to}...`);
-  const templateMsgId = await sendTemplateMessage(to, 'new_email_notification', parameters);
+  logger.info(`Sending test template notification to ${to}...`);
+  // Try custom template first; if not approved yet, use pre-built 'hello_world'
+  let templateMsgId = await sendTemplateMessage(to, 'new_email_notification', parameters, 'en_US');
   if (!templateMsgId) {
-    logger.warn(`Template message failed for ${to}, falling back to direct text message...`);
-    const fallbackText = `📧 *New Email*\n*Subject:* ${subject}\n\n*Summary:* ${summary}\n\n*Priority:* ${priority}/10`;
-    return await sendTextMessage(to, fallbackText);
+    logger.info(`Custom template pending, using pre-built 'hello_world' template for ${to}...`);
+    templateMsgId = await sendTemplateMessage(to, 'hello_world', [], 'en_US');
   }
+
+  // Follow up with email details
+  const detailsText = `📧 *New Email*\n*Subject:* ${subject}\n\n*Summary:* ${summary}\n\n*Priority:* ${priority}/10`;
+  await sendTextMessage(to, detailsText);
+
   return templateMsgId;
 };
